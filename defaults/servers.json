@@ -1,0 +1,19 @@
+{
+    "default": true,
+    "servers":[
+        {
+            "name": "Server Name",
+            "id": 1111,
+            "tags": [],
+            "roles": [],
+            "users": [
+                {
+                    "id": 1111,
+                    "name": "User Name",
+                    "tags": [],
+                    "roles": []
+                }
+            ]
+        }
+    ]
+}

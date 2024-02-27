@@ -1,0 +1,6 @@
+Show version of the bot and foundation
+
+```
+Usage:
+    version
+```

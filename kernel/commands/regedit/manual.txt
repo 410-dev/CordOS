@@ -1,0 +1,14 @@
+Edit registry of cordOS
+
+Required permissions:
+    root
+
+If the key requires user ID or server ID, then you may substitute using: 
+    $user for the user ID
+    $server for the server ID
+    
+```
+Usage:
+    regedit <key> <data>  : Set the value of the key
+    regedit <key>         : Show the value of the key
+```

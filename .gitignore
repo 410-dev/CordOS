@@ -1,0 +1,9 @@
+
+## Local Data
+data/*
+*/__pycache__/*
+*.pyc
+
+## MacOS
+*.DS_Store
+krustoken.txt

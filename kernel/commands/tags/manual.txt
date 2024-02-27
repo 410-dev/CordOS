@@ -1,0 +1,16 @@
+Change tags (permissions) of a user
+
+Required permissions:
+    admin
+    
+```
+Actions available:
+    add     : Add a tag to a user
+    remove  : Remove a tag from a user
+```
+
+```
+Usage:
+    tags <action> <@user mention> tag1
+    tags <action> <@user mention> "tag1 tag2 tagn"
+```

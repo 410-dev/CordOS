@@ -1,0 +1,6 @@
+Show list of commands available.
+
+```
+Usage:
+    fasthelp
+```

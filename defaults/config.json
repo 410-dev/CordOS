@@ -1,0 +1,10 @@
+{
+    "default": true,
+    "config_parser": {
+        "version": 100,
+        "env_trigger": "ENV:",
+        "file_trigger": "FILE:"
+    },
+    "token": "ENV:TOKEN",
+    "registry": "data/registry"
+}

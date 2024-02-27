@@ -1,0 +1,7 @@
+Show manual for commands
+
+```
+Usage:
+    help           : Show this manual
+    help <command> : Show the manual for <command>
+```
