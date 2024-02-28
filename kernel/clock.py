@@ -10,6 +10,7 @@ def init():
     if not os.path.exists(os.path.join(cacheLoc, "start")):
         with open(os.path.join(cacheLoc, "start"), "w") as f:
             f.write(str(datetime.datetime.now().timestamp()))
+            print("Clock initialized.")
     
 
 def getUptime():
