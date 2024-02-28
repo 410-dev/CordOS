@@ -27,6 +27,8 @@ def main():
             webhookList: list = Webhook.list()
             for webhookModule in webhookList:
                 try:
+                    if Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.EnableLogging") == "1":
+                        print(f"Running webhook '{webhookModule}'")
                     import importlib
                     moduleName = f"{regPath.replace('/', '.')}.{webhookModule}"
                     module = importlib.import_module(moduleName)
@@ -40,6 +42,9 @@ def main():
                     thread = threading.Thread(target=module.main, args=(libraryPath,))
                     thread.daemon = True
                     thread.start()
+
+                    if Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.EnableLogging") == "1":
+                        print(f"Webhook '{webhookModule}' launch successfully.")
 
                 except Exception as e:
                     print(f"Error in running webhook '{webhookModule}'. e: {e}")
