@@ -2,6 +2,7 @@ import kernel.registry as Registry
 import kernel.ipc as IPC
 import kernel.webhook as Webhook
 
+import os
 import time
 import threading
 
@@ -33,7 +34,10 @@ def main():
                     if Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.ReloadOnCall") == "1":
                         importlib.reload(module)
 
-                    thread = threading.Thread(target=module.main)
+                    libraryPath = Webhook.getLibrary(webhookModule)
+
+                    # Pass libraryPath as argument
+                    thread = threading.Thread(target=module.main, args=(libraryPath,))
                     thread.daemon = True
                     thread.start()
 
