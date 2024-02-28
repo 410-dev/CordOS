@@ -9,7 +9,8 @@ import kernel.servers as Servers
 import kernel.objects as Objects
 import kernel.registry as Registry
 import kernel.config as Config
-import kernel.services as Services
+import kernel.servicectl as Services
+import kernel.launchcmd as Launcher
 
 import discord
 import importlib
@@ -65,24 +66,6 @@ def getConfig(key):
         
     return dictionary
 
-def splitArgument(splitted_list: list) -> List[str]:
-    string = " ".join(splitted_list)
-    words = []
-    in_quotes = False
-    current_word = ""
-    for char in string:
-        if char == " " and not in_quotes:
-            if current_word:
-                words.append(current_word)
-                current_word = ""
-        elif char == '"':
-            in_quotes = not in_quotes
-        else:
-            current_word += char
-    if current_word:
-        words.append(current_word)
-    return words
-
 # Define a function to handle incoming messages
 @client.event
 async def on_message(message):
@@ -110,43 +93,22 @@ async def on_message(message):
         Servers.updateServer(message)
 
         # Extract the command and arguments from the message content
-        command = message.content[len(prefix):].split()[0]
-        args = message.content.split()[1:]
+        msgContent = message.content[len(prefix):]
+        args = Launcher.splitArguments(msgContent)
+        cmd = Launcher.getCommand(args)
 
-        # Handle the command based on its name
-        commandPaths: List[str] = json.loads(Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths"))['data']
-        appropriateCommandPath: str = ""
-        for commandPath in commandPaths:
-            try:
-                with open(os.path.join(commandPath, command, "main.py"), 'r') as f:
-                    appropriateCommandPath = commandPath
-                    break
-            except:
-                pass
+        runnablePath = Launcher.getRunnableModule(args)
         
-        if appropriateCommandPath == "":
-            await message.reply(f"Command {command} not found.", mention_author=True)
+        if runnablePath == "":
+            await message.reply(f"Command {cmd} not found.", mention_author=True)
             return
 
         try:
-            module_name = f"{appropriateCommandPath.replace('/', '.')}{command}.main"
-            module = importlib.import_module(module_name)
-            
-            if Registry.read("SOFTWARE.CordOS.Kernel.ReloadOnCall") == "1":
-                importlib.reload(module)
-
-            CommandClass = getattr(module, command.capitalize())
-            
-            # Set arguments: Split by space, but if there's a quote, don't split
-            args = splitArgument(args)
-
-            # Instantiate the command and execute it
-            command_instance = CommandClass(args, message)
-            await command_instance.exec()
+            await Launcher.runRunnableModule(runnablePath, args, message)
         except Exception as e:
-            if Registry.read("SOFTWARE.CordOS.Kernel.PrintErrors") == "1": print(f"Error executing command '{command}': {e}")
+            if Registry.read("SOFTWARE.CordOS.Kernel.PrintErrors") == "1": print(f"Error executing command '{cmd}': {e}")
             if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
-            await message.reply(f"Error executing command '{command}': {e}", mention_author=True)
+            await message.reply(f"Error executing command '{cmd}': {e}", mention_author=True)
     
     
     except Exception as e:
