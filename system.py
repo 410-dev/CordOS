@@ -1,9 +1,13 @@
 import json
 import os
 import traceback
+import time
+import discord
+import importlib
+import threading
+import asyncio
 
-from objects.user import User
-from objects.server import Server
+from typing import List
 
 import kernel.servers as Servers
 import kernel.objects as Objects
@@ -12,14 +16,14 @@ import kernel.config as Config
 import kernel.servicectl as Services
 import kernel.launchcmd as Launcher
 import kernel.clock as Clock
+import kernel.ipc as IPC
 
-import discord
-import importlib
-
-from typing import List
+from objects.user import User
+from objects.server import Server
 
 # Load configurations
 Clock.init()
+IPC.init()
 Services.start(1)
 config = Config.load()
 
@@ -115,7 +119,6 @@ async def on_message(message):
             if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
             await message.reply(f"Error executing command '{cmd}': {e}", mention_author=True)
     
-    
     except Exception as e:
         
         # Set everything default mode. Try not loading registry.
@@ -148,9 +151,41 @@ client.event(on_ready)
 # Register the on_message event handler
 client.event(on_message)
 
+# Shutdown signal
+async def shutdownListener():
+    while True:
+        try:
+            value: str = IPC.read(Registry.read("SOFTWARE.CordOS.Kernel.Services.CoreServices.IPC.LabelKernelState"))
+            if value == Registry.read("SOFTWARE.CordOS.Kernel.Signals.Shutdown") or value == Registry.read("SOFTWARE.CordOS.Kernel.Signals.Restart"):
+                print(f"Received shutdown signal '{value}'.")
+                try:
+                    await client.close()
+                    break
+                except:
+                    print("Error in shutting down client.")
+                    exit(1)
+        except:
+            pass
+        
+        # Sleep
+        time.sleep(1)
+
 # Start the client
 Services.start(3)
+
+# Start the shutdown listener
+def start_async_loop():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(shutdownListener())
+    loop.close()
+
+# Start the shutdown listener in an appropriate manner for async execution
+print("Starting IPC event listener...")
+thread = threading.Thread(target=start_async_loop)
+thread.daemon = True
+thread.start()
+
 print("Starting client...")
 client.run(config['token'])
-
 
