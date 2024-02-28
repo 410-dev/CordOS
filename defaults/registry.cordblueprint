@@ -46,4 +46,5 @@ SOFTWARE.CordOS.Security.Registry=root
 SOFTWARE.CordOS.Security.Token=root
 SOFTWARE.CordOS.Security.Master=root
 SOFTWARE.CordOS.Security.Tags=admin
+SOFTWARE.CordOS.Security.Services=root
 SOFTWARE.CordOS.Debug=0
