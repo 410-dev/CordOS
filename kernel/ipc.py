@@ -1,7 +1,9 @@
 import os
+import shutil
 import json
 
 import kernel.partitionmgr as Partitions
+import kernel.clock as Clock
 
 def set(id: str, value: str):
     parentPath: str = f"{Partitions.cache()}/ipc/{id}"
@@ -65,3 +67,18 @@ def exists(id: str) -> bool:
 
     # Check if parent path exists
     return os.path.exists(parentPath)
+
+def init():
+    # Check if uptime is less than 10 seconds
+    if Clock.getUptimeSeconds() < 10000:
+        # Clear IPC cache
+        try:
+            if os.path.exists(f"{Partitions.cache()}/ipc"):
+                shutil.rmtree(os.path.join(Partitions.cache(), "ipc"))
+            os.makedirs(f"{Partitions.cache()}/ipc", exist_ok=True)
+            print("IPC cache cleared.")
+        except Exception as e:
+            print("Error in clearing IPC cache: " + str(e))
+        
+    else:
+        print(f"IPC cache not cleared (Uptime > 3 seconds).")
