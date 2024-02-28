@@ -52,6 +52,7 @@ def main():
 
             # Sleep
             time.sleep(int(Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.TimeSync")))
+        print("Webhook service stopped.")
     except Exception as e:
         print(f"Error in starting / running service. e: {e}")
         pass
