@@ -93,12 +93,15 @@ async def on_message(message):
         Servers.updateServer(message)
 
         # Extract the command and arguments from the message content
-        msgContent = message.content[len(prefix):]
-        args = Launcher.splitArguments(msgContent)
-        cmd = Launcher.getCommand(args)
+        try:
+            msgContent: str = message.content[len(prefix):]
+            args: list = Launcher.splitArguments(msgContent)
+            cmd: str = Launcher.getCommand(args)
+            runnablePath: str = Launcher.getRunnableModule(args)
+        except Exception as e:
+            await message.reply(f"Failed looking up for command. This should not occur. {e}", mention_author=True)
+            return
 
-        runnablePath = Launcher.getRunnableModule(args)
-        
         if runnablePath == "":
             await message.reply(f"Command {cmd} not found.", mention_author=True)
             return
@@ -133,8 +136,8 @@ async def on_message(message):
                 await message.reply("Registry rebuilt.", mention_author=True)
                 
             else:            
-                print(f"!!!SYSTEM PANIC!!!!\nKernel cannot launch subprocess due to the following error:\n{e}\nIt may be due to registry issue. To recover, type `regfix`. If it does not work, type `regrestore` to fully clean the registry.")
-                await message.reply(f"!!!SYSTEM PANIC!!!!\nKernel cannot launch subprocess due to the following error:\n```{e}```\nIt may be due to registry issue. To recover, type `regfix`. If it does not work, type `regrestore` to fully clean the registry.", mention_author=True)
+                print(f"!!!SYSTEM PANIC!!!!\nKernel cannot launch subprocess due to the following error:\n{e}\nIt may be due to registry issue. To recover, type `regfix` to reset default registries. If it does not work, type `regrestore` to fully clean the registry.")
+                await message.reply(f"!!!SYSTEM PANIC!!!!\nKernel cannot launch subprocess due to the following error:\n```{e}```\nIt may be due to registry issue. To recover, type `regfix` to reset default registries. If it does not work, type `regrestore` to fully clean the registry.", mention_author=True)
         
 
 # Register the on_ready event handler

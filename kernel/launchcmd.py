@@ -1,9 +1,10 @@
 import os
+import json
 
 import kernel.registry as Registry
 
 def getRunnableModule(args: list):
-    commandsPaths: list = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths")['data']
+    commandsPaths: list = json.loads(Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths"))['data']
     appropriateCommandPath: str = ""
     for commandPath in commandsPaths:
         try:
@@ -16,7 +17,7 @@ def getRunnableModule(args: list):
     if appropriateCommandPath == "":
         return None
     
-    return os.path.join(appropriateCommandPath, args[0], "main").replace("/", ".")
+    return os.path.join(appropriateCommandPath, args[0], "main").replace("/", ".").replace("\\", ".")
 
 def getCommand(args: list):
     return args[0]
