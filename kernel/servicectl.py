@@ -10,15 +10,15 @@ def start(stage: int):
     
     print(f"Starting services for stage {stage}")
 
-    servicesList: list = os.listdir("kernel/coreservices")
+    servicesList: list = os.listdir("kernel/services")
 
     for service in servicesList:
 
-        if "main.py" not in os.listdir(f"kernel/coreservices/{service}"):
+        if "main.py" not in os.listdir(f"kernel/services/{service}"):
             continue
 
         try:
-            with open(f"kernel/coreservices/{service}/service.json", 'r') as f:
+            with open(f"kernel/services/{service}/service.json", 'r') as f:
                 serviceData = json.loads(f.read())
                 if serviceData['stage'] != stage:
                     continue
@@ -37,7 +37,7 @@ def start(stage: int):
 
         try:
             import importlib
-            moduleName = f"kernel.coreservices.{service}.main"
+            moduleName = f"kernel.services.{service}.main"
             print(f"Starting service (Stage {stage}) '{service}'.")
             module = importlib.import_module(moduleName)
 
