@@ -11,6 +11,7 @@ import kernel.registry as Registry
 import kernel.config as Config
 import kernel.servicectl as Services
 import kernel.launchcmd as Launcher
+import kernel.clock as Clock
 
 import discord
 import importlib
@@ -18,6 +19,7 @@ import importlib
 from typing import List
 
 # Load configurations
+Clock.init()
 Services.start(1)
 config = Config.load()
 
