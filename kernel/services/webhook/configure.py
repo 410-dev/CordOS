@@ -19,18 +19,8 @@ async def main(args: list, message):
             await message.reply("Missing arguments: <url> <webhookid>")
             return
         
-        links = Webhook.getLibrary(args[2]) + "/linkages"
-        # write url with no special characters
-        specialChars: list = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*", " ", "-"]
-        url = args[1]
-        url = url.split("webhooks/")[1]
-        for char in specialChars:
-            url = url.replace(char, "")
+        Webhook.setLinkage(args[2], args[1])
         
-
-        with open(f"{links}/{url}", 'w') as f:
-            f.write(args[1])
-
         await message.reply(f"Linked {args[1]} to {args[2]}")
 
     elif args[0] == "unlink":
