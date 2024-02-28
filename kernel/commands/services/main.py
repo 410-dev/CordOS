@@ -1,7 +1,8 @@
 import traceback
+import os
+
 import kernel.config as Config
 import kernel.registry as Registry
-
 import kernel.servers as Servers
 
 class Services:
@@ -27,7 +28,7 @@ class Services:
         
         # Check if args are present
         if len(self.args) < 2:
-            await self.message.reply(f"Missing arguments. \nUsage: services <configure> [service] args...", mention_author=True)
+            await self.message.reply(f"Missing arguments. \nUsage: services <configure|list> [service] args...", mention_author=True)
             return
         
         # Check if command is configure
@@ -49,7 +50,18 @@ class Services:
                 traceback.print_exc()
                 pass
             return
+        elif self.args[1] == "list":
+            servicesList: list = os.listdir("kernel/services")
+            services = ""
+            for service in servicesList:
+                try:
+                    if "main.py" not in os.listdir(f"kernel/services/{service}"):
+                        continue
+                except:
+                    continue
+                services += f"{service}\n"
+            await self.message.reply(f"Services:\n{services}", mention_author=True)
         else:
-            await self.message.reply(f"Unknown action: {self.args[0]}\nUsage: services <configure> [service] args...", mention_author=True)
+            await self.message.reply(f"Unknown action: {self.args[0]}\nUsage: services <configure|list> [service] args...", mention_author=True)
             return
         return
