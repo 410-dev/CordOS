@@ -17,3 +17,10 @@ def send(webhookURL: str, message: str) -> None:
     webhook = DiscordWebhook(url=webhookURL, content=message)
     response = webhook.execute()
     print(response)
+
+def getLibrary(webhookID: str) -> str:
+    libraryPath: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.LibraryPath")
+    libraryPath = libraryPath.replace("<id>", webhookID)
+    os.makedirs(libraryPath, exist_ok=True)
+    os.makedirs(f"{libraryPath}/linkages", exist_ok=True)
+    return libraryPath
