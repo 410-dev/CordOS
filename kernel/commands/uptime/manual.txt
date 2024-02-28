@@ -1,0 +1,6 @@
+Check the uptime of the bot.
+
+```
+Usage:
+    uptime
+```
