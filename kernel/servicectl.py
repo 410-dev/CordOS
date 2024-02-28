@@ -3,6 +3,7 @@ import threading
 import json
 
 import kernel.registry as Registry
+import kernel.partitionmgr as PartitionMgr
 
 def start(stage: int):
     if Registry.read("SOFTWARE.CordOS.Kernel.Services.Enabled") == "0":
@@ -53,3 +54,10 @@ def start(stage: int):
         except Exception as e:
             print(f"Error in starting service '{service}' e: {e}")
             pass
+
+def markStopped(service: str):
+    cache: str = PartitionMgr.cache()
+    cache = os.path.join(cache, "krnlsrv", "services")
+    os.makedirs(cache, exist_ok=True)
+    with open(os.path.join(cache, service), "w") as f:
+        f.write("0")
