@@ -3,10 +3,12 @@ import os
 
 import kernel.config as Config
 
-def read(key: str, regloc: str = Config.get("registry")):
+def read(key: str, regloc: str = Config.get("registry"), default=None, writeDefault=False):
     key = key.replace(".", "/")
     if not os.path.exists(os.path.join(regloc, key)):
-        return None
+        if writeDefault:
+            write(key, default, regloc)
+        return default
 
     # If regloc is directory, read list of files excluding directory and names starting with .
     if os.path.isdir(os.path.join(regloc, key)):
@@ -24,7 +26,9 @@ def read(key: str, regloc: str = Config.get("registry")):
             return f.read()
         
         else:
-            return None
+            if writeDefault:
+                write(key, default, regloc)
+            return default
 
 def isKey(key: str, regloc: str = Config.get("registry")) -> int:
     key = key.replace(".", "/")
