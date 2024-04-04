@@ -11,7 +11,7 @@ class Services:
         self.args: list = lineArgs
         self.message = message
         self.config = Config.load()
-        self.permission = Registry.read("SOFTWARE.CordOS.Security.Registry")
+        self.permission = Registry.read("SOFTWARE.CordOS.Security.Services")
         self.user = Servers.getUserAtServer(self.message.guild.id, self.message.author.id)
 
     async def chkPermission(self, permission):

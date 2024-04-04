@@ -6,11 +6,11 @@ Required permissions:
 ```
 Actions available:
     add     : Add a tag to a user
+    list    : List all tags of a user
     remove  : Remove a tag from a user
 ```
 
 ```
 Usage:
-    tags <action> <@user mention> tag1
-    tags <action> <@user mention> "tag1 tag2 tagn"
+    tags <action> <@user mention> <tag name> <tag value>
 ```

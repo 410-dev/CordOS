@@ -7,8 +7,6 @@ import importlib
 import threading
 import asyncio
 
-from typing import List
-
 import kernel.servers as Servers
 import kernel.objects as Objects
 import kernel.registry as Registry
@@ -17,11 +15,11 @@ import kernel.servicectl as Services
 import kernel.launchcmd as Launcher
 import kernel.clock as Clock
 import kernel.ipc as IPC
+import kernel.host as HostMachine
 
-from objects.user import User
-from objects.server import Server
 
 # Load configurations
+Services.start(0)
 Clock.init()
 IPC.init()
 Services.start(1)
@@ -69,13 +67,13 @@ def getConfig(key):
             dictionary = dictionary[key]
         else:
             return None
-        
+
     return dictionary
 
 # Define a function to handle incoming messages
 @client.event
 async def on_message(message):
-    try: 
+    try:
         if Registry.read("SOFTWARE.CordOS.Events.Inbound.PrintMessage") == "1":
             formattedMsg = Registry.read("SOFTWARE.CordOS.Events.Inbound.PrintMessageFormat")
             formattedMsg = formattedMsg.replace("$uname", str(message.author.name))
@@ -85,7 +83,7 @@ async def on_message(message):
             formattedMsg = formattedMsg.replace("$servername", str(message.guild.name))
             formattedMsg = formattedMsg.replace("$message", str(message.content))
             print(formattedMsg)
-        
+
         # Check if the message was sent by the bot itself
         if message.author == client.user:
             return
@@ -94,7 +92,7 @@ async def on_message(message):
         prefix = Registry.read("SOFTWARE.CordOS.Config.Core.Prefix")
         if not message.content.startswith(prefix):
             return
-        
+
         # Update the user's server data
         Servers.updateServer(message)
 
@@ -118,9 +116,9 @@ async def on_message(message):
             if Registry.read("SOFTWARE.CordOS.Kernel.PrintErrors") == "1": print(f"Error executing command '{cmd}': {e}")
             if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
             await message.reply(f"Error executing command '{cmd}': {e}", mention_author=True)
-    
+
     except Exception as e:
-        
+
         # Set everything default mode. Try not loading registry.
         if message.content.startswith("."):
             if message.content == ".regrestore":
@@ -139,11 +137,45 @@ async def on_message(message):
                 Registry.build('defaults/registry.cordblueprint', 'data/registry')
                 print("Registry rebuilt.")
                 await message.reply("Registry rebuilt.", mention_author=True)
-                
-            else:            
-                print(f"!!!SYSTEM PANIC!!!!\nKernel cannot launch subprocess due to the following error:\n{e}\nIt may be due to registry issue. To recover, type `regfix` to reset default registries. If it does not work, type `regrestore` to fully clean the registry.")
-                await message.reply(f"!!!SYSTEM PANIC!!!!\nKernel cannot launch subprocess due to the following error:\n```{e}```\nIt may be due to registry issue. To recover, type `regfix` to reset default registries. If it does not work, type `regrestore` to fully clean the registry.", mention_author=True)
-        
+
+            elif message.content == ".rebootfix":
+                print("Terminating system and restarting kernel.")
+                await message.reply("Terminating system and restarting kernel.", mention_author=True)
+                isPosix: bool = HostMachine.getHostOSType() == "posix"
+                if isPosix:
+                    # sleep for 3 seconds, then run boot.sh file asynchronously
+                    shScript: str = os.path.join(os.getcwd(), "boot.sh")
+                    # chmod +x boot.sh
+                    exitcode = HostMachine.executeCommand(f"chmod +x {shScript}")
+                    if exitcode != 0:
+                        print(f"POSIX: Failed to make {shScript} executable.")
+                        await message.reply(f"Failed to queue reboot. (POSIX, Exit code {exitcode}@stg1)", mention_author=True)
+                    else:
+                        exitcode = HostMachine.executeCommand(f"sleep 3 && {shScript} &")
+                        if exitcode != 0:
+                            print(f"POSIX: Failed to run {shScript}.")
+                            await message.reply(f"Failed to queue reboot. (POSIX, Exit code {exitcode}@stg2)", mention_author=True)
+                        else:
+                            await message.reply("Reboot queued.", mention_author=True)
+                            await client.close()
+                            exit(0)
+
+                else:
+                    # sleep for 3 seconds, then run boot.bat file asynchronously
+                    batScript: str = os.path.join(os.getcwd(), "boot.bat")
+                    exitcode = HostMachine.executeCommand(f"timeout 3 && start {batScript}")
+                    if exitcode != 0:
+                        print(f"NON-POSIX: Failed to run {batScript}.")
+                        await message.reply(f"Failed to queue reboot. (NON-POSIX, Exit code {exitcode})", mention_author=True)
+                    else:
+                        await message.reply("Reboot queued.", mention_author=True)
+                        await client.close()
+                        exit(0)
+
+            else:
+                print(f"!!!SYSTEM PANIC!!!!\nKernel cannot launch subprocess due to the following error:\n{e}\nIt may be due to registry issue. To recover, type `regfix` to reset default registries. If it does not work, type `regrestore` to fully clean the registry. If it still does not work, type `rebootfix` to restart the kernel. However, this is not recommended as it uses asynchronous subprocesses and may console instability.")
+                await message.reply(f"!!!SYSTEM PANIC!!!!\nKernel cannot launch subprocess due to the following error:\n```{e}```\nIt may be due to registry issue. To recover, type `regfix` to reset default registries. If it does not work, type `regrestore` to fully clean the registry. If it still does not work, type `rebootfix` to restart the kernel. However, this is not recommended as it uses asynchronous subprocesses and may console instability.", mention_author=True)
+
 
 # Register the on_ready event handler
 client.event(on_ready)
@@ -166,7 +198,7 @@ async def shutdownListener():
                     exit(1)
         except:
             pass
-        
+
         # Sleep
         time.sleep(1)
 

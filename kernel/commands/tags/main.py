@@ -15,43 +15,46 @@ class Tags:
     async def exec(self):
         
         try:
+            if len(self.args) > 0:
+                self.args.pop(0)
+
             if not self.user.hasPermission(Registry.read("SOFTWARE.CordOS.Security.Tags")):
                 await self.message.reply(f"You do not have permission to use this command. (Requires {Registry.read('SOFTWARE.CordOS.Security.Tags')})", mention_author=True)
                 return
             
-            if len(self.args) != 3:
-                await self.message.reply(f"Invalid number of arguments. Expected 3, got {len(self.args)}", mention_author=True)
+            if len(self.args) < 2 or len(self.args) > 4:
+                await self.message.reply(f"Invalid number of arguments. Expected 2 ~ 4, got {len(self.args)}", mention_author=True)
                 return
             
             action: str = self.args[0]
             target: str = self.args[1].replace("<", "").replace(">", "").replace("@", "").replace("!", "")
-            tags: list = self.args[2].split(" ")
+            tagName: str = self.args[2] if len(self.args) >= 3 else None
+            tagValue: str = self.args[3] if len(self.args) == 4 else None
+
+            try:
+                int(target)
+            except:
+                await self.message.reply(f"Invalid target user ID: {target}", mention_author=True)
+                return
             
-            targetUserObject: User = Servers.getUserAtServer(self.message.guild.id, target)
+            targetUserObject: User = Servers.getUserAtServer(self.message.guild.id, int(target))
             
             messageStr = ""
-            unprocessed: list = []
-            
+
             if action == "add":
-                for tag in tags:
-                    if targetUserObject.hasTag(tag):
-                        unprocessed.append(tag)
-                        continue
-                    
-                    targetUserObject.addTag(tag)
-                messageStr = f"Added tags {tags} to user {targetUserObject.name}"
-                if len(unprocessed) > 0:
-                    messageStr += f"\nTags {unprocessed} were already added to user {targetUserObject.name}"
+                targetUserObject.addTag(tagName, tagValue)
+                messageStr = f"Added tag {tagName} to user {targetUserObject.name}"
                 
             elif action == "remove":
+                targetUserObject.removeTag(tagName)
+                messageStr = f"Removed tag {tagName} from user {targetUserObject.name}"
+
+            elif action == "list":
+                tags = targetUserObject.getTags()
+                messageStr = f"Tags for user {targetUserObject.name}:\n```"
                 for tag in tags:
-                    if not targetUserObject.hasTag(tag):
-                        unprocessed.append(tag)
-                        continue
-                    targetUserObject.removeTag(tag)
-                messageStr = f"Removed tags {tags} from user {targetUserObject.name}"
-                if len(unprocessed) > 0:
-                    messageStr += f"\nTags {unprocessed} were not removed to user {targetUserObject.name}"
+                    messageStr += f"{tag['id']}: {tag['value']}\n"
+                messageStr += "```"
                 
             # Update server json
             serverObject: Server = Servers.getServer(self.message.guild.id)

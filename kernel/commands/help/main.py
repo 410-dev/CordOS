@@ -18,7 +18,7 @@ class Help:
         try: 
             commandPaths: List[str] = json.loads(Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths"))['data']
             
-            if len(self.args) == 0:
+            if len(self.args) < 2:
                 # Print current manual
                 with open("kernel/commands/help/manual.txt", 'r') as f:
                     await self.message.reply(f.read(), mention_author=True)
@@ -28,7 +28,7 @@ class Help:
             helpString: str = ""
             for commandPath in commandPaths:
                 try:
-                    with open(os.path.join(commandPath, self.args[0], "manual.txt"), 'r') as f:
+                    with open(os.path.join(commandPath, self.args[1], "manual.txt"), 'r') as f:
                         helpString = f.read()
                         break
                 except:

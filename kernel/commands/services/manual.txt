@@ -1,0 +1,16 @@
+Manage services in system
+
+Required permissions:
+    root
+
+```
+Actions available:
+    list       : List current available services
+    configure  : Configure a service
+```
+
+```
+Usage:
+    services list
+    services configure <service_name> <parameters...>
+```

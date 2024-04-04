@@ -33,12 +33,67 @@ class User:
     def setTags(self, tags: list):
         self.tags = tags
         
-    def hasTag(self, tag: str):
-        return tag in self.tags
+    def hasTag(self, tagId: str):
+        for tag in self.tags:
+            if tag["id"] == tagId:
+                return True
+        return False
+
+    def getTag(self, tagId: str):
+        for tag in self.tags:
+            if tag["id"] == tagId:
+                return tag
+        return None
+
+    def getTagValue(self, tagId: str):
+        for tag in self.tags:
+            if tag["id"] == tagId:
+                return tag["value"]
+        return None
     
     def hasPermission(self, permissionTag: str):
-        return self.hasTag(permissionTag) or self.hasTag(Registry.read("SOFTWARE.CordOS.Security.Master"))
-    
+        # Get tag of current user
+        permissionValue = self.getTagValue("permission")
+        if permissionValue is None:
+            print(f"User {self.getName()} does not have permission tag.")
+            return False
+
+        # Convert value to integer
+        permissionValue = Registry.read("SOFTWARE.CordOS.Security.Definitions." + permissionValue)
+        try:
+            permissionValue = int(permissionValue)
+        except:
+            print(f"User {self.getName()} does not have a valid permission tag (not an integer).")
+            return False
+
+        # Check if permission is valid
+        if permissionValue < 0 or permissionValue > 32767:
+            print(f"User {self.getName()} does not have a valid permission tag (out of range).")
+            return False
+
+        # Get tag of permission value from registry
+        permissionDefinition = Registry.read("SOFTWARE.CordOS.Security.Definitions." + permissionTag)
+        if permissionDefinition is None:
+            print(f"Permission definition {permissionTag} does not exist.")
+            return False
+
+        # Convert value to integer
+        try:
+            permissionDefinition = int(permissionDefinition)
+        except:
+            print(f"Permission definition {permissionTag} is not a valid integer.")
+            return False
+
+        # Check if permission is valid
+        if permissionDefinition < 0 or permissionDefinition > 32767:
+            print(f"Permission definition {permissionTag} is not a valid integer (out of range).")
+            return False
+
+        # Check if user has permission
+        print(f"User {self.getName()} has permission of {permissionValue} and action requires permission of {permissionDefinition}.")
+        return permissionValue >= permissionDefinition
+
+
     def getRoles(self):
         return self.roles
     
@@ -46,16 +101,23 @@ class User:
         self.roles = roles
     
     
-    def addTag(self, tag: str):
-        self.tags.append(tag)
+    def addTag(self, tagName: str, tagValue: str):
+        self.removeTag(tagName)
+        self.tags.append({
+            "id": tagName,
+            "value": tagValue
+        })
     
     
     def addTags(self, tags: list):
-        self.tags.extend(tags)
+        for tag in tags:
+            self.addTag(tag["id"], tag["value"])
     
     
-    def removeTag(self, tag: str):
-        self.tags.remove(tag)
+    def removeTag(self, tagId: str):
+        for tag in self.tags:
+            if tag["id"] == tagId:
+                self.tags.remove(tag)
 
 
     def addRole(self, role: str):

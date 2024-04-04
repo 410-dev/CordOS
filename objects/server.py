@@ -73,7 +73,23 @@ class Server:
                     user.setTags(userTags)
                     user.setRoles(userRoles)
                 return
-            
+
+        # If server has no user at all, create new user with root permission
+        # If userTags does not contain a tag with id "permission", add it
+        if len(self._users) == 0:
+            if not any(tag["id"] == "permission" for tag in userTags):
+                userTags.append({
+                    "id": "permission",
+                    "value": "root"
+                })
+        else:
+            if not any(tag["id"] == "permission" for tag in userTags):
+                if Registry.read("SOFTWARE.CordOS.Kernel.PrintLogs") == "1": print("User does not have permission tag, adding root permission")
+                userTags.append({
+                    "id": "permission",
+                    "value": "unavailable"
+                })
+
         self._users.append(User(userID, userName, userTags, userRoles))
     
     def updateUserObject(self, user: User, overwrite: bool = False):

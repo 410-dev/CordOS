@@ -8,7 +8,7 @@ import kernel.partitionmgr as PartitionMgr
 def start(stage: int):
     if Registry.read("SOFTWARE.CordOS.Kernel.Services.Enabled") == "0":
         return
-    
+
     print(f"Starting services for stage {stage}")
 
     servicesList: list = os.listdir("kernel/services")
@@ -32,6 +32,9 @@ def start(stage: int):
                     print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
                     continue
 
+                if Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service}.Enabled") == "0":
+                    continue
+
                 Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{service}.Enabled", "1")
         except:
             pass
@@ -43,7 +46,8 @@ def start(stage: int):
             module = importlib.import_module(moduleName)
 
             if Registry.read("SOFTWARE.CordOS.Kernel.Services.ReloadOnCall") == "1":
-                importlib.reload(module)
+                if not Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service}.ReloadOnCall") == "0":
+                    importlib.reload(module)
 
             thread = threading.Thread(target=module.main)
             thread.daemon = True

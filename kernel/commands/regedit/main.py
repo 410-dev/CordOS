@@ -14,17 +14,21 @@ class Regedit:
         self.user = Servers.getUserAtServer(self.message.guild.id, self.message.author.id)
 
     async def chkPermission(self, permission):
-        if self.user.hasPermission(permission) == False:
+        if not self.user.hasPermission(permission):
             await self.message.reply(f"You do not have permission to use this command. (Requires {permission})", mention_author=True)
             return False
         return True
 
     async def exec(self):
         
-        try: 
+        try:
+
+            # Remove first index of args if the length is greater than 0
+            if len(self.args) > 0:
+                self.args.pop(0)
             
             # Check if user has permission to use this command
-            if await self.chkPermission(self.regPermission) == False: return
+            if not await self.chkPermission(self.regPermission): return
 
             # Replace key variables
             key = ""
@@ -67,7 +71,7 @@ class Regedit:
                         if l[i].find("=") != -1:
                             l[i] = "[Val] " + l[i].replace("=", ": ")
                         else:
-                            l[i] = "[Sub] " + l[i]
+                            l[i] = "[Key] " + l[i]
                     l = "\n".join(l)
                     await self.message.reply(f"Registry key `{key}` contains:\n\n```{l}```", mention_author=True)
                 else:
