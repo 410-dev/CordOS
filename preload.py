@@ -177,6 +177,7 @@ try:
             if installed.startswith("-"):
                 continue
             listInstalled[index] = installed.split(" ")[0]
+            print(f"[  Found   ] {listInstalled[index]}")
 
         for req in reqs:
             req = req.strip()
