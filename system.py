@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import traceback
 import time
 import discord
@@ -17,12 +18,15 @@ import kernel.clock as Clock
 import kernel.ipc as IPC
 import kernel.host as HostMachine
 
+# Check commandline arguments
+argsList: list = sys.argv
+safeMode: bool = "--safe" in argsList
 
 # Load configurations
-Services.start(0)
+Services.start(0, safeMode)
 Clock.init()
 IPC.init()
-Services.start(1)
+Services.start(1, safeMode)
 config = Config.load()
 
 
@@ -45,7 +49,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
 
-Services.start(2)
+Services.start(2, safeMode)
 
 # Define a function to send a message to all servers that the bot is connected to
 async def broadcast_message(message):
@@ -203,7 +207,7 @@ async def shutdownListener():
         time.sleep(1)
 
 # Start the client
-Services.start(3)
+Services.start(3, safeMode)
 
 # Start the shutdown listener
 def start_async_loop():
