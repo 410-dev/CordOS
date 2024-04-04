@@ -41,6 +41,10 @@ def isKey(key: str, regloc: str = Config.get("registry")) -> int:
     
 def write(key: str, value = None, regloc: str = Config.get("registry")):
     key = key.replace(".", "/")
+
+    # If key starts with ? and already exists, return
+    if key.startswith("?") and os.path.exists(os.path.join(regloc, key[1:])):
+        return
     
     # If parent directory does not exist, create all parent directories
     for i in range(len(key.split("/"))):
@@ -110,4 +114,3 @@ def build(blueprintPath: str, registryPath: str = Config.get("registry"), silent
         if not silent: print(f"[ Generate ] {key}")
         write(key, value, registryPath)
         
-    
