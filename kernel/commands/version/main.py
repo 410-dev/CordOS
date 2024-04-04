@@ -1,4 +1,5 @@
 import kernel.registry as Registry
+import kernel.ipc as IPC
 
 class Version:
     
@@ -13,6 +14,7 @@ class Version:
             version = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")
             botName = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.BotName")
             botVer = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.BotVersion")
-            await self.message.reply(f"Version Profiling:\nBaseSystem: {foundation} {version}\nBot: {botName} {botVer}", mention_author=True)
+            isSafe = "" if not IPC.readObj("kernel.safemode") else " (Safe Mode)"
+            await self.message.reply(f"Version Profiling:\n\nBaseSystem: {foundation} {version} {isSafe}\nBot: {botName} {botVer}", mention_author=True)
         except Exception as e:
-            await self.message.reply(f"Error opening config.json e: {e}", mention_author=True)
+            await self.message.reply(f"Error loading profile: {e}", mention_author=True)

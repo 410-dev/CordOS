@@ -26,6 +26,7 @@ safeMode: bool = "--safe" in argsList
 Services.start(0, safeMode)
 Clock.init()
 IPC.init()
+IPC.setObj("kernel.safemode", safeMode)
 Services.start(1, safeMode)
 config = Config.load()
 
@@ -143,38 +144,49 @@ async def on_message(message):
                 await message.reply("Registry rebuilt.", mention_author=True)
 
             elif message.content == ".rebootfix":
-                print("Terminating system and restarting kernel in safemode.")
-                await message.reply("Terminating system and restarting kernel in safemode.", mention_author=True)
-                isPosix: bool = HostMachine.getHostOSType() == "posix"
-                if isPosix:
-                    # sleep for 3 seconds, then run boot.sh file asynchronously
-                    shScript: str = os.path.join(os.getcwd(), "boot.sh")
-                    # chmod +x boot.sh
-                    exitcode = HostMachine.executeCommand(f"chmod +x {shScript}")
-                    if exitcode != 0:
-                        print(f"POSIX: Failed to make {shScript} executable.")
-                        await message.reply(f"Failed to queue reboot. (POSIX, Exit code {exitcode}@stg1)", mention_author=True)
-                    else:
-                        exitcode = HostMachine.executeCommand(f"sleep 3 && {shScript} --safe &")
-                        if exitcode != 0:
-                            print(f"POSIX: Failed to run {shScript}.")
-                            await message.reply(f"Failed to queue reboot. (POSIX, Exit code {exitcode}@stg2)", mention_author=True)
-                        else:
-                            await message.reply("Reboot queued.", mention_author=True)
-                            await client.close()
-                            exit(0)
+                print("Terminating system and restarting kernel in safemode. Set `SOFTWARE.CordOS.Kernel.SafeMode` to 0 after reboot to return to normal mode.")
+                await message.reply("Terminating system and restarting kernel in safemode. Set `SOFTWARE.CordOS.Kernel.SafeMode` to 0 after reboot to return to normal mode.", mention_author=True)
+                with open("restart", "w") as f:
+                    f.write("")
+                try:
+                    Registry.write("SOFTWARE.CordOS.Kernel.SafeMode", "1")
+                except:
+                    print("Failed to update registry. The system will reboot into normal mode.")
+                    message.reply("Failed to update registry. The system will reboot into normal mode.", mention_author=True)
 
-                else:
-                    # sleep for 3 seconds, then run boot.bat file asynchronously
-                    batScript: str = os.path.join(os.getcwd(), "boot.bat")
-                    exitcode = HostMachine.executeCommand(f"timeout 3 && start {batScript} --safe")
-                    if exitcode != 0:
-                        print(f"NON-POSIX: Failed to run {batScript}.")
-                        await message.reply(f"Failed to queue reboot. (NON-POSIX, Exit code {exitcode})", mention_author=True)
-                    else:
-                        await message.reply("Reboot queued.", mention_author=True)
-                        await client.close()
-                        exit(0)
+                await client.close()
+                exit(0)
+
+                # isPosix: bool = HostMachine.getHostOSType() == "posix"
+                # if isPosix:
+                #     # sleep for 3 seconds, then run boot.sh file asynchronously
+                #     shScript: str = os.path.join(os.getcwd(), "boot.sh")
+                #     # chmod +x boot.sh
+                #     exitcode = HostMachine.executeCommand(f"chmod +x {shScript}")
+                #     if exitcode != 0:
+                #         print(f"POSIX: Failed to make {shScript} executable.")
+                #         await message.reply(f"Failed to queue reboot. (POSIX, Exit code {exitcode}@stg1)", mention_author=True)
+                #     else:
+                #         exitcode = HostMachine.executeCommand(f"sleep 3 && {shScript} --safe &")
+                #         if exitcode != 0:
+                #             print(f"POSIX: Failed to run {shScript}.")
+                #             await message.reply(f"Failed to queue reboot. (POSIX, Exit code {exitcode}@stg2)", mention_author=True)
+                #         else:
+                #             await message.reply("Reboot queued.", mention_author=True)
+                #             await client.close()
+                #             exit(0)
+                #
+                # else:
+                #     # sleep for 3 seconds, then run boot.bat file asynchronously
+                #     batScript: str = os.path.join(os.getcwd(), "boot.bat")
+                #     exitcode = HostMachine.executeCommand(f"timeout 3 && start {batScript} --safe")
+                #     if exitcode != 0:
+                #         print(f"NON-POSIX: Failed to run {batScript}.")
+                #         await message.reply(f"Failed to queue reboot. (NON-POSIX, Exit code {exitcode})", mention_author=True)
+                #     else:
+                #         await message.reply("Reboot queued.", mention_author=True)
+                #         await client.close()
+                #         exit(0)
 
             else:
                 print(f"!!!SYSTEM PANIC!!!!\nKernel cannot launch subprocess due to the following error:\n{e}\nIt may be due to registry issue. To recover, type `regfix` to reset default registries. If it does not work, type `regrestore` to fully clean the registry. If it still does not work, type `rebootfix` to restart the kernel in safemode. However, this is not recommended as it uses asynchronous subprocesses and may console instability.")
