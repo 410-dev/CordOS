@@ -7,3 +7,6 @@ data/*
 ## MacOS
 *.DS_Store
 krustoken.txt
+token.txt
+
+.idea/*
