@@ -39,11 +39,12 @@ def isKey(key: str, regloc: str = Config.get("registry")) -> int:
     else:
         return 2
     
-def write(key: str, value = None, regloc: str = Config.get("registry")):
+def write(key: str, value = None, regloc: str = Config.get("registry"), verbose=False):
     key = key.replace(".", "/")
 
     # If key starts with ? and already exists, return
     if key.startswith("?") and os.path.exists(os.path.join(regloc, key[1:])):
+        if verbose: print(f"[  Exists  ] {key[1:].replace("/", ".")}")
         return
     
     # If parent directory does not exist, create all parent directories
@@ -65,6 +66,7 @@ def write(key: str, value = None, regloc: str = Config.get("registry")):
                 f.write(json.dumps(value))
             else:
                 f.write(value)
+            if verbose: print(f"[ Generate ] {key.replace('/', '.').replace('?','')}")
 
 def delete(key: str, deleteSubkeys: bool = False, regloc: str = Config.get("registry")):
     key = key.replace(".", "/")
@@ -111,6 +113,5 @@ def build(blueprintPath: str, registryPath: str = Config.get("registry"), silent
     for line in lines:
         key = line.split("=")[0]
         value = line.split("=")[1] if len(line.split("=")) > 1 else None
-        if not silent: print(f"[ Generate ] {key}")
-        write(key, value, registryPath)
+        write(key, value, registryPath, verbose=not silent)
         
