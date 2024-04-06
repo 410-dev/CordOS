@@ -145,8 +145,8 @@ async def on_message(message):
             elif message.content == ".rebootfix":
                 print("Terminating system and restarting kernel in safemode. Set `SOFTWARE.CordOS.Kernel.SafeMode` to 0 after reboot to return to normal mode.")
                 await message.reply("Terminating system and restarting kernel in safemode. Set `SOFTWARE.CordOS.Kernel.SafeMode` to 0 after reboot to return to normal mode.", mention_author=True)
-                with open("restart", "w") as f:
-                    f.write("")
+                # with open("restart", "w") as f:
+                #     f.write("")
                 try:
                     Registry.write("SOFTWARE.CordOS.Kernel.SafeMode", "1")
                 except:
@@ -154,7 +154,7 @@ async def on_message(message):
                     message.reply("Failed to update registry. The system will reboot into normal mode.", mention_author=True)
 
                 await client.close()
-                exit(0)
+                exit(1)
 
             else:
                 print(f"!!!SYSTEM PANIC!!!!\nKernel cannot launch subprocess due to the following error:\n{e}\nIt may be due to registry issue. To recover, type `regfix` to reset default registries. If it does not work, type `regrestore` to fully clean the registry. If it still does not work, type `rebootfix` to restart the kernel in safemode. However, this is not recommended as it uses asynchronous subprocesses and may console instability.")
@@ -180,8 +180,8 @@ async def shutdownListener():
                         await client.close()
                         break
                     elif signal == "REBOOT":
-                        with open("restart", "w") as f:
-                            f.write("")
+                        # with open("restart", "w") as f:
+                        #     f.write("")
                         await client.close()
                         break
                     await client.close()

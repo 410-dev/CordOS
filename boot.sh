@@ -10,6 +10,11 @@ while true; do
     fi
 
     python3 ./bootloader.py "$@"
+    exit_code=$?
+
+    if [ $exit_code -eq 1 ]; then
+        touch ./restart
+    fi
 
     rm -rf ./data/cache
 

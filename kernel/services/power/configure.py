@@ -36,8 +36,8 @@ async def main(args: list, message):
             await message.reply(f"!!!!! EXTREME SENSITIVE WARNING !!!!!\nYou have triggered system reset. ***This will stop the system immediately and may cause data loss***. If you are sure, type the trigger command again. If you are not sure, type `power off` to shutdown the system. To cancel the confirmation, type `power reset-cancel`.")
 
         else:
-            with open("restart", 'w') as f:
-                f.write("")
+            # with open("restart", 'w') as f:
+            #     f.write("")
             await message.reply(f"System will now be reset.")
             exit(1)
 

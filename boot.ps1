@@ -9,6 +9,10 @@ do {
 
     python3 ./bootloader.py $args
 
+    if ($LASTEXITCODE -eq 1) {
+        New-Item -Path .\restart -ItemType "file" -Force
+    }
+
     Remove-Item -Path ./data/cache -Recurse -Force -ErrorAction SilentlyContinue
 
 } while (Test-Path .\restart)
