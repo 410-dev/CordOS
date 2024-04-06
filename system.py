@@ -187,18 +187,14 @@ async def shutdownListener():
                     await client.close()
                     break
                 except Exception as e:
-                    print("Error in shutting down client.")
-                    exit(1)
+                    print("Error in shutting down client: " + str(e))
+                    break
+
         except Exception as e:
             pass
 
         # Sleep
         time.sleep(1)
-
-    terminationCode = IPC.read("power.off.state", default="OFF")
-    if terminationCode == "REBOOT":
-        exit(1)
-    exit(0)
 
 # Start the client
 Services.start(3, safeMode)
@@ -219,3 +215,9 @@ thread.start()
 print("Starting client...")
 client.run(config['token'])
 
+terminationCode = IPC.read("power.off.state")
+print(f"CoreSystem terminating with code '{terminationCode}'.")
+if terminationCode == "REBOOT":
+    exit(1)
+else:
+    exit(0)
