@@ -1,0 +1,12 @@
+Remove package from the system
+
+This command is not thoroughly removing the package from the system. It is just removing the package from the package installation location.
+
+```
+Usage:
+    uninstall krnlcmd <package name>   : Remove kernel command from kernel/commands/
+    uninstall krnlsrv <package name>   : Remove kernel service from kernel/services/
+    uninstall krnlmod <package name>   : Remove kernel module from kernel/
+    uninstall cmd <package name>       : Remove command from data/commands/
+    uninstall srv <package name>       : Remove service from data/services/
+```
