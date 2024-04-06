@@ -36,6 +36,7 @@ class Services:
             if len(self.args) < 3:
                 await self.message.reply("Usage: services configure <service> args...", mention_author=True)
                 return
+
             try:
                 import importlib
                 moduleName = f"kernel.services.{self.args[2]}.configure"
@@ -45,6 +46,10 @@ class Services:
                     importlib.reload(module)
 
                 await module.main(self.args[3:], self.message)
+            except ModuleNotFoundError:
+                await self.message.reply(f"Service '{self.args[2]}' not found.", mention_author=True)
+                return
+
             except Exception as e:
                 await self.message.reply(f"Error in configuring service '{self.args[1]}' e: {e}", mention_author=True)
                 traceback.print_exc()
