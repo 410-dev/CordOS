@@ -1,6 +1,6 @@
 # cordOS Blueprint
 SOFTWARE.CordOS.Kernel.Signals.Shutdown=SIGTERM
-?SOFTWARE.CordOS.Kernel.Programs.Paths={"data": ["kernel/commands/", "commands/"]}
+?SOFTWARE.CordOS.Kernel.Programs.Paths={"data": ["kernel/commands/", "commands/", "data/commands"]}
 SOFTWARE.CordOS.Kernel.Signals.Restart=SIGRESTART
 ?SOFTWARE.CordOS.Kernel.Programs.OthersEnabled=1
 ?SOFTWARE.CordOS.Kernel.Services.Enabled=1
