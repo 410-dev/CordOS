@@ -56,6 +56,10 @@ def main():
 
         print(f"Upgrade complete.")
 
+        print(f"Cleaning up upgrade files.")
+        shutil.rmtree(upgradeFile)
+        print(f"Upgrade files cleaned up.")
+
     except Exception as e:
         print(f"Error upgrading system. e: {e}")
         pass

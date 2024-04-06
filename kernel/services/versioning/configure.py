@@ -68,7 +68,12 @@ async def main(args: list, message):
             print("Process 2/2: Extracting image...", end="")
             try:
                 with zipfile.ZipFile("data/cache/tmpimg.zip", 'r') as file:
-                    file.extractall("data/cache/upgradable")
+                    for member in file.namelist():
+                        if not member.endswith('/'):
+                            path_to_extract = os.path.join("data/UPGRADE_IMAGE", '/'.join(member.split('/')[1:]))
+                            os.makedirs(os.path.dirname(path_to_extract), exist_ok=True)
+                            with file.open(member) as source, open(path_to_extract, 'wb') as target:
+                                target.write(source.read())
             except Exception as e:
                 print(f"Failed. Error: {e}")
                 await message.reply(f"Failed to extract image. Error: {e}")
@@ -81,10 +86,8 @@ async def main(args: list, message):
 
             IPC.set("power.off", True)
             IPC.set("power.off.state", "REBOOT")
-            Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeMode", "data/cache/upgradable")
+            Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeMode", "data/UPGRADE_IMAGE")
             Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeQueue", "1")
-            # with open("restart", 'w') as f:
-            #     f.write("")
 
             if forceReboot == "1":
                 sys.exit(1)
@@ -109,7 +112,6 @@ async def main(args: list, message):
             except:
                 await message.reply("Failed to get latest version information.")
 
-
         elif args[0] == "branch":
             if len(args) < 2:
                 await message.reply(f"Current branch: {branch}")
@@ -127,5 +129,5 @@ async def main(args: list, message):
             await message.reply("Usage: versioning upgrade")
 
     except Exception as e:
-        await message.reply("Usage: versioning <upgrade|latest|branch|imgdl>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause data loss.")
+        await message.reply("Usage: versioning <upgrade|latest|branch>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause data loss.")
         return
