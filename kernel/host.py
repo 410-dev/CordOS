@@ -3,6 +3,9 @@ import os
 def getHostOSType():
     return os.name
 
+def isHostPOSIX():
+    return os.name == "posix"
+
 def getHostOSName():
     return os.uname().sysname
 
