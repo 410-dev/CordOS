@@ -2,7 +2,6 @@ import kernel.registry as Registry
 import kernel.ipc as IPC
 import kernel.webhook as Webhook
 
-import os
 import time
 import threading
 
@@ -12,15 +11,11 @@ def main():
     if enabled == "0":
         return
 
-    ipcState = ""
-
     try:
-        while (enabled == "1" and ipcState != Registry.read("SOFTWARE.CordOS.Kernel.Signals.Shutdown")):
+        while enabled == "1" and not IPC.read("power.off"):
             
             # Update enabled
             enabled = Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.Enabled")
-            ipcState = IPC.read(Registry.read("SOFTWARE.CordOS.Kernel.Services.CoreServices.IPC.LabelKernelState"))
-
             regPath = Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.RegistrationPath")
 
             # If enabled, call webhook
