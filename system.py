@@ -171,20 +171,34 @@ client.event(on_message)
 async def shutdownListener():
     while True:
         try:
-            value: str = IPC.read(Registry.read("SOFTWARE.CordOS.Kernel.Services.CoreServices.IPC.LabelKernelState"))
-            if value == Registry.read("SOFTWARE.CordOS.Kernel.Signals.Shutdown") or value == Registry.read("SOFTWARE.CordOS.Kernel.Signals.Restart"):
-                print(f"Received shutdown signal '{value}'.")
+            powerOffTrigger: bool = bool(IPC.read("power.off", default=False))
+            if powerOffTrigger:
+                signal: str = str(IPC.read("power.off.state", default="OFF"))
+                print(f"Received shutdown signal '{signal}'.")
                 try:
+                    if signal == "OFF":
+                        await client.close()
+                        break
+                    elif signal == "REBOOT":
+                        with open("restart", "w") as f:
+                            f.write("")
+                        await client.close()
+                        break
                     await client.close()
                     break
-                except:
+                except Exception as e:
                     print("Error in shutting down client.")
                     exit(1)
-        except:
+        except Exception as e:
             pass
 
         # Sleep
         time.sleep(1)
+
+    terminationCode = IPC.read("power.off.state", default="OFF")
+    if terminationCode == "REBOOT":
+        exit(1)
+    exit(0)
 
 # Start the client
 Services.start(3, safeMode)
