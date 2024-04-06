@@ -6,6 +6,7 @@ SOFTWARE.CordOS.Kernel.Signals.Restart=SIGRESTART
 ?SOFTWARE.CordOS.Kernel.Services.Enabled=1
 ?SOFTWARE.CordOS.Kernel.Services.SafeModeServices=power,
 ?SOFTWARE.CordOS.Kernel.Services.OthersEnabled=1
+?SOFTWARE.CordOS.Kernel.Services.OtherServices=data/services
 SOFTWARE.CordOS.Kernel.Services.APIMinimum=1
 SOFTWARE.CordOS.Kernel.Services.APIMaximum=2
 ?SOFTWARE.CordOS.Kernel.Services.ReloadOnCall=1

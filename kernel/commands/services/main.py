@@ -4,6 +4,7 @@ import os
 import kernel.config as Config
 import kernel.registry as Registry
 import kernel.servers as Servers
+import kernel.partitionmgr as PartitionMgr
 
 class Services:
     
@@ -39,16 +40,34 @@ class Services:
 
             try:
                 import importlib
-                moduleName = f"kernel.services.{self.args[2]}.configure"
+                userServiceLocation = Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices").replace("/", ".").replace("\\", ".")
+                moduleName = f"{userServiceLocation}.{self.args[2]}.configure"
                 module = importlib.import_module(moduleName)
 
                 if Registry.read("SOFTWARE.CordOS.Kernel.Services.ReloadOnCall") == "1":
                     importlib.reload(module)
 
                 await module.main(self.args[3:], self.message)
+
             except ModuleNotFoundError:
-                await self.message.reply(f"Service '{self.args[2]}' not found.", mention_author=True)
-                return
+                try:
+                    import importlib
+                    moduleName = f"kernel.services.{self.args[2]}.configure"
+                    module = importlib.import_module(moduleName)
+
+                    if Registry.read("SOFTWARE.CordOS.Kernel.Services.ReloadOnCall") == "1":
+                        importlib.reload(module)
+
+                    await module.main(self.args[3:], self.message)
+
+                except ModuleNotFoundError:
+                    await self.message.reply(f"Service '{self.args[2]}' not found.", mention_author=True)
+                    return
+
+                except Exception as e:
+                    await self.message.reply(f"Error in configuring service '{self.args[2]}' e: {e}", mention_author=True)
+                    traceback.print_exc()
+                    pass
 
             except Exception as e:
                 await self.message.reply(f"Error in configuring service '{self.args[1]}' e: {e}", mention_author=True)
@@ -56,16 +75,53 @@ class Services:
                 pass
             return
         elif self.args[1] == "list":
-            servicesList: list = os.listdir("kernel/services")
-            services = ""
-            for service in servicesList:
+            kernelServices: list = os.listdir("kernel/services")
+            userServices: list = []
+            if os.path.isdir(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices")):
+                userServices: list = os.listdir(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices"))
+            services = "Kernel Services:\n```"
+            for service in kernelServices:
                 try:
                     if "main.py" not in os.listdir(f"kernel/services/{service}"):
                         continue
                 except:
                     continue
                 services += f"{service}\n"
-            await self.message.reply(f"Services:\n{services}", mention_author=True)
+
+            services += "```\nUser Services:\n```"
+            for service in userServices:
+                try:
+                    if "main.py" not in os.listdir(f"{Registry.read('SOFTWARE.CordOS.Kernel.Services.OtherServices')}/{service}"):
+                        continue
+                except:
+                    continue
+                services += f"{service}\n"
+            await self.message.reply(f"{services}```", mention_author=True)
+        elif self.args[1] == "loaded":
+            flist = os.listdir(PartitionMgr.cache() + "/krnlsrv")
+            flist.sort()
+            loadedKernelService = {}
+            loadedThirdPartyService = {}
+            for file in flist:
+                if file.startswith("stg"):
+                    stageNum = file.split("_")[0][len("stg"):]
+                    scope = file.split("_")[2]
+                    with open(PartitionMgr.cache() + "/krnlsrv/" + file, 'r') as f:
+                        data = f.read().split("\n")
+                        if scope == "kernel":
+                            loadedKernelService[stageNum] = data
+                        elif scope == "thirdparty":
+                            loadedThirdPartyService[stageNum] = data
+
+            response = ""
+            for stage in loadedKernelService:
+                response += f"Stage {stage} Kernel Services: {', '.join(loadedKernelService[stage])}\n"
+            response += "\n"
+            for stage in loadedThirdPartyService:
+                response += f"Stage {stage} Third Party Services: {', '.join(loadedThirdPartyService[stage])}\n"
+
+            await self.message.reply(f"```{response}```", mention_author=True)
+
         else:
             await self.message.reply(f"Unknown action: {self.args[0]}\nUsage: services <configure|list> [service] args...", mention_author=True)
             return
