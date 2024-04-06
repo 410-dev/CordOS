@@ -1,8 +1,11 @@
+import sys
+
 import kernel.registry as Registry
 import kernel.ipc as IPC
 import requests
 
 def getValueOf(url: str, key: str):
+    print(f"Requesting {key} from {url}...")
     response = requests.get(url)
     if response.status_code != 200:
         print(f"Failed to get version information. Error: {response.status_code}")
@@ -30,7 +33,7 @@ async def main(args: list, message):
         forceReboot: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.ForceReboot", default="1")
 
         if args[0] == "upgrade":
-            if (len(args) > 1 and args[1] == "--reinstall") or (getBuild(metaURL) == Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Build") and getVersion(metaURL) == Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")):
+            if not (len(args) > 1 and args[1] == "--reinstall") and (getBuild(metaURL) == Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Build") and getVersion(metaURL) == Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")):
                 await message.reply("You are already on the latest version.")
                 return
 
@@ -84,7 +87,7 @@ async def main(args: list, message):
             #     f.write("")
 
             if forceReboot == "1":
-                exit(1)
+                sys.exit(1)
 
         elif args[0] == "latest":
             try:
@@ -123,6 +126,6 @@ async def main(args: list, message):
         else:
             await message.reply("Usage: versioning upgrade")
 
-    except:
+    except Exception as e:
         await message.reply("Usage: versioning <upgrade|latest|branch|imgdl>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause data loss.")
         return
