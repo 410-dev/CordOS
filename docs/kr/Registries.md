@@ -57,7 +57,6 @@
 | SOFTWARE.CordOS.Security.Config                          | String | root | No | 보안에 대한 구성입니다. |
 | SOFTWARE.CordOS.Security.Install                         | String | admin | No | 설치에 대한 권한입니다. |
 | SOFTWARE.CordOS.Security.Registry                        | String | root | No | 레지스트리에 대한 권한입니다. |
-| SOFTWARE.CordOS.Security.Token                           | String | root | No | 토큰에 대한 권한입니다. |
 | SOFTWARE.CordOS.Security.Tags                            | String | admin | No | 태그에 대한 권한입니다. |
 | SOFTWARE.CordOS.Security.Services                        | String | root | No | 서비스에 대한 권한입니다. |
 | SOFTWARE.CordOS.Debug                                    | Binary Integer | 0 | No | 디버그 모드가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
