@@ -9,24 +9,28 @@ This service runs sync mode - Be careful!
 
 """
 
-def cp(src, dest):
-    for root, dirs, files in os.walk(src):
-        # Calculate the relative path from the source directory to the current directory
-        relative_path = os.path.relpath(root, src)
-        current_dest = os.path.join(dest, relative_path)
+def cp(src: str, dest: str):
+    for root, dirs, files in os.walk(src, topdown=True):
+        # Ensure the directory structure is mirrored in dest
+        for dir_name in dirs:
+            source_dir = os.path.join(root, dir_name)
+            relative_path = os.path.relpath(source_dir, src)
+            destination_dir = os.path.join(dest, relative_path)
 
-        # Make sure the current directory exists in the destination
-        if not os.path.exists(current_dest):
-            os.makedirs(current_dest)
-            print(f"Created directory: {current_dest}")
+            try:
+                os.makedirs(destination_dir)
+                print(f"Directory created: {destination_dir}")
+            except FileExistsError:
+                print(f"Directory already exists: {destination_dir}")
 
-        for file in files:
-            src_file_path = os.path.join(root, file)
-            dest_file_path = os.path.join(current_dest, file)
+        # Copy each file
+        for file_name in files:
+            source_file = os.path.join(root, file_name)
+            relative_path = os.path.relpath(source_file, src)
+            destination_file = os.path.join(dest, relative_path)
 
-            # Copy each file
-            shutil.copy2(src_file_path, dest_file_path)
-            print(f"Copied {src_file_path} to {dest_file_path}")
+            shutil.copy2(source_file, destination_file)
+            print(f"File copied: {source_file} to {destination_file}")
 
 
 def main():
@@ -40,6 +44,7 @@ def main():
     try:
         print("Starting upgrade process.")
         upgradeFile: str = Registry.read("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeMode")
+        upgradeFile = os.path.join(os.getcwd(), upgradeFile)
 
         print(f"Overwriting files from {upgradeFile} to root directory.")
         cp(upgradeFile, os.getcwd())
