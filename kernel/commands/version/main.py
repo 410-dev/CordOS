@@ -14,7 +14,7 @@ class Version:
             version = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")
             botName = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.BotName")
             botVer = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.BotVersion")
-            isSafe = "" if not IPC.readObj("kernel.safemode") else " (Safe Mode)"
+            isSafe = "" if not IPC.read("kernel.safemode") else " (Safe Mode)"
             await self.message.reply(f"Version Profiling:\n\nBaseSystem: {foundation} {version} {isSafe}\nBot: {botName} {botVer}", mention_author=True)
         except Exception as e:
             await self.message.reply(f"Error loading profile: {e}", mention_author=True)
