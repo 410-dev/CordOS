@@ -137,12 +137,19 @@ with open("defaults/registry.cordblueprint", 'r') as f:
 for reg in blueprintList:
     try:
         regn = reg.split("=")[0]
-        # print(f"Testing registry: {reg}.....", end='')
+
+        # If registry is optional, it starts with a question mark
+        optional = regn.startswith("?")
+        if optional: regn = regn[1:]
+
         regVal = Registry.read(regn)
-        if regVal == None:
+        if regVal == None or not optional:
             value = reg.split("=")[1] if len(reg.split("=")) > 1 else None
             Registry.write(regn, value, config['registry'])
-            print("[ Upgraded ] " + regn)
+            if not optional:
+                print("[  Passed  ] " + regn)
+            else:
+                print("[ Upgraded ] " + regn)
         else:
             print("[  Passed  ] " + regn)
         
