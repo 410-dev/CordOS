@@ -14,8 +14,6 @@
 | SOFTWARE.CordOS.Kernel.Services.APIMinimum | Integer | 1 | Yes | 커널 서비스에서 지원하는 최소 API 버전입니다. |
 | SOFTWARE.CordOS.Kernel.Services.APIMaximum | Integer | 2 | Yes | 커널 서비스에서 지원하는 최대 API 버전입니다. |
 | SOFTWARE.CordOS.Kernel.Services.ReloadOnCall | Binary Integer | 1 | No | API 호출시 서비스를 다시로드할지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
-| SOFTWARE.CordOS.Kernel.Services.CoreServices.IPC.TimeSync | Binary Integer | 1 | No | 핵심 서비스의 IPC에서 시간 동기화가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
-| SOFTWARE.CordOS.Kernel.Services.CoreServices.IPC.LabelKernelState | String | KernelState | No | 코어 서비스의 IPC에서 커널 상태에 할당된 라벨입니다. |
 | SOFTWARE.CordOS.Kernel.Services.Webhook.Enabled | Binary Integer | 1 | No | 웹훅이 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.Services.Webhook.ReloadOnCall | Binary Integer | 1 | No | API 호출시 웹훅을 다시로드할지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.Services.Webhook.TimeSync | Binary Integer | 1 | No | 웹훅의 시간 동기화가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
