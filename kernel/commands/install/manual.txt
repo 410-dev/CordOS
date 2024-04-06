@@ -1,0 +1,8 @@
+Install package to the system
+
+THIS COMMAND IS NOT IMPLEMENTED YET
+
+```
+Usage:
+    install <url>   : Installs the package from the given url
+```
