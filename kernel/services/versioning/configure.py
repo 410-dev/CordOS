@@ -108,7 +108,7 @@ async def main(args: list, message):
                 else:
                     text = f"Update available."
 
-                await message.reply(f"{text}\nLatest version: {latestVersion} (build {latestBuild})")
+                await message.reply(f"{text}\nLatest version: {latestVersion} (build {latestBuild})\nCurrent version: {currentVersion} (build {currentBuild})")
             except:
                 await message.reply("Failed to get latest version information.")
 
