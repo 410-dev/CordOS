@@ -90,13 +90,15 @@ def main(args):
     check_configuration(args)
 
     print(f"{Colors.NC}Starting bot...{Colors.NC}")
-    subprocess.run(['python3', 'system.py'] + args)
+    completion = subprocess.run(['python3', 'system.py'] + args)
 
     if "--clear-cache" in args:
         print(f"{Colors.YELLOW}Clearing cache...{Colors.NC}")
         clear_cache()
 
     print(f"{Colors.NC}Bot exited.{Colors.NC}")
+
+    sys.exit(completion.returncode)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
