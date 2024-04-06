@@ -26,8 +26,13 @@ def start(stage: int, safeMode: bool):
                 print(f"Service '{service}' is not in safe mode list. Skipping.")
                 continue
 
+        if not os.path.isdir(f"kernel/services/{service}"):
+            continue
+
         if "main.py" not in os.listdir(f"kernel/services/{service}"):
             continue
+
+        runSync: bool = False
 
         try:
             with open(f"kernel/services/{service}/service.json", 'r') as f:
@@ -42,6 +47,9 @@ def start(stage: int, safeMode: bool):
                 if serviceData['api'] > int(Registry.read("SOFTWARE.CordOS.Kernel.Services.APIMaximum")):
                     print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
                     continue
+
+                if serviceData['api'] >= 2 and serviceData['sync']:
+                    runSync = True
 
                 if Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service}.Enabled") == "0":
                     continue
@@ -62,6 +70,12 @@ def start(stage: int, safeMode: bool):
 
             thread = threading.Thread(target=module.main)
             thread.daemon = True
+
+            if runSync:
+                print(f"Running service (Stage {stage}) '{service}' in sync mode.")
+                thread.run()
+                continue
+
             thread.start()
 
             print(f"Started service (Stage {stage}) '{service}'.")
