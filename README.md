@@ -2,7 +2,7 @@
 Discord 봇을 빠르게 제작하기 위한 프레임워크입니다.
 
 ## 시작하기
-1. `git clone ~~~` 로 프로젝트를 다운로드 받습니다.
+1. `git clone https://github.com/410-dev/CordOS.git` 로 프로젝트를 다운로드 받습니다.
 2. `boot.ps1`, `boot.sh`, `boot.bat` (이하 시동파일) 중 하나를 실행하여 프로젝트를 시작/초기화 합니다.
 3. `data/config.json` 파일의 `token` 값을 자신의 봇 토큰으로 변경합니다.
 4. 다시 시동파일을 실행하여 봇을 시작합니다.
