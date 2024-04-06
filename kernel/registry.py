@@ -3,6 +3,7 @@ import os
 
 import kernel.config as Config
 
+
 def read(key: str, regloc: str = Config.get("registry"), default=None, writeDefault=False):
     key = key.replace(".", "/")
     if not os.path.exists(os.path.join(regloc, key)):
@@ -18,17 +19,18 @@ def read(key: str, regloc: str = Config.get("registry"), default=None, writeDefa
                 listOfFiles.append(file + "=" + read(os.path.join(key, file).replace("/", "."), regloc))
             elif os.path.isdir(os.path.join(regloc, key, file)) and not file.startswith("."):
                 listOfFiles.append(file)
-                
+
         return listOfFiles
-        
+
     with open(os.path.join(regloc, key), 'r') as f:
         if os.path.isfile(os.path.join(regloc, key)):
             return f.read()
-        
+
         else:
             if writeDefault:
                 write(key, default, regloc)
             return default
+
 
 def isKey(key: str, regloc: str = Config.get("registry")) -> int:
     key = key.replace(".", "/")
@@ -38,26 +40,26 @@ def isKey(key: str, regloc: str = Config.get("registry")) -> int:
         return 1
     else:
         return 2
-    
-def write(key: str, value = None, regloc: str = Config.get("registry"), verbose=False):
+
+
+def write(key: str, value=None, regloc: str = Config.get("registry"), verbose=False):
     key = key.replace(".", "/")
 
     # If key starts with ? and already exists, return
     if key.startswith("?") and os.path.exists(os.path.join(regloc, key[1:])):
         if verbose: print(f"[  Exists  ] {key[1:].replace("/", ".")}")
         return
-    
+
     # If parent directory does not exist, create all parent directories
     for i in range(len(key.split("/"))):
         if not os.path.exists(os.path.join(regloc, "/".join(key.split("/")[:i]))):
             os.mkdir(os.path.join(regloc, "/".join(key.split("/")[:i])))
-    
-    
+
     # If value is none, create directory
     if value is None:
         os.mkdir(os.path.join(regloc, key))
         return
-    
+
     else:
         with open(os.path.join(regloc, key), 'w') as f:
             if type(value) is list:
@@ -66,13 +68,14 @@ def write(key: str, value = None, regloc: str = Config.get("registry"), verbose=
                 f.write(json.dumps(value))
             else:
                 f.write(value)
-            if verbose: print(f"[ Generate ] {key.replace('/', '.').replace('?','')}")
+            if verbose: print(f"[ Generate ] {key.replace('/', '.').replace('?', '')}")
+
 
 def delete(key: str, deleteSubkeys: bool = False, regloc: str = Config.get("registry")):
     key = key.replace(".", "/")
     if not os.path.exists(os.path.join(regloc, key)):
         return
-    
+
     if os.path.isfile(os.path.join(regloc, key)):
         os.remove(os.path.join(regloc, key))
     else:
@@ -83,21 +86,22 @@ def delete(key: str, deleteSubkeys: bool = False, regloc: str = Config.get("regi
                 else:
                     delete(os.path.join(key, file), deleteSubkeys, regloc)
         os.rmdir(os.path.join(regloc, key))
-                
+
+
 def listSubKeys(key: str, subdirectories: list = [], regloc: str = Config.get("registry")) -> list:
     key = key.replace(".", "/")
     if not os.path.exists(os.path.join(regloc, key)):
         return []
-        
+
     listOfFiles: list = []
     for file in os.listdir(os.path.join(regloc, key)):
         if os.path.isfile(os.path.join(regloc, key, file)) and not file.startswith("."):
             listOfFiles.append(file.replace("/", ".") + "=" + read(os.path.join(key, file).replace("/", "."), regloc))
         elif os.path.isdir(os.path.join(regloc, key, file)) and not file.startswith("."):
             listSubKeys(os.path.join(key, file), subdirectories, regloc)
-            
+
     return listOfFiles
-    
+
 
 def build(blueprintPath: str, registryPath: str = Config.get("registry"), silent=False):
     lines: list = []
@@ -109,9 +113,9 @@ def build(blueprintPath: str, registryPath: str = Config.get("registry"), silent
             if line.strip() == "":
                 continue
             lines.append(line.strip())
-            
+
     for line in lines:
         key = line.split("=")[0]
         value = line.split("=")[1] if len(line.split("=")) > 1 else None
         write(key, value, registryPath, verbose=not silent)
-        
+
