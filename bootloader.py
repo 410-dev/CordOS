@@ -96,7 +96,7 @@ def main(args):
         print(f"{Colors.YELLOW}Clearing cache...{Colors.NC}")
         clear_cache()
 
-    print(f"{Colors.NC}Bot exited.{Colors.NC}")
+    print(f"{Colors.NC}Bot exited with code {completion.returncode}.{Colors.NC}")
 
     sys.exit(completion.returncode)
 
