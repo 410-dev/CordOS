@@ -110,7 +110,7 @@ async def on_message(message):
             await message.reply(f"Failed looking up for command. This should not occur. {e}", mention_author=True)
             return
 
-        if runnablePath == "":
+        if runnablePath == "" or runnablePath is None:
             await message.reply(f"Command {cmd} not found.", mention_author=True)
             return
 
