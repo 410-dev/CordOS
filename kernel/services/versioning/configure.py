@@ -29,7 +29,7 @@ async def main(args: list, message):
     try:
         branch: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.Branch", default="stable")
         imageurl: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.ImageURL", default="https://github.com/410-dev/cordOS/archive/<branch>.zip")
-        metaURL: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.MetaURL", default="https://raw.githubusercontent.com/410-dev/CordOS/main/defaults/registry.cordblueprint?token=GHSAT0AAAAAACQRHLNFYZEZK5ZDE7CCBYPMZQQ6OKQ")
+        metaURL: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.MetaURL", default="https://raw.githubusercontent.com/410-dev/CordOS/<branch>/defaults/registry.cordreg")
         forceReboot: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.ForceReboot", default="1")
 
         if args[0] == "upgrade":

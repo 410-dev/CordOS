@@ -17,7 +17,7 @@
 | SOFTWARE.CordOS.Kernel.Services.ReloadOnCall             | Binary Integer | 1 | No | API 호출시 서비스를 다시로드할지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.Services.Webhook.Enabled          | Binary Integer | 1 | No | 웹훅이 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.Services.Webhook.ReloadOnCall     | Binary Integer | 1 | No | API 호출시 웹훅을 다시로드할지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
-| SOFTWARE.CordOS.Kernel.Services.Webhook.TimeSync         | Binary Integer | 1 | No | 웹훅의 시간 동기화가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
+| SOFTWARE.CordOS.Kernel.Services.Webhook.Interval         | Binary Integer | 1 | No | 웹훅의 시간 동기화가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.Services.Webhook.EnableLogging    | Binary Integer | 1 | No | 웹훅의 로깅이 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.Services.Webhook.LibraryPath      | String | data/files/webhooks/\<id> | No | 웹훅 라이브러리의 경로입니다. |
 | SOFTWARE.CordOS.Kernel.Services.Webhook.RegistrationPath | String | data/webhooks | No | 웹훅 등록 디렉토리의 경로입니다. |

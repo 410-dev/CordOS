@@ -40,7 +40,7 @@ async def main(args: list, message):
             os.remove(f"{links}/{url}")
             await message.reply(f"Unlinked {args[1]} from {args[2]}")
         except:
-           await  message.reply(f"Failed to unlink {args[1]} from {args[2]}")
+           await message.reply(f"Failed to unlink {args[1]} from {args[2]}")
 
     elif args[0] == "list":
         webhooks = Webhook.list()

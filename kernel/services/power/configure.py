@@ -18,7 +18,7 @@ async def main(args: list, message):
         await message.reply(f"Reboot signal published. System will reboot after all services have stopped.")
 
     elif args[0] == "halt":
-        haltKey = f"SOFTWARE.CordOS.Kernel.Signals.Halt.{message.author.id}"
+        haltKey = f"KernelHaltSignal.{message.author.id}"
         haltValue = IPC.read(haltKey, default="0")
         if haltValue != "1" and (len(args) < 2 or args[1] != "--no-warning"):
             IPC.set(haltKey, "1")
@@ -29,7 +29,7 @@ async def main(args: list, message):
             exit(0)
 
     elif args[0] == "reset":
-        resetKey = f"SOFTWARE.CordOS.Kernel.Signals.Reset.{message.author.id}"
+        resetKey = f"KernelResetSignal.{message.author.id}"
         resetValue = IPC.read(resetKey)
         if resetValue != "1" and (len(args) < 2 or args[1] != "--no-warning"):
             IPC.set(resetKey, "1")
@@ -42,12 +42,12 @@ async def main(args: list, message):
             exit(1)
 
     elif args[0] == "halt-cancel":
-        haltKey = f"SOFTWARE.CordOS.Kernel.Signals.Halt.{message.author.id}"
+        haltKey = f"KernelHaltSignal.{message.author.id}"
         IPC.delete(haltKey)
         await message.reply("Force-halt cancelled.")
 
     elif args[0] == "reset-cancel":
-        resetKey = f"SOFTWARE.CordOS.Kernel.Signals.Reset.{message.author.id}"
+        resetKey = f"KernelResetSignal.{message.author.id}"
         IPC.delete(resetKey)
         await message.reply("Reset cancelled.")
 

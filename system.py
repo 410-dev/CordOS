@@ -131,14 +131,14 @@ async def on_message(message):
                 Registry.delete("", deleteSubkeys=True)
                 print("Registry erased.")
                 await message.reply("Registry erased.", mention_author=True)
-                Registry.build('defaults/registry.cordblueprint', 'data/registry')
+                Registry.build('defaults/registry.cordreg', 'data/registry')
                 print("Registry rebuilt.")
                 await message.reply("Registry rebuilt.", mention_author=True)
                 return
 
             elif message.content == ".regfix":
                 print("Running registry fix.")
-                Registry.build('defaults/registry.cordblueprint', 'data/registry')
+                Registry.build('defaults/registry.cordreg', 'data/registry')
                 print("Registry rebuilt.")
                 await message.reply("Registry rebuilt.", mention_author=True)
 

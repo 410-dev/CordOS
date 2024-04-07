@@ -120,12 +120,12 @@ import kernel.registry as Registry
 if not os.path.exists('data/registry') or not os.path.isdir('data/registry'):
     print("data/registry does not exist or is not a directory. Creating data/registry")
     os.mkdir('data/registry')
-    Registry.build('defaults/registry.cordblueprint', 'data/registry')
+    Registry.build('defaults/registry.cordreg', 'data/registry')
 
 print("Checking required registries...")
 
 blueprintList: list = []
-with open("defaults/registry.cordblueprint", 'r') as f:
+with open("defaults/registry.cordreg", 'r') as f:
     conf: list = f.readlines()
     for line in conf:
         if line.startswith("#"):
