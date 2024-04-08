@@ -3,6 +3,9 @@ import subprocess
 import sys
 import shutil
 
+python3 = None
+pip3 = None
+
 # Color variables for terminal output
 class Colors:
     RED = '\033[0;31m'
@@ -17,17 +20,19 @@ def command_exists(cmd):
 # Function to install required components
 def install_components():
     try:
-        subprocess.check_call(['pip3', 'install', '-r', 'requirements.txt'])
+        global pip3
+        subprocess.check_call([pip3, 'install', '-r', 'requirements.txt'])
         print(f"{Colors.GREEN}Components installed.{Colors.NC}")
         open('data/pip-done', 'a').close()  # Create the file to indicate components are installed
     except subprocess.CalledProcessError:
         print(f"{Colors.RED}Error: Failed to install components. Exiting...{Colors.NC}")
-        sys.exit(1)
+        sys.exit(2)
 
 # Function to check configuration using preload.py script
 def check_configuration(args):
     # result = subprocess.run(['python3', 'preload.py'] + args, capture_output=True)
-    result = subprocess.run(['python3', 'preload.py'] + args)
+    global python3
+    result = subprocess.run([python3, 'preload.py'] + args)
     if result.returncode == 0:
         print(f"{Colors.GREEN}Configuration check passed.{Colors.NC}")
     elif result.returncode == 1:
@@ -35,28 +40,28 @@ def check_configuration(args):
         sys.exit(0)
     elif result.returncode == 2:
         print(f"{Colors.RED}Configuration corrupted: Failed loading token value from data/config.json. Exiting...{Colors.NC}")
-        sys.exit(1)
+        sys.exit(2)
     elif result.returncode == 3:
         print(f"{Colors.RED}data/server.json seems to be corrupted. Please delete it and run this script again.{Colors.NC}")
-        sys.exit(1)
+        sys.exit(2)
     elif result.returncode == 4:
         print(f"{Colors.RED}data/config.json seems to be corrupted. Please delete it and run this script again.{Colors.NC}")
-        sys.exit(1)
+        sys.exit(2)
     elif result.returncode == 5:
         print(f"{Colors.RED}data/config.json has missing keys that are necessary. Read the output logs to check which key is missing.{Colors.NC}")
-        sys.exit(1)
+        sys.exit(2)
     elif result.returncode == 6:
         print(f"{Colors.RED}Registry has missing keys or values that are necessary. Read the output logs to check which key or value is missing.{Colors.NC}")
-        sys.exit(1)
+        sys.exit(2)
     elif result.returncode == 7:
         print(f"{Colors.RED}Error reading pip3 list. Exiting...{Colors.NC}")
-        sys.exit(1)
+        sys.exit(2)
     elif result.returncode == 8:
         print(f"{Colors.RED}Core dependencies missing. Unable to continue. Exiting...{Colors.NC}")
-        sys.exit(1)
+        sys.exit(2)
     else:
         print(f"{Colors.RED}Configuration check failed with unknown error: {result.returncode}. Exiting...{Colors.NC}")
-        sys.exit(1)
+        sys.exit(2)
 
 # Function to clear cache
 def clear_cache():
@@ -68,14 +73,31 @@ def clear_cache():
         shutil.rmtree('data/cache')
     print(f"{Colors.GREEN}Cache cleared.{Colors.NC}")
 
-def main(args):
-    if not command_exists('pip3'):
-        print(f"{Colors.RED}Error: pip3 is not installed. Please install it and try again.{Colors.NC}")
-        sys.exit(1)
 
-    if not command_exists('python3'):
+def main(args):
+    pipcmds = ['pip3', 'pip']
+    pythoncmds = ['python3', 'python']
+
+    global pip3
+    global python3
+
+    for cmd in pipcmds:
+        if command_exists(cmd):
+            pip3 = cmd
+            break
+
+    for cmd in pythoncmds:
+        if command_exists(cmd):
+            python3 = cmd
+            break
+
+    if pip3 is None:
+        print(f"{Colors.RED}Error: pip3 is not installed. Please install it and try again.{Colors.NC}")
+        sys.exit(2)
+
+    if python3 is None:
         print(f"{Colors.RED}Error: python3 is not installed. Please install it and try again.{Colors.NC}")
-        sys.exit(1)
+        sys.exit(2)
 
     print(f"{Colors.NC}Creating required directories...{Colors.NC}")
     os.makedirs('data/cache', exist_ok=True)
@@ -90,7 +112,9 @@ def main(args):
     check_configuration(args)
 
     print(f"{Colors.NC}Starting bot...{Colors.NC}")
-    completion = subprocess.run(['python3', 'system.py'] + args)
+
+    # Check if python3 is available as a command
+    completion = subprocess.run([python3, 'system.py'] + args)
 
     if "--clear-cache" in args:
         print(f"{Colors.YELLOW}Clearing cache...{Colors.NC}")
