@@ -32,6 +32,9 @@ async def main(args: list, message):
         metaURL: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.MetaURL", default="https://raw.githubusercontent.com/410-dev/CordOS/<branch>/defaults/registry.cordreg")
         forceReboot: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.ForceReboot", default="1")
 
+        imageurl = imageurl.replace("<branch>", branch)
+        metaURL = metaURL.replace("<branch>", branch)
+
         if args[0] == "upgrade":
             if not (len(args) > 1 and args[1] == "--reinstall") and (getBuild(metaURL) == Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Build") and getVersion(metaURL) == Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")):
                 await message.reply("You are already on the latest version.")
@@ -126,7 +129,7 @@ async def main(args: list, message):
             await message.reply(f"Branch set to {args[1]}.")
 
         else:
-            await message.reply("Usage: versioning upgrade")
+            await message.reply("Usage: versioning <upgrade|latest|branch>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause data loss.")
 
     except Exception as e:
         await message.reply("Usage: versioning <upgrade|latest|branch>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause data loss.")
