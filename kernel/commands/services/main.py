@@ -96,7 +96,7 @@ class Services:
                 except:
                     continue
                 services += f"{service}\n"
-            await self.message.reply(f"{services}```", mention_author=True)
+            await self.message.reply(f"{services} ```", mention_author=True)
         elif self.args[1] == "loaded":
             flist = os.listdir(PartitionMgr.cache() + "/krnlsrv")
             flist.sort()
