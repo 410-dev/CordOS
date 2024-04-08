@@ -52,8 +52,8 @@ def write(key: str, value=None, regloc: str = Config.get("registry"), verbose=Fa
 
     # If parent directory does not exist, create all parent directories
     for i in range(len(key.split("/"))):
-        if not os.path.exists(os.path.join(regloc, "/".join(key.split("/")[:i]))):
-            os.mkdir(os.path.join(regloc, "/".join(key.split("/")[:i])))
+        if not os.path.exists(os.path.join(regloc, os.sep.join(key.split("/")[:i]))):
+            os.mkdir(os.path.join(regloc, os.sep.join(key.split("/")[:i])))
 
     # If value is none, create directory
     if value is None:
