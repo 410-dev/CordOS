@@ -5,6 +5,7 @@ import json
 import kernel.registry as Registry
 import kernel.partitionmgr as PartitionMgr
 
+
 def start(stage: int, safeMode: bool):
     if Registry.read("SOFTWARE.CordOS.Kernel.Services.Enabled") == "0":
         return
@@ -34,6 +35,10 @@ def start(stage: int, safeMode: bool):
     loadedThirdPartyService: list = []
 
     for service in servicesList:
+
+        if service.endswith(".disabled"):
+            print(f"Service '{service}' is disabled. Skipping.")
+            continue
 
         if safeMode:
             if service not in safeServiceList:
