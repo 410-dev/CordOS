@@ -1,6 +1,8 @@
 
 import traceback
 from typing import List
+from objects.embedmsg import EmbeddedMessage
+
 import kernel.registry as Registry
 
 import json
@@ -30,7 +32,10 @@ async def main(args: list, message) -> None:
         if helpString == "":
             return Registry.read("SOFTWARE.CordOS.Kernel.Proc.CommandNotFound")
 
-        await message.reply(helpString, mention_author=True)
+        msg = EmbeddedMessage(message, title=args[1], description=helpString, footer="CordOS")
+        await msg.sendAsReply()
+
+        # await message.reply(helpString, mention_author=True)
     except Exception as e:
         if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
         await message.reply(f"Error in settings. e: {e}", mention_author=True)
