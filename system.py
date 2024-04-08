@@ -146,16 +146,17 @@ try:
                 elif message.content == ".rebootfix":
                     print("Terminating system and restarting kernel in safemode. Set `SOFTWARE.CordOS.Kernel.SafeMode` to 0 after reboot to return to normal mode.")
                     await message.reply("Terminating system and restarting kernel in safemode. Set `SOFTWARE.CordOS.Kernel.SafeMode` to 0 after reboot to return to normal mode.", mention_author=True)
-                    # with open("restart", "w") as f:
-                    #     f.write("")
                     try:
+                        IPC.set("power.off", True)
+                        IPC.set("power.off.state", "REBOOT-SAFE")
                         Registry.write("SOFTWARE.CordOS.Kernel.SafeMode", "1")
                     except:
-                        print("Failed to update registry. The system will reboot into normal mode.")
-                        message.reply("Failed to update registry. The system will reboot into normal mode.", mention_author=True)
+                        print("Failed to update registry / IPC. The system will try reboot to safe mode anyway.")
+                        await message.reply("Failed to update registry. The system will try reboot to safe mode anyway.", mention_author=True)
+                        sys.exit(3)
 
                     await client.close()
-                    exit(1)
+                    sys.exit(1)
 
                 else:
                     print(f"!!!SYSTEM PANIC!!!!\nKernel cannot launch subprocess due to the following error:\n{e}\nIt may be due to registry issue. To recover, type `regfix` to reset default registries. If it does not work, type `regrestore` to fully clean the registry. If it still does not work, type `rebootfix` to restart the kernel in safemode. However, this is not recommended as it uses asynchronous subprocesses and may console instability.")
@@ -181,8 +182,6 @@ try:
                             await client.close()
                             break
                         elif signal == "REBOOT":
-                            # with open("restart", "w") as f:
-                            #     f.write("")
                             await client.close()
                             break
                         await client.close()
@@ -220,6 +219,8 @@ try:
     print(f"CoreSystem terminating with code '{terminationCode}'.")
     if terminationCode == "REBOOT":
         sys.exit(1)
+    elif terminationCode == "REBOOT-SAFE":
+        sys.exit(3)
     else:
         sys.exit(0)
 

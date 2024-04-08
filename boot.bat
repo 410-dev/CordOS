@@ -10,17 +10,18 @@ if exist ".\venv" (
 
 if exist ".\safe_restart" (
     del ".\safe_restart"
-    python .\bootloader.py --safe %*
-    set exit_code=%errorlevel%
+    call python .\bootloader.py --safe %*
 ) else (
-    python .\bootloader.py %*
-    set exit_code=%errorlevel%
+    call python .\bootloader.py %*
 )
 
-if %exit_code% equ 1 (
-    echo. > .\restart
-) else if %exit_code% equ 3 (
-    echo. > .\safe_restart
+:: Directly check the errorlevel
+if errorlevel 1 (
+    if errorlevel 3 (
+        echo. > .\safe_restart
+    ) else (
+        echo. > .\restart
+    )
 )
 
 if exist ".\data\cache" (
@@ -28,7 +29,9 @@ if exist ".\data\cache" (
 )
 
 if not exist ".\restart" (
-    goto :eof
+    if not exist ".\safe_restart" (
+        goto :eof
+    )
 )
 
 goto loop
