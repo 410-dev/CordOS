@@ -32,10 +32,14 @@ async def main(args: list, message) -> None:
         if helpString == "":
             return Registry.read("SOFTWARE.CordOS.Kernel.Proc.CommandNotFound")
 
-        msg = EmbeddedMessage(message, title=args[1], description=helpString, footer="CordOS")
-        await msg.sendAsReply()
+        if Registry.read("SOFTWARE.CordOS.Experimental.EmbeddedMessage", default="0") == "0":
+            await message.reply(helpString, mention_author=True)
+            return
 
-        # await message.reply(helpString, mention_author=True)
+        else:
+            msg = EmbeddedMessage(message, title=args[1], description=helpString, footer="CordOS")
+            await msg.sendAsReply()
+
     except Exception as e:
         if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
         await message.reply(f"Error in settings. e: {e}", mention_author=True)
