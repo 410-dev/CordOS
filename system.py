@@ -223,6 +223,17 @@ try:
     else:
         sys.exit(0)
 
+except discord.errors.LoginFailure as e:
+    print(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print(f"KERNEL CRASHED WITH DISCORD LOGIN FAILURE")
+    print(f"---------------------------------------")
+    print(f"Error Time: {time.ctime()}")
+    print(f"Error: {e}")
+    print(f"---------------------------------------")
+    print(f"System will stop now immediately.")
+    print(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    sys.exit(0)
+
 except Exception as e:
     print(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     print(f"KERNEL CRASHED WITH UNHANDLED EXCEPTION")
