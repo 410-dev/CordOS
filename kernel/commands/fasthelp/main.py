@@ -8,7 +8,7 @@ import os
 
 async def main(args: list, message) -> None:
     try:
-        commandPaths: List[str] = json.loads(Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths"))['data']
+        commandPaths: List[str] = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
 
         # Find executable bundle
         cmdList: str = "Available Commands:\n"

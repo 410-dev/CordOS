@@ -33,7 +33,7 @@ try:
 
     # Load registry
     prefix = Registry.read("SOFTWARE.CordOS.Config.Core.Prefix")
-    paths: list = json.loads(Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths"))['data']
+    paths: list = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
     foundation = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Foundation")
     version = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")
     botname = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.BotName")
