@@ -1,3 +1,5 @@
+import asyncio
+
 from discord import Message
 
 import kernel.registry as Registry
@@ -51,14 +53,19 @@ async def runModule(message: Message, scope: str):
             print(f"Event bundle {eventBundle} does not have a main.py file.")
 
     import importlib
+    executedTasks: list = []
     for eventBundle in eventBundles:
         try:
             module = importlib.import_module(eventBundle.replace("/", ".").replace("\\", ".") + ".main")
             importlib.reload(module)
-            await module.main(message)
+            # await module.main(message)
+            executedTasks.append(asyncio.create_task(module.main(message)))
             print(f"Event bundle {eventBundle} started in a new thread.")
         except Exception as e:
             print(f"Error while running event bundle {eventBundle}: {e}")
+
+    for task in executedTasks:
+        await task
 
 
 async def onInteractiveInputEvent(message: Message):
