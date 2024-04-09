@@ -56,6 +56,18 @@ def start(stage: int, safeMode: bool):
         try:
             with open(f"{service}/service.json", 'r') as f:
                 serviceData = json.loads(f.read())
+
+                # Check if keys exists
+                keysRequired = ["api", "stage", "sync"]
+                keysType = [int, int, bool]
+                for i in range(len(keysRequired)):
+                    if keysRequired[i] not in serviceData:
+                        print(f"Service Failed: Service '{service}' is missing '{keysRequired[i]}' key. (Not Found) Skipping.")
+                        continue
+                    if not isinstance(serviceData[keysRequired[i]], keysType[i]):
+                        print(f"Service Failed: Service '{service}' has invalid '{keysRequired[i]}' key. (Type Mismatch) Skipping.")
+                        continue
+
                 if serviceData['stage'] != stage:
                     continue
 
@@ -70,11 +82,12 @@ def start(stage: int, safeMode: bool):
                 if serviceData['api'] < int(Registry.read("SOFTWARE.CordOS.Kernel.Services.APIMinimum")):
                     print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too old). Skipping.")
                     continue
+
                 if serviceData['api'] > int(Registry.read("SOFTWARE.CordOS.Kernel.Services.APIMaximum")):
                     print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
                     continue
 
-                if serviceData['api'] >= 2 and serviceData['sync']:
+                if serviceData['sync']:
                     runSync = True
 
                 if service.startswith("kernel/services"):
