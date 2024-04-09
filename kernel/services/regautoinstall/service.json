@@ -1,5 +1,5 @@
 {
     "api": 1,
     "stage": 1,
-    "name": "regautoinstall"
+    "sync": false
 }

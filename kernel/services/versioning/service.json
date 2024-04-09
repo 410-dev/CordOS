@@ -1,6 +1,5 @@
 {
-    "api": 2,
+    "api": 1,
     "stage": 0,
-    "name": "versioning",
     "sync": true
 }

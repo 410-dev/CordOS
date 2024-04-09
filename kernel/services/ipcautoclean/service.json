@@ -1,6 +1,5 @@
 {
-    "api": 2,
+    "api": 1,
     "stage": 1,
-    "name": "IPCAutoClean",
     "sync": false
 }
