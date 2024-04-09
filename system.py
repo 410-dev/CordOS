@@ -18,6 +18,7 @@ try:
     import kernel.clock as Clock
     import kernel.ipc as IPC
     import kernel.host as HostMachine
+    import kernel.services.ioeventsmgr.main as IOEventsMgr
 
     # Check commandline arguments
     argsList: list = sys.argv
@@ -29,7 +30,6 @@ try:
     IPC.set("kernel.safemode", safeMode)
     Services.start(1, safeMode)
     config = Config.load()
-
 
     # Load registry
     prefix = Registry.read("SOFTWARE.CordOS.Config.Core.Prefix")
@@ -79,7 +79,11 @@ try:
     @client.event
     async def on_message(message):
         try:
-            if Registry.read("SOFTWARE.CordOS.Events.Inbound.PrintMessage") == "1":
+
+            if Registry.read("SOFTWARE.CordOS.Experimental.SystemEventHooker.InboundPassive", default="0") == "1":
+                await IOEventsMgr.onPassiveInputEvent(message)
+
+            elif Registry.read("SOFTWARE.CordOS.Events.Inbound.PrintMessage") == "1":
                 formattedMsg = Registry.read("SOFTWARE.CordOS.Events.Inbound.PrintMessageFormat")
                 formattedMsg = formattedMsg.replace("$uname", str(message.author.name))
                 formattedMsg = formattedMsg.replace("$author", str(message.author))
@@ -88,6 +92,8 @@ try:
                 formattedMsg = formattedMsg.replace("$servername", str(message.guild.name))
                 formattedMsg = formattedMsg.replace("$message", str(message.content))
                 print(formattedMsg)
+
+
 
             # Check if the message was sent by the bot itself
             if message.author == client.user:
@@ -101,26 +107,30 @@ try:
             # Update the user's server data
             Servers.updateServer(message)
 
-            # Extract the command and arguments from the message content
-            try:
-                msgContent: str = message.content[len(prefix):]
-                args: list = Launcher.splitArguments(msgContent)
-                cmd: str = Launcher.getCommand(args)
-                runnablePath: str = Launcher.getRunnableModule(args)
-            except Exception as e:
-                await message.reply(f"Failed looking up for command. This should not occur. {e}", mention_author=True)
-                return
+            if Registry.read("SOFTWARE.CordOS.Experimental.SystemEventHooker.InboundInteractive", default="0") == "1":
+                await IOEventsMgr.onInteractiveInputEvent(message)
 
-            if runnablePath == "" or runnablePath is None:
-                await message.reply(f"Command {cmd} not found.", mention_author=True)
-                return
+            else:
+                # Extract the command and arguments from the message content
+                try:
+                    msgContent: str = message.content[len(prefix):]
+                    args: list = Launcher.splitArguments(msgContent)
+                    cmd: str = Launcher.getCommand(args)
+                    runnablePath: str = Launcher.getRunnableModule(args)
+                except Exception as e:
+                    await message.reply(f"Failed looking up for command. This should not occur. {e}", mention_author=True)
+                    return
 
-            try:
-                await Launcher.runRunnableModule(runnablePath, args, message)
-            except Exception as e:
-                if Registry.read("SOFTWARE.CordOS.Kernel.PrintErrors") == "1": print(f"Error executing command '{cmd}': {e}")
-                if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
-                await message.reply(f"Error executing command '{cmd}': {e}", mention_author=True)
+                if runnablePath == "" or runnablePath is None:
+                    await message.reply(f"Command {cmd} not found.", mention_author=True)
+                    return
+
+                try:
+                    await Launcher.runRunnableModule(runnablePath, args, message)
+                except Exception as e:
+                    if Registry.read("SOFTWARE.CordOS.Kernel.PrintErrors") == "1": print(f"Error executing command '{cmd}': {e}")
+                    if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
+                    await message.reply(f"Error executing command '{cmd}': {e}", mention_author=True)
 
         except Exception as e:
 
