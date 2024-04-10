@@ -1,0 +1,49 @@
+{
+    "spec": "CordOSInstallablePackage",
+    "specv": 1,
+    "sdk": 1,
+    "name": "Package Name Here",
+    "version": "1.0.0",
+    "author": "Author Name Here",
+    "build": 1,
+    "description": "Description Here",
+    "level": "data/kernel/root",
+    "type": "event.passive/event.interactive/service/command",
+    "dependencies": {
+        "system": {
+            "version": "any",
+            "build": 1
+        }
+    },
+    "conflicts": {
+        "system": {
+            "version": "any",
+            "build": 1
+        }
+    },
+    "pip": [
+        "package1==1.0.0",
+        "package2"
+    ],
+    "taskmap": [
+        {
+            "task": "cleanup",
+            "target": [
+                "data/files/thispackagecache"
+            ],
+            "ignoreFail": true
+        },
+        {
+            "task": "install"
+        },
+        {
+            "task": "copy",
+            "source": [
+                "$SOURCE/data/files/thispackage"
+            ],
+            "destination": [
+                "data/files/thispackage"
+            ]
+        }
+    ]
+}
