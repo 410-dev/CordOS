@@ -9,6 +9,9 @@
     "description": "Description Here",
     "level": "data/kernel/root",
     "type": "event.passive/event.interactive/service/command",
+    "package": {
+        "zip": "https://github.com/dev/<repo>/archive/<branch>.zip"
+    },
     "dependencies": {
         "system": {
             "version": "any",
