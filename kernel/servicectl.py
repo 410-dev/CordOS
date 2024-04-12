@@ -58,7 +58,7 @@ def start(stage: int, safeMode: bool):
                 serviceData = json.loads(f.read())
 
                 # Check if keys exists
-                keysRequired = ["api", "stage", "sync"]
+                keysRequired = ["sdk", "stage", "sync"]
                 keysType = [int, int, bool]
                 for i in range(len(keysRequired)):
                     if keysRequired[i] not in serviceData:
@@ -79,11 +79,11 @@ def start(stage: int, safeMode: bool):
                         continue
 
                 # Check compatibility
-                if serviceData['api'] < int(Registry.read("SOFTWARE.CordOS.Kernel.Services.APIMinimum")):
+                if serviceData['sdk'] < int(Registry.read("SOFTWARE.CordOS.Kernel.Services.SDKMinimum")):
                     print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too old). Skipping.")
                     continue
 
-                if serviceData['api'] > int(Registry.read("SOFTWARE.CordOS.Kernel.Services.APIMaximum")):
+                if serviceData['sdk'] > int(Registry.read("SOFTWARE.CordOS.Kernel.Services.SDKMaximum")):
                     print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
                     continue
 
