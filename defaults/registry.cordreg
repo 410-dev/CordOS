@@ -58,4 +58,7 @@ SOFTWARE.CordOS.Kernel.Profiles.BotVersion=0.9.1
 ?SOFTWARE.CordOS.Security.Registry=root
 ?SOFTWARE.CordOS.Security.Tags=admin
 ?SOFTWARE.CordOS.Security.Services=root
+SOFTWARE.CordOS.Packages.Compatibility.SDKMinimum=1
+SOFTWARE.CordOS.Packages.Compatibility.SDKMaximum=1
+SOFTWARE.CordOS.Packages.Compatibility.InstallerSpecVersion=1
 ?SOFTWARE.CordOS.Debug=0
