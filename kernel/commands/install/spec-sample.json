@@ -7,14 +7,12 @@
     "author": "Author Name Here",
     "build": 1,
     "description": "Description Here",
-    "level": "data/kernel/root",
-    "type": "event.passive/event.interactive/service/command",
     "package": {
         "zip": "https://github.com/dev/<repo>/archive/<branch>.zip"
     },
     "dependencies": {
         "system": {
-            "version": "any",
+            "version": ">=1.0",
             "build": 1
         }
     },
@@ -28,6 +26,24 @@
         "package1==1.0.0",
         "package2"
     ],
+    "packageMaps": {
+        "kernel": {
+            "modules": "MODULES",
+            "services": "SERVICES",
+            "commands": "COMMANDS"
+        },
+        "user": {
+            "modules": "MODULES-USER",
+            "services": "SERVICES-USER",
+            "commands": "COMMANDS-USER"
+        },
+        "data": [
+            {
+                "source": "data/files/thispackage",
+                "destination": "data/files/thispackage"
+            }
+        ]
+    },
     "taskmap": [
         {
             "task": "cleanup",
