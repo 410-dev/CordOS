@@ -8,7 +8,7 @@
     "build": 1,
     "description": "Description Here",
     "package": {
-        "zip": "https://github.com/dev/<repo>/archive/<branch>.zip"
+        "zip": "https://github.com/dev/<repo>/archive/<branch>.zip   or    self"
     },
     "dependencies": {
         "system": {
@@ -51,6 +51,10 @@
                 "data/files/thispackagecache"
             ],
             "ignoreFail": true
+        },
+        {
+            "task": "execute",
+            "target": "data/files/thispackage/install.sh"
         },
         {
             "task": "install"
