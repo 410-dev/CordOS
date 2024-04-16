@@ -1,6 +1,6 @@
 import asyncio
 
-from discord import Message
+from objects.discordmessage import DiscordMessageWrapper
 
 import kernel.registry as Registry
 import os
@@ -16,7 +16,7 @@ def printIfEnabled(msg: str):
         print(msg)
 
 
-async def runModule(message: Message, scope: str):
+async def runModule(message: DiscordMessageWrapper, scope: str):
     # List directories in kernel/events/interaction and value of SOFTWARE.CordOS.Events.EventsBundleContainer
     eventBundles: list = []
 
@@ -74,14 +74,24 @@ async def runModule(message: Message, scope: str):
         await task
 
 
-async def onInteractiveInputEvent(message: Message):
+async def onInteractiveInputEvent(message: DiscordMessageWrapper):
     await runModule(message, "interaction")
 
 
-async def onPassiveInputEvent(message: Message):
+async def onPassiveInputEvent(message: DiscordMessageWrapper):
     await runModule(message, "passive")
 
 
-async def onOutputEvent(message: Message):
-    # Unsupported now
-    pass
+async def onReplyOutputEvent(message: DiscordMessageWrapper):
+    print("Reply output event")
+    await runModule(message, "output_reply")
+
+
+async def onSendOutputEvent(message: DiscordMessageWrapper):
+    print("Send output event")
+    await runModule(message, "output_send")
+
+
+async def onOutputEvent(message: DiscordMessageWrapper):
+    print("Output event")
+    await runModule(message, "output")

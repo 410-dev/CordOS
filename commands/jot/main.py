@@ -3,6 +3,8 @@ import os
 
 import kernel.partitionmgr as Partition
 
+from objects.discordmessage import DiscordMessageWrapper
+
 
 def hasFlag(flagFile, flag):
     if not os.path.exists(flagFile):
@@ -11,8 +13,11 @@ def hasFlag(flagFile, flag):
     with open(flagFile, 'r') as f:
         return flag in f.read().split("\n")
 
-async def createNote(args, message):
+
+async def createNote(args, messageWrapper: DiscordMessageWrapper):
     # If args has "get" or "list", list all notes
+
+    message = messageWrapper.getMessageObject()
 
     # Check if message.reference is None
     if message.reference is None:
@@ -36,7 +41,7 @@ async def createNote(args, message):
 
     # Check if existing flags have protected flag
     if hasFlag(flagsFile, "--protected"):
-        await message.reply("This note is protected. Cannot be modified.", mention_author=True)
+        await messageWrapper.reply("This note is protected. Cannot be modified.", mention_author=True)
         return
 
     # Check if already existed
@@ -48,7 +53,7 @@ async def createNote(args, message):
     with open(flagsFile, 'w') as f:
         f.write("\n".join(flags))
 
-    await message.reply(f"Note {'overwritten' if fileExists else 'added'}. Title: {title}", mention_author=True)
+    await messageWrapper.reply(f"Note {'overwritten' if fileExists else 'added'}. Title: {title}", mention_author=True)
 
 
 async def main(args, message: discord.Message):

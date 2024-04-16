@@ -6,7 +6,7 @@ CordOS의 서비스 번들 표준은 다음과 같은 규칙을 가집니다:
 1. 커널 서비스 번들은 반드시 `/kernel/services/` 디렉토리에 위치해야 합니다.
 2. 제3자 제공 서비스 번들은 레지스트리 키 `SOFTWARE.CordOS.Kernel.Services.OtherServices` 의 값에 해당하는 위치에 위치해야 합니다. (기본값: `/data/services`)
 3. 서비스 번들은 반드시 `configure.py`, `main.py`, `service.json` 파일을 포함해야 합니다.
-4. `configure.py`: 사용자 명령어 `servies configure <service> args...` 가 실행되었을 때 호출되는 파일이며, 호출되는 대상은 `async main(args: list, message)` 입니다.
+4. `configure.py`: 사용자 명령어 `servies configure <service> args...` 가 실행되었을 때 호출되는 파일이며, 호출되는 대상은 `async main(args: list, message: DiscordMessageWrapper)` 입니다.
 5. `main.py`: CordOS 시동시 비동기적으로 실행됩니다. 호출되는 대상은 `def main()` 입니다.
 6. `service.json`: 서비스 실행시 로드되는 서비스 정보 파일입니다. 해당 파일은 다음과 같은 필드를 가져야 합니다:
    1. `sdk` [SDKv1+]: 정수형 - 사용되는 커널 SDK 버전입니다. 호환 값은 레지스트리의 `SOFTWARE.CordOS.Kernel.Services.SDKMinimum` 과 `SOFTWARE.CordOS.Kernel.Services.SDKMaximum` 의 사잇값이여야 합니다.
@@ -22,9 +22,10 @@ CordOS의 서비스 번들 표준은 다음과 같은 규칙을 가집니다:
 configure.py
 ```python
 import kernel.registry as Registry
+from objects.discordmessage import DiscordMessageWrapper
 
 # 이 함수는 사용자 명령어 `services configure <service> args...` 가 실행되었을 때 호출됩니다.
-async def main(args: list, message):
+async def main(args: list, message: DiscordMessageWrapper):
    
     # 명령어가 올바르게 입력되었는지 확인합니다.
     if len(args) < 2:

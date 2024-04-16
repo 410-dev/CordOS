@@ -20,6 +20,8 @@ try:
     import kernel.host as HostMachine
     import kernel.services.ioeventsmgr.main as IOEventsMgr
 
+    from objects.discordmessage import DiscordMessageWrapper
+
     # Check commandline arguments
     argsList: list = sys.argv
     safeMode: bool = "--safe" in argsList
@@ -77,7 +79,8 @@ try:
 
     # Define a function to handle incoming messages
     @client.event
-    async def on_message(message):
+    async def on_message(message_original):
+        message = DiscordMessageWrapper(message_original)
         try:
 
             if Registry.read("SOFTWARE.CordOS.Experimental.SystemEventHooker.InboundPassive", default="0") == "1":
@@ -105,7 +108,7 @@ try:
                 return
 
             # Update the user's server data
-            Servers.updateServer(message)
+            Servers.updateServer(message.getMessageObject())
 
             if Registry.read("SOFTWARE.CordOS.Experimental.SystemEventHooker.InboundInteractive", default="0") == "1":
                 await IOEventsMgr.onInteractiveInputEvent(message)

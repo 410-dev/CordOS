@@ -11,11 +11,12 @@ CordOS의 입출력 번들 표준은 다음과 같은 규칙을 가집니다:
    2. Interactive Input: 입력값이 prefix 를 가지고 있고 CordOS 의 response 값이 아닐 경우 발생하는 이벤트입니다. 이 이벤트는 `{event container}/interactive/` 디렉토리에 위치해야 합니다.
    3. Output: 출력값을 전달할 때 발생하는 이벤트입니다. ***(미구현)***
 5. `main.py`: 이벤트가 실행될 때 호출되는 파일이며, 호출되는 대상은 다음과 같습니다.
-   1. `async def main(message)` 를 호출합니다.
+   1. `async def main(message: DiscordMessageWrapper)` 를 호출합니다.
 
 ## 개발 예시
 main.py (Function 구조)
 ```python
-async def main(message):
+from objects.discordmessage import DiscordMessageWrapper
+async def main(message: DiscordMessageWrapper):
    await message.reply("Hello, world!")
 ```
