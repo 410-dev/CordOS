@@ -84,12 +84,12 @@ async def onPassiveInputEvent(message: DiscordMessageWrapper):
 
 async def onReplyOutputEvent(message: DiscordMessageWrapper):
     print("Reply output event")
-    await runModule(message, "output_reply")
+    await runModule(message, "reply")
 
 
 async def onSendOutputEvent(message: DiscordMessageWrapper):
     print("Send output event")
-    await runModule(message, "output_send")
+    await runModule(message, "send")
 
 
 async def onOutputEvent(message: DiscordMessageWrapper):

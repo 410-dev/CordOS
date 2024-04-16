@@ -5,9 +5,11 @@ CordOS 의 메시지 입출력의 이벤트를 관리하는 서비스입니다. 
 이벤트 번들 제작 방법은 [개발 가이드](../developerguide/IOEventBundle.md)를 참조하세요.
 
 ## 입출력 종류
-- Passive Input: 입력값이 prefix 인지, CordOS 의 response 값인지 확인하지 않은 이벤트입니다.
+- Passive Input: 입력값이 prefix 인지, CordOS 의 response 값인지 확인하지 않은 이벤트입니다. 
 - Interactive Input: 입력값이 prefix 를 가지고 있고 CordOS 의 response 값이 아닐 경우 발생하는 이벤트입니다.
-- Output: 출력값을 전달할 때 발생하는 이벤트입니다. ***(미구현)***
+- Output: 출력 DiscordMessageWrapper 에서 발생하는 출력 이벤트입니다. 모든 출력형 함수에 적용되어있습니다.
+- Output Reply: `message.reply()` 함수가 실행될 때 발생하는 이벤트입니다.
+- Output Send: `message.send()` 함수가 실행될 때 발생하는 이벤트입니다.
 
 ## configure
 `ioeventsmgr list`: 현재 등록된 이벤트 목록을 출력합니다.<br>
