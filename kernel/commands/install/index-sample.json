@@ -1,0 +1,33 @@
+{
+    "spec": "CordOSInstallablePackageRepository",
+    "specv": 1,
+    "name": "Repository name here",
+    "description": "Repository description here",
+    "updateTime": 0,
+    "source": "http://example.com/repo",
+    "packages": [
+        {
+            "name": "com.example.app",
+            "version": "1.0",
+            "description": "Example app",
+            "sdk": 1,
+            "spec": "http://example.com/repo/com.example.app-1.0.cordapp.spec.json",
+            "dependencies": [
+                {
+                    "name": "com.example.lib",
+                    "version": "1.0"
+                }
+            ],
+            "conflicts": []
+        },
+        {
+            "name": "com.example.lib",
+            "version": "1.0",
+            "description": "Example library",
+            "sdk": 1,
+            "spec": "http://example.com/repo/com.example.lib-1.0.cordapp.spec.json",
+            "dependencies": [],
+            "conflicts": []
+        }
+    ]
+}
