@@ -7,3 +7,6 @@ def cache() -> str:
 
 def files() -> str:
     return f"{data()}/files"
+
+def root() -> str:
+    return f"./"
