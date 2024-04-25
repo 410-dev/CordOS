@@ -19,14 +19,18 @@ CordOS 의 메시지 입출력의 이벤트를 관리하는 서비스입니다. 
 
 
 ## 레지스트리
-| 키 이름                                                      | 기본 값 | 설명                                |
-|-----------------------------------------------------------|------|-----------------------------------|
-| `SOFTWARE.CordOS.Kernel.Services.ioeventsmgr.Print`       | 0    | 이벤트 로드 과정의 로그 출력                  |
-| `SOFTWARE.CordOS.Events.Kernel.InboundPassiveEnabled`     | 1    | 커널의 Passive Input 이벤트 활성화 여부      |
-| `SOFTWARE.CordOS.Events.Kernel.InboundInteractiveEnabled` | 1    | 커널의 Interactive Input 이벤트 활성화 여부  |
-| `SOFTWARE.CordOS.Events.Kernel.OutboundEnabled`           | 0    | 커널의 Output 이벤트 활성화 여부             |
-| `SOFTWARE.CordOS.Events.User.InboundPassiveEnabled`       | 1    | 사용자의 Passive Input 이벤트 활성화 여부     |
-| `SOFTWARE.CordOS.Events.User.InboundInteractiveEnabled`   | 1    | 사용자의 Interactive Input 이벤트 활성화 여부 |
-| `SOFTWARE.CordOS.Events.User.OutboundEnabled`             | 0    | 사용자의 Output 이벤트 활성화 여부            |
-| `SOFTWARE.CordOS.Events.EventsBundleContainer`            | `data/events/, events/`    | 사용자 이벤트 번들 디렉토리 경로                |
+| 키 이름                                                      | 기본 값                    | 설명                               |
+|-----------------------------------------------------------|-------------------------|----------------------------------|
+| `SOFTWARE.CordOS.Kernel.Services.ioeventsmgr.Print`       | 0                       | 이벤트 로드 과정의 로그 출력                 |
+| `SOFTWARE.CordOS.Events.Kernel.InboundPassiveEnabled`     | 1                       | 커널의 Passive Input 이벤트 활성화 여부     |
+| `SOFTWARE.CordOS.Events.Kernel.InboundInteractiveEnabled` | 1                       | 커널의 Interactive Input 이벤트 활성화 여부 |
+| `SOFTWARE.CordOS.Events.Kernel.OutboundReplyEnabled`      | 0                       | 커널의 Reply 이벤트 활성화 여부             |
+| `SOFTWARE.CordOS.Events.Kernel.OutboundSendEnabled`       | 0                       | 커널의 Send 이벤트 활성화 여부              |
+| `SOFTWARE.CordOS.Events.Kernel.OutboundGlobalEnabled`     | 1                       | 커널의 Global 이벤트 활성화 여부            |
+| `SOFTWARE.CordOS.Events.User.InboundPassiveEnabled`       | 1                       | 사용자의 Passive Input 이벤트 활성화 여부    |
+| `SOFTWARE.CordOS.Events.User.InboundInteractiveEnabled`   | 1                       | 사용자의 Interactive Input 이벤트 활성화 여부 |
+| `SOFTWARE.CordOS.Events.User.OutboundReplyEnabled`        | 0                       | 사용자의 Reply 이벤트 활성화 여부            |
+| `SOFTWARE.CordOS.Events.User.OutboundSendEnabled`         | 0                       | 사용자의 Send 이벤트 활성화 여부             |
+| `SOFTWARE.CordOS.Events.User.OutboundGlobalEnabled`       | 1                       | 사용자의 Global 이벤트 활성화 여부           |
+| `SOFTWARE.CordOS.Events.EventsBundleContainer`            | `data/events/, events/` | 사용자 이벤트 번들 디렉토리 경로               |
 
