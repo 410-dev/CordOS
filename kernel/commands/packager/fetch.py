@@ -1,8 +1,11 @@
+from typing import Any
+from kernel.commands.packager.spec import Spec
+
 import requests
 import json
 
 
-def getSpecFromRepository(repoURL: str) -> str:
+def getSpecRawURLFromGitHubURL(repoURL: str, file: str) -> str:
     try:
         # Example input URL:
         # https://github.com/410-dev/CordOS or https://github.com/410-dev/CordOS.git
@@ -26,20 +29,53 @@ def getSpecFromRepository(repoURL: str) -> str:
 
         # Example output URL:
         # https://raw.githubusercontent.com/410-dev/CordOS/branch/spec.json
-        return f"https://raw.githubusercontent.com/{author}/{repo}/{defaultBranch}/spec.json"
+        return f"https://raw.githubusercontent.com/{author}/{repo}/{defaultBranch}/{file}"
     except Exception as e:
         return f"Error while getting spec from repository. e: {e}"
 
 
-def getSpecFromURL(specURL: str) -> str:
+def fetchFromURL(specURL: str) -> dict:
     try:
-        return requests.get(specURL).json()
+        data: dict = requests.get(specURL).json()
+        data['state'] = "SUCCESS"
+        return data
     except Exception as e:
-        return f"Error while getting spec from URL. e: {e}"
+        return {"state": f"Error while getting spec from URL. e: {e}"}
 
 
-def getSpecFromLocal(specPath: str) -> str:
+def fetchFromLocal(specPath: str) -> dict:
     try:
-        return json.load(open(specPath))
+        data: dict = json.load(open(specPath, "r"))
+        data['state'] = "SUCCESS"
+        return data
     except Exception as e:
-        return f"Error while getting spec from local. e: {e}"
+        return {"state": f"Error while getting spec from local. e: {e}"}
+
+
+def fetchSpec(specPath: str) -> dict:
+    if specPath.startswith("http://github") or specPath.startswith("https://github") or "github.com" in specPath:
+        specURL = getSpecRawURLFromGitHubURL(specPath, "spec.json")
+        return fetchFromURL(specURL)
+    elif specPath.startswith("file://"):
+        return fetchFromLocal(specPath[7:])
+    else:
+        return fetchFromURL(specPath)
+
+
+def fetchIndex(indexURL: str) -> dict:
+    if indexURL.startswith("http://github") or indexURL.startswith("https://github") or "github.com" in indexURL:
+        indexURL = getSpecRawURLFromGitHubURL(indexURL, "index.json")
+        return fetchFromURL(indexURL)
+    elif indexURL.startswith("file://"):
+        return fetchFromLocal(indexURL[7:])
+    else:
+        return fetchFromURL(indexURL)
+
+
+def fetchPackage(spec: Spec, output: str, label: str = "core"):
+    packageFileURL: str = spec.getObject("payloads")[label]
+    print(f"Downloading package from: {packageFileURL}", end=" ")
+    result = requests.get(packageFileURL)
+    with open(f"{output}/{label}.cpkg", "wb") as f:
+        f.write(result.content)
+        print(f"Success. ({output}/{label}.cpkg)")

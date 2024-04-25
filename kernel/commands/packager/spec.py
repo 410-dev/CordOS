@@ -47,6 +47,9 @@ class Spec:
     def getAuthor(self):
         return self.getObject("author")
 
+    def getArch(self):
+        return self.getObject("arch")
+
     def getObject(self, key):
         if "." in key:
             keys = key.split(".")

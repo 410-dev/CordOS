@@ -6,9 +6,12 @@
     "version": "1.0.0",
     "author": "Author Name Here",
     "build": 1,
+    "arch": "any",
     "description": "Description Here",
-    "package": {
-        "zip": "https://github.com/dev/<repo>/archive/<branch>.zip   or    self"
+    "payloads": {
+        "core": "https://github.com/dev/<repo>/archive/<branch>.zip",
+        "additional1": "https://github.com/dev/<repo>/archive/<branch>.zip",
+        "additional2": "https://github.com/dev/<repo>/archive/<branch>.zip"
     },
     "dependencies": {
         "system": {
@@ -26,43 +29,97 @@
         "package1==1.0.0",
         "package2"
     ],
-    "packageMaps": {
-        "kernel": {
-            "modules": "MODULES",
-            "services": "SERVICES",
-            "commands": "COMMANDS"
-        },
-        "user": {
-            "modules": "MODULES-USER",
-            "services": "SERVICES-USER",
-            "commands": "COMMANDS-USER"
-        },
-        "data": [
-            {
-                "source": "data/files/thispackage",
-                "destination": "data/files/thispackage"
-            }
-        ]
-    },
-    "taskmap": [
+    "procedure": [
         {
-            "task": "cleanup",
+            "task": "delete",
             "target": [
                 "data/files/thispackagecache"
             ],
             "ignoreFail": true
         },
         {
-            "task": "execute",
-            "target": "data/files/thispackage/install.sh"
+            "task": "install",
+            "package": "core"
         },
         {
-            "task": "install"
+            "task": "filecheck",
+            "conditions": [
+                {
+                    "file": "",
+                    "exists": true,
+                    "value": "Hello 123"
+                },
+                {
+                    "file": "",
+                    "exists": true
+                }
+            ],
+            "true": {
+
+            },
+            "false": {
+
+            }
         },
         {
+            "task": "prompt",
+            "message": "Which Additional Package would you like to install? (all, 0, 1, 2)",
+            "cases": [
+                {
+                    "input": "all",
+                    "message": "Installing Additional1",
+                    "set": {
+                        "additional1": "yes",
+                        "additional2": "yes"
+                    }
+                },
+                {
+                    "input": "0",
+                    "message": "Installing nothing.",
+                    "set": {
+                        "additional1": "no",
+                        "additional2": "no"
+                    }
+                },
+                {
+                    "input": "1",
+                    "message": "Installing Additional1",
+                    "set": {
+                        "additional1": "yes",
+                        "additional2": "no"
+                    }
+                },
+                {
+                    "input": "2",
+                    "message": "Installing Additional2",
+                    "set": {
+                        "additional1": "no",
+                        "additional2": "yes"
+                    }
+                }
+            ]
+        },
+        {
+            "task": "install",
+            "if": {
+                "packageQueue": {
+                    "exists": true,
+                    "compare": "==",
+                    "value": "additional1"
+                }
+            },
+            "package": "additional1"
+        },
+        {
+            "task": "print",
+            "label": "testlabel",
+            "message": "This is a test for label-conditional statement"
+        },
+        {
+            "label": "end",
             "task": "copy",
             "source": [
-                "$SOURCE/data/files/thispackage"
+                "data/files/thispackage"
             ],
             "destination": [
                 "data/files/thispackage"
