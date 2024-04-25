@@ -2,10 +2,11 @@ import json
 import shutil
 import string
 
-import database as Database
+import kernel.commands.packager.database as Database
+import kernel.commands.packager.sources as Sources
 import kernel.partitionmgr
-import spec as Spec
-import fetch as Fetch
+import kernel.commands.packager.spec as Spec
+import kernel.commands.packager.fetch as Fetch
 import kernel.registry as Registry
 import kernel.partitionmgr as PartitionMgr
 import kernel.profile as Profile
@@ -18,7 +19,7 @@ from typing import List
 
 def install(keywords: list, case: str):
     # Get sources list
-    sourcesList = Database.getSources()
+    sourcesList = Sources.getSources()
 
     # Get dependencies
     dependencies: List[dict] = getDependencies(sourcesList, keywords)
