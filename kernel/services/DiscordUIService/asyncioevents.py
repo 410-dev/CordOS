@@ -3,18 +3,12 @@ import asyncio
 import kernel.registry as Registry
 import os
 
-
-def main():
-    # Does nothing in the background.
-    pass
-
-
 def printIfEnabled(msg: str):
     if Registry.read("SOFTWARE.CordOS.Kernel.Services.ioeventsmgr.Print", default="0") == "1":
         print(msg)
 
 
-async def runModule(message: str, scope: str):
+async def runModule(message, scope: str):
     # List directories in kernel/events/interaction and value of SOFTWARE.CordOS.Events.EventsBundleContainer
     try:
         eventBundles: list = []
@@ -70,7 +64,7 @@ async def runModule(message: str, scope: str):
             try:
                 module = importlib.import_module(eventBundle.replace("/", ".").replace("\\", ".") + ".main")
                 importlib.reload(module)
-                executedTasks.append(asyncio.create_task(module.main(message)))
+                executedTasks.append(asyncio.create_task(module.mainAsync(message)))
                 printIfEnabled(f"Event bundle {eventBundle} started in a new thread.")
             except Exception as e:
                 printIfEnabled(f"Error while running event bundle {eventBundle}: {e}")
@@ -82,21 +76,21 @@ async def runModule(message: str, scope: str):
         printIfEnabled(f"Error while running event bundles: {e}")
 
 
-async def onInteractiveInputEvent(message: str):
+async def onInteractiveInputEvent(message):
     await runModule(message, "interaction")
 
 
-async def onPassiveInputEvent(message: str):
+async def onPassiveInputEvent(message):
     await runModule(message, "passive")
 
 
-async def onReplyOutputEvent(message: str):
+async def onReplyOutputEvent(message):
     await runModule(message, "reply")
 
 
-async def onSendOutputEvent(message: str):
+async def onSendOutputEvent(message):
     await runModule(message, "send")
 
 
-async def onOutputEvent(message: str):
+async def onOutputEvent(message):
     await runModule(message, "output")

@@ -8,7 +8,7 @@ import kernel.registry as Registry
 import json
 import os
 
-async def main(args: list, message) -> None:
+async def mainAsync(args: list, message) -> None:
     try:
         commandPaths: List[str] = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
 

@@ -19,7 +19,7 @@ class Regedit:
             return False
         return True
 
-    async def exec(self):
+    async def mainAsync(self):
         
         try:
 

@@ -1,7 +1,7 @@
 import kernel.ipc as IPC
 import kernel.registry as Registry
 
-async def main(args: list, message):
+async def mainAsync(args: list, message):
 
     if len(args) < 1:
         await message.reply("Usage: power off")

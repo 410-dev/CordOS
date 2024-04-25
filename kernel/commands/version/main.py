@@ -9,7 +9,7 @@ class Version:
         self.args: list = lineArgs
         self.message = message
 
-    async def exec(self):
+    async def mainAsync(self):
         
         try: 
             foundation = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Foundation")

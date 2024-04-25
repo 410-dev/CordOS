@@ -27,10 +27,10 @@
 | SOFTWARE.CordOS.Kernel.PrintTraceback                    | Binary Integer | 1 | No | 트레이스백을 인쇄할지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.PrintLogs                         | Binary Integer | 1 | No | 로그를 인쇄할지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.PrintErrors                       | Binary Integer | 1 | No | 오류를 인쇄할지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
-| SOFTWARE.CordOS.Kernel.Profiles.Foundation               | String | cordOS | Yes | cordOS의 기반 프로필입니다. |
-| SOFTWARE.CordOS.Kernel.Profiles.Version                  | Float | 1.0 | Yes | cordOS 프로필의 버전입니다. |
-| SOFTWARE.CordOS.Kernel.Profiles.BotName                  | String | cordOS Bot | Yes | cordOS를 사용하는 봇의 이름입니다. |
-| SOFTWARE.CordOS.Kernel.Profiles.BotVersion               | String | 1.0rc-2 | Yes | cordOS를 사용하는 봇의 버전입니다. |
+| SOFTWARE.CordOS.Kernel.Profiles.Foundation               | String | CordOS | Yes | CordOS의 기반 프로필입니다. |
+| SOFTWARE.CordOS.Kernel.Profiles.Version                  | Float | 1.0 | Yes | CordOS 프로필의 버전입니다. |
+| SOFTWARE.CordOS.Kernel.Profiles.BotName                  | String | CordOS Bot | Yes | CordOS를 사용하는 봇의 이름입니다. |
+| SOFTWARE.CordOS.Kernel.Profiles.BotVersion               | String | 1.0rc-2 | Yes | CordOS를 사용하는 봇의 버전입니다. |
 | SOFTWARE.CordOS.Events.Inbound.CommandHooks.Enabled      | Binary Integer | 0 | No | 입력 이벤트에 대한 명령 후크가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Events.Inbound.CommandHooks.Loaded       | List | [] | No | 입력 이벤트에 대한 로드된 명령 후크 목록입니다. |
 | SOFTWARE.CordOS.Events.Inbound.Hooks.Enabled             | Binary Integer | 0 | No | 입력 이벤트에 대한 후크가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
@@ -46,7 +46,7 @@
 | SOFTWARE.CordOS.Events.Boot.Broadcast.Enabled            | Binary Integer | 0 | No | 부팅 이벤트에 대한 브로드캐스트가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Events.Boot.Broadcast.Message            | String |  | No | 부팅 이벤트 중 브로드캐스트할 메시지입니다. |
 | SOFTWARE.CordOS.Events.Boot.Broadcast.Blacklist          | List | [] | No | 부팅 이벤트 중 브로드캐스트할 항목의 블랙리스트입니다. |
-| SOFTWARE.CordOS.Config.Core.Prefix                       | String | . | No | cordOS 명령어 트리고 접두사입니다. |
+| SOFTWARE.CordOS.Config.Core.Prefix                       | String | . | No | CordOS 명령어 트리고 접두사입니다. |
 | SOFTWARE.CordOS.Security.Definitions.unavailable         | Integer | 1 | No | "사용 불가" 사용자의 보안 수준 정의입니다. |
 | SOFTWARE.CordOS.Security.Definitions.user                | Integer | 2 | No | 일반 사용자의 보안 수준 정의입니다. |
 | SOFTWARE.CordOS.Security.Definitions.mod                 | Integer | 3 | No | 모더레이터의 보안 수준 정의입니다. |

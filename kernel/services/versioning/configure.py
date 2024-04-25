@@ -25,10 +25,10 @@ def getBuild(url: str):
 def getVersion(url: str):
     return getValueOf(url, "SOFTWARE.CordOS.Kernel.Profiles.Version")
 
-async def main(args: list, message):
+async def mainAsync(args: list, message):
     try:
         branch: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.Branch", default="stable")
-        imageurl: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.ImageURL", default="https://github.com/410-dev/cordOS/archive/<branch>.zip")
+        imageurl: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.ImageURL", default="https://github.com/410-dev/CordOS/archive/<branch>.zip")
         metaURL: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.MetaURL", default="https://raw.githubusercontent.com/410-dev/CordOS/<branch>/defaults/registry.cordreg")
         forceReboot: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.ForceReboot", default="1")
 

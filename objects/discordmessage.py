@@ -1,6 +1,6 @@
 from discord import message as DiscordMessage
 
-import kernel.services.ioeventsmgr.main as IOEventsMgr
+import kernel.services.DiscordUIService.asyncioevents as IOEventsMgr
 import kernel.registry as Registry
 
 

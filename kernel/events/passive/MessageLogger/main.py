@@ -1,6 +1,6 @@
 import kernel.registry as Registry
 
-async def main(message):
+async def mainAsync(message):
     if Registry.read("SOFTWARE.CordOS.Events.Inbound.PrintMessage") == "1":
         formattedMsg = Registry.read("SOFTWARE.CordOS.Events.Inbound.PrintMessageFormat")
         formattedMsg = formattedMsg.replace("$uname", str(message.author.name))

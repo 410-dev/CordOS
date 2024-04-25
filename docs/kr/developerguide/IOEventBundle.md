@@ -13,12 +13,12 @@ CordOS의 입출력 번들 표준은 다음과 같은 규칙을 가집니다:
    4. Output Reply: `message.reply()` 함수가 실행될 때 발생하는 이벤트입니다. 이 이벤트는 `{event container}/output/reply/` 디렉토리에 위치해야 합니다.
    5. Output Send: `message.send()` 함수가 실행될 때 발생하는 이벤트입니다. 이 이벤트는 `{event container}/output/send/` 디렉토리에 위치해야 합니다. 
 5. `main.py`: 이벤트가 실행될 때 호출되는 파일이며, 호출되는 대상은 다음과 같습니다.
-   1. `async def main(message: DiscordMessageWrapper)` 를 호출합니다.
+   1. `async def mainAsync(message: DiscordMessageWrapper)` 를 호출합니다.
 
 ## 개발 예시
 main.py (Function 구조)
 ```python
 from objects.discordmessage import DiscordMessageWrapper
-async def main(message: DiscordMessageWrapper):
+async def mainAsync(message: DiscordMessageWrapper):
    await message.reply("Hello, world!")
 ```

@@ -21,7 +21,7 @@ class Services:
             return False
         return True
     
-    async def exec(self):
+    async def mainAsync(self):
 
         # Check access permission
         if await self.chkPermission(self.permission) == False:
@@ -47,7 +47,7 @@ class Services:
                 if Registry.read("SOFTWARE.CordOS.Kernel.Services.ReloadOnCall") == "1":
                     importlib.reload(module)
 
-                await module.main(self.args[3:], self.message)
+                await module.mainAsync(self.args[3:], self.message)
 
             except ModuleNotFoundError:
                 try:
@@ -58,7 +58,7 @@ class Services:
                     if Registry.read("SOFTWARE.CordOS.Kernel.Services.ReloadOnCall") == "1":
                         importlib.reload(module)
 
-                    await module.main(self.args[3:], self.message)
+                    await module.mainAsync(self.args[3:], self.message)
 
                 except ModuleNotFoundError:
                     await self.message.reply(f"Service '{self.args[2]}' not found.", mention_author=True)

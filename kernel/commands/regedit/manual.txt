@@ -1,4 +1,4 @@
-Edit registry of cordOS
+Edit registry of CordOS
 
 Required permissions:
     root
