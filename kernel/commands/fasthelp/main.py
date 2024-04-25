@@ -55,8 +55,8 @@ def main(args: list) -> None:
             except:
                 pass
 
-        IO.printf(cmdList)
+        IO.println(cmdList)
     except Exception as e:
         if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
-        IO.printf(f"Error in settings. e: {e}")
+        IO.println(f"Error in settings. e: {e}")
 

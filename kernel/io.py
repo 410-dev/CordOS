@@ -4,6 +4,11 @@ def printf(string):
     return
 
 
+def println(string):
+    printf(string + '\n')
+    return
+
+
 def read(prompt):
 
     return input(prompt)
