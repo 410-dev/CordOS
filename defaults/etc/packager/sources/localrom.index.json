@@ -1,0 +1,35 @@
+{
+    "spec": "CordOSInstallablePackageRepositoryIndex",
+    "specv": 1,
+    "name": "Local Repository",
+    "id": "localrom",
+    "description": "Repository description here",
+    "updateTime": 0,
+    "source": "file:///defaults/etc/repository/{name}-{version}.spec.json",
+    "index": "file:///defaults/etc/packager/sources/localrom.index.json",
+    "packages": [
+        {
+            "name": "system",
+            "version": "1.0",
+            "description": "System file for CordOS",
+            "sdk": 1,
+            "arch": "any",
+            "dependencies": [
+                {
+                    "name": "cordos-kernelkit",
+                    "version": "==1.0"
+                }
+            ],
+            "conflicts": []
+        },
+        {
+            "name": "cordos-kernelkit",
+            "version": "1.0",
+            "description": "Kernel modules for CordOS",
+            "sdk": 1,
+            "arch": "any",
+            "dependencies": [],
+            "conflicts": []
+        }
+    ]
+}
