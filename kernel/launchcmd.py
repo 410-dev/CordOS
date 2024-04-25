@@ -40,7 +40,7 @@ def splitArguments(string: str) -> list:
     return words
 
 
-def launchRunnable(module: str, args: list, message):
+def launchRunnable(module: str, args: list):
     import importlib
     module = importlib.import_module(module)
 
@@ -50,14 +50,14 @@ def launchRunnable(module: str, args: list, message):
     # Try with class structure
     try:
         commandClass = getattr(module, args[0].capitalize())
-        command = commandClass(args, message)
+        command = commandClass(args)
         command.main()
 
     except Exception as ignored:
         # Try with function structure
         # Call the function where signature is async def main(lineArgs: list, message) -> None:
         try:
-            module.main(args, message)
+            module.main(args)
         except Exception as e:
-            message.reply(f"Error while running executive. e: {e}", mention_author=True)
+            print(f"Error while running executive. e: {e}")
             return

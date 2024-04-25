@@ -9,6 +9,7 @@ def main():
     while not IPC.read("kernel.off"):
         runnablePath = ""
         cmd = ""
+        args: list = []
 
         try:
             msgContent: str = input("> ")
@@ -21,9 +22,9 @@ def main():
         if runnablePath == "" or runnablePath is None:
             print(f"Command {cmd} not found.")
 
-    # try:
-    #     await Launcher.runRunnableModule(runnablePath, args, message)
-    # except Exception as e:
-    #     if Registry.read("SOFTWARE.CordOS.Kernel.PrintErrors") == "1": print(f"Error executing command '{cmd}': {e}")
-    #     if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
-    #     await message.reply(f"Error executing command '{cmd}': {e}", mention_author=True)
+        try:
+            Launcher.launchRunnable(runnablePath, args)
+        except Exception as e:
+            if Registry.read("SOFTWARE.CordOS.Kernel.PrintErrors") == "1": print(f"Error executing command '{cmd}': {e}")
+            if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
+            print(f"Error executing command '{cmd}': {e}")
