@@ -23,7 +23,9 @@ async def runModule(message: DiscordMessageWrapper, scope: str):
     kernelBundles: list = []
     kernelBundleEnabled: bool = Registry.read("SOFTWARE.CordOS.Events.Kernel.InboundPassiveEnabled") == "1" and scope == "passive"
     kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.Kernel.InboundInteractiveEnabled") == "1" and scope == "interaction")
-    kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.Kernel.OutboundEnabled") == "1" and scope == "output")
+    kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.Kernel.OutboundReplyEnabled") == "1" and scope == "reply")
+    kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.Kernel.OutboundSendEnabled") == "1" and scope == "send")
+    kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.Kernel.OutboundGlobalEnabled") == "1" and scope == "output")
     if kernelBundleEnabled:
         kernelBundles: list = os.listdir(f"kernel/events/{scope}")
         for idx, eventBundle in enumerate(kernelBundles):
@@ -32,7 +34,9 @@ async def runModule(message: DiscordMessageWrapper, scope: str):
     userBundles: list = []
     userBundleEnabled: bool = Registry.read("SOFTWARE.CordOS.Events.User.InboundPassiveEnabled") == "1" and scope == "passive"
     userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.User.InboundInteractiveEnabled") == "1" and scope == "interaction")
-    userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.User.OutboundEnabled") == "1" and scope == "output")
+    userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.User.OutboundReplyEnabled") == "1" and scope == "reply")
+    userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.User.OutboundSendEnabled") == "1" and scope == "send")
+    userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.User.OutboundGlobalEnabled") == "1" and scope == "output")
     if userBundleEnabled:
         eventBundlesContainers: list = Registry.read("SOFTWARE.CordOS.Events.EventsBundleContainer", default="").replace(", ", ",").split(",")
         for eventBundle in eventBundlesContainers:
@@ -83,15 +87,12 @@ async def onPassiveInputEvent(message: DiscordMessageWrapper):
 
 
 async def onReplyOutputEvent(message: DiscordMessageWrapper):
-    print("Reply output event")
     await runModule(message, "reply")
 
 
 async def onSendOutputEvent(message: DiscordMessageWrapper):
-    print("Send output event")
     await runModule(message, "send")
 
 
 async def onOutputEvent(message: DiscordMessageWrapper):
-    print("Output event")
     await runModule(message, "output")
