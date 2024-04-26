@@ -1,5 +1,4 @@
 import sys
-
 import kernel.ipc as IPC
 import kernel.registry as Registry
 import kernel.io as IO
@@ -29,6 +28,8 @@ async def mainAsync(args: list, message):
 
         else:
             await message.reply(f"System will now be force terminated. Goodbye.")
+            IPC.set("power.off", True)
+            IPC.set("power.off.state", "OFF")
             sys.exit(0)
 
     elif args[0] == "reset":
@@ -39,9 +40,9 @@ async def mainAsync(args: list, message):
             await message.reply(f"!!!!! EXTREME SENSITIVE WARNING !!!!!\nYou have triggered system reset. ***This will stop the system immediately and may cause data loss***. If you are sure, type the trigger command again. If you are not sure, type `power off` to shutdown the system. To cancel the confirmation, type `power reset-cancel`.")
 
         else:
-            # with open("restart", 'w') as f:
-            #     f.write("")
             await message.reply(f"System will now be reset.")
+            IPC.set("power.off", True)
+            IPC.set("power.off.state", "REBOOT")
             sys.exit(1)
 
     elif args[0] == "halt-cancel":
