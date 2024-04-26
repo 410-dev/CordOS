@@ -142,16 +142,17 @@ def start(stage: int, safeMode: bool):
                     runSync = True
 
                 if service.startswith("kernel/services"):
-                    if Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service}.Enabled") == "0":
+                    if Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled") == "0":
                         continue
 
-                    Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{service}.Enabled", "1")
+                    Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled", "1")
 
                 else:
-                    if Registry.read(f"SOFTWARE.CordOS.Services.{service}.Enabled") == "0":
+                    serviceName = service.replace(thirdPartyServicesLoc.replace("/", ".").replace("\\", "."), "")
+                    if Registry.read(f"SOFTWARE.CordOS.Services.{serviceName}.Enabled") == "0":
                         continue
 
-                    Registry.write(f"SOFTWARE.CordOS.Services.{service}.Enabled", "1")
+                    Registry.write(f"SOFTWARE.CordOS.Services.{serviceName}.Enabled", "1")
 
         except:
             pass
