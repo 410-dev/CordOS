@@ -1,5 +1,6 @@
 import kernel.ipc as IPC
 import kernel.registry as Registry
+import kernel.io as IO
 
 async def mainAsync(args: list, message):
 
@@ -55,5 +56,33 @@ async def mainAsync(args: list, message):
         await message.reply("Usage: power off")
         return
 
+
+def main(args: list):
+
+    if len(args) < 1:
+        IO.println("Usage: power off")
+        return
+
+    if args[0] == "off":
+        IPC.set("power.off", True)
+        IPC.set("power.off.state", "OFF")
+        IO.println(f"Shutdown signal published. System will shutdown after all services have stopped.")
+
+    elif args[0] == "reboot":
+        IPC.set("power.off", True)
+        IPC.set("power.off.state", "REBOOT")
+        IO.println(f"Reboot signal published. System will reboot after all services have stopped.")
+
+    elif args[0] == "halt":
+        IO.println(f"System will now be force terminated. Goodbye.")
+        exit(0)
+
+    elif args[0] == "reset":
+        IO.println(f"System will now be reset.")
+        exit(1)
+
+    else:
+        IO.println("Usage: power off")
+        return
 
 
