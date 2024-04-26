@@ -48,7 +48,10 @@ def removeExpired():
     if ipcGC == 0:
         return
     memoryLiveTime: int = int(Registry.read("SOFTWARE.CordOS.Kernel.IPC.MemoryLiveTime", default="1800"))
+    toDelete = []
     for key in IPCMemory.memory.keys():
         if IPCMemory.referenceTime[key] + memoryLiveTime < Clock.getEpoch():
-            IPCMemory.delete(key)
+            toDelete.append(key)
 
+    for key in toDelete:
+        IPCMemory.delete(key)
