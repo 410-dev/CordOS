@@ -1,4 +1,3 @@
-import single
 
 try:
     import json
