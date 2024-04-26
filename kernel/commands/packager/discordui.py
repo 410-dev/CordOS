@@ -25,6 +25,12 @@ async def mainAsync(args, message: DiscordMessageWrapper):
         if not await chkPermission(message):
             return
 
+        if Registry.read("SOFTWARE.CordOS.Experimental.Packager", default="0") == "0":
+            await message.reply("This feature is experimental and disabled at this time.", mention_author=True)
+            return
+        else:
+            await message.reply("This feature is experimental and may not work as expected.", mention_author=True)
+
         # Check arguments:
         # install: packager install <package-name> <package-name> <package-name> ...
         # remove: packager remove <package-name> <package-name> <package-name> ...
