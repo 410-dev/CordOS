@@ -1,3 +1,5 @@
+import sys
+
 import kernel.ipc as IPC
 import kernel.registry as Registry
 import kernel.io as IO
@@ -27,7 +29,7 @@ async def mainAsync(args: list, message):
 
         else:
             await message.reply(f"System will now be force terminated. Goodbye.")
-            exit(0)
+            sys.exit(0)
 
     elif args[0] == "reset":
         resetKey = f"KernelResetSignal.{message.author.id}"
@@ -40,7 +42,7 @@ async def mainAsync(args: list, message):
             # with open("restart", 'w') as f:
             #     f.write("")
             await message.reply(f"System will now be reset.")
-            exit(1)
+            sys.exit(1)
 
     elif args[0] == "halt-cancel":
         haltKey = f"KernelHaltSignal.{message.author.id}"
@@ -75,11 +77,11 @@ def main(args: list):
 
     elif args[0] == "halt":
         IO.println(f"System will now be force terminated. Goodbye.")
-        exit(0)
+        sys.exit(0)
 
     elif args[0] == "reset":
         IO.println(f"System will now be reset.")
-        exit(1)
+        sys.exit(1)
 
     else:
         IO.println("Usage: power off")
