@@ -1,4 +1,5 @@
 import kernel.clock as Clock
+import kernel.io as IO
 
 class Uptime:
     
@@ -8,3 +9,7 @@ class Uptime:
 
     async def mainAsync(self):
         await self.message.reply(f"Uptime: {Clock.getUptime()}")
+
+
+def main(args: list):
+    IO.println(f"Uptime: {Clock.getUptime()}")

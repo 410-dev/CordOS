@@ -27,7 +27,6 @@ try:
     # Check commandline arguments
     argsList: list = sys.argv
     safeMode: bool = "--safe" in argsList
-    singleUser: bool = "--single" in argsList
 
     foundation = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Foundation")
     version = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")
