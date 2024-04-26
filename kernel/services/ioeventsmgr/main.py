@@ -82,21 +82,21 @@ async def runModule(message: str, scope: str):
         printIfEnabled(f"Error while running event bundles: {e}")
 
 
-async def onInteractiveInputEvent(message: str):
-    await runModule(message, "interaction")
+def onInteractiveInputEvent(message: str):
+    runModule(message, "interaction")
 
 
-async def onPassiveInputEvent(message: str):
-    await runModule(message, "passive")
+def onPassiveInputEvent(message: str):
+    runModule(message, "passive")
 
 
-async def onReplyOutputEvent(message: str):
-    await runModule(message, "reply")
+def onReplyOutputEvent(message: str):
+    runModule(message, "reply")
 
 
-async def onSendOutputEvent(message: str):
-    await runModule(message, "send")
+def onSendOutputEvent(message: str):
+    runModule(message, "send")
 
 
-async def onOutputEvent(message: str):
-    await runModule(message, "output")
+def onOutputEvent(message: str):
+    runModule(message, "output")

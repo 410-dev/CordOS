@@ -54,7 +54,7 @@ async def runModule(message, scope: str):
         # Check if the event is in the eventBundles
         for idx, eventBundle in enumerate(eventBundles):
             printIfEnabled(f"Checking event bundle {eventBundle}...")
-            if not os.path.isfile(os.path.join(eventBundle, "main.py")):
+            if not os.path.isfile(os.path.join(eventBundle, "discordui.py")):
                 eventBundles.pop(idx)
                 printIfEnabled(f"Event bundle {eventBundle} does not have a main.py file.")
 
@@ -62,7 +62,7 @@ async def runModule(message, scope: str):
         executedTasks: list = []
         for eventBundle in eventBundles:
             try:
-                module = importlib.import_module(eventBundle.replace("/", ".").replace("\\", ".") + ".main")
+                module = importlib.import_module(eventBundle.replace("/", ".").replace("\\", ".") + ".discordui")
                 importlib.reload(module)
                 executedTasks.append(asyncio.create_task(module.mainAsync(message)))
                 printIfEnabled(f"Event bundle {eventBundle} started in a new thread.")
