@@ -3,21 +3,23 @@ import json
 
 import kernel.registry as Registry
 
-def getRunnableModule(args: list):
+def getRunnableModule(args: list, targetExecutive: str = "main"):
     commandsPaths: list = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
     appropriateCommandPath: str = ""
+
     for commandPath in commandsPaths:
         try:
-            with open(os.path.join(commandPath, args[0], "main.py"), 'r') as f:
-                appropriateCommandPath = commandPath
-                break
+            if not os.path.isfile(os.path.join(commandPath, args[0], f"{targetExecutive}.py")):
+                continue
+            appropriateCommandPath = commandPath
+            break
         except:
             pass
     
     if appropriateCommandPath == "":
         return None
     
-    return os.path.join(appropriateCommandPath, args[0], "main").replace("/", ".").replace("\\", ".")
+    return os.path.join(appropriateCommandPath, args[0], targetExecutive).replace("/", ".").replace("\\", ".")
 
 def getCommand(args: list):
     return args[0]

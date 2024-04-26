@@ -11,8 +11,7 @@ async def mainAsync(message):
         msgContent: str = message.content[len(prefix):]
         args: list = Launcher.splitArguments(msgContent)
         cmd: str = Launcher.getCommand(args)
-        runnablePath: str = Launcher.getRunnableModule(args)
-        runnablePath = runnablePath[:-(len(".main"))] + ".discordui"
+        runnablePath: str = Launcher.getRunnableModule(args, "discordui")
     except Exception as e:
         await message.reply(f"Failed looking up for command. This should not occur. {e}", mention_author=True)
         return
