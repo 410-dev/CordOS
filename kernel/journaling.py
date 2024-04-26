@@ -15,9 +15,6 @@ def record(state: str, text: str):
         scriptFileName = os.path.basename(caller.filename).replace(".py", "")
         callerName = f"{bundleName}.{scriptFileName}"
 
-
-    print(f"[{timestamp}] [{state}] {caller.name}@{callerName}: {text}")
-
     specificJournal = f"{PartitionMgr.data()}/etc/journals/{Clock.getStartTime().split(".")[0]}/{callerName}.journal"
     globalJournal = f"{PartitionMgr.data()}/etc/journals/{Clock.getStartTime().split(".")[0]}/_.journal"
 
