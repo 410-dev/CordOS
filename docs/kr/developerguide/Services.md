@@ -16,7 +16,9 @@ CordOS의 서비스 번들 표준은 다음과 같은 규칙을 가집니다:
       3. Stage 2: `data/config.json` 가 로드되고 최소한의 레지스트리를 불러옵니다. 이후 Discord 클라이언트를 초기화 한 후 실행됩니다.
       4. Stage 3 (권장): Discord 이벤트 리스너 및 최소한의 기초 함수들이 초기화/등록 된 후 실행합니다. 중요한 초기화 단계의 서비스가 아니라면 실행 단계를 3으로 설정하는 것을 권장합니다.
    3. `name` [SDKv1+]: Alphanumeric 문자열: 서비스의 이름이며 공백을 포함한 특수문자는 허용되지 않습니다.
-   4. `sync` [SDKv2+]: Boolean (true 혹은 false) - true 일 경우, 서비스가 동기적으로 실행됩니다. 기본값은 false입니다. 동기적으로 실행 될 경우 부트 프로세스가 해당 서비스의 실행이 완료될 때까지 대기합니다.
+   4. `sync` [SDKv1+]: Boolean (true 혹은 false) - true 일 경우, 서비스가 동기적으로 실행됩니다. 기본값은 false입니다. 동기적으로 실행 될 경우 부트 프로세스가 해당 서비스의 실행이 완료될 때까지 대기합니다.
+   5. `role` [SDKv1+]: 문자열 - 서비스의 역할을 지정합니다. 이는 동일한 역할을 하는 서비스가 중복적으로 로드되는 현상을 막기 위해 사용됩니다. 예를 들어, `critical.unique.shell` 로 설정된 서비스는 시스템의 셸 기능을 담당하며 동일한 역할을 가진 다른 서비스는 로드되지 않습니다. `role` 값이 `critical.unique.***` 로 시작한다면 해당 역할의 서비스는 중복 로드되지 않습니다.
+   6. `id` [SDKv1+]: 문자열 - 서비스의 고유 식별자입니다. 이 값은 서비스의 고유성을 보장합니다.
 
 ## 개발 예시
 configure.py
@@ -25,7 +27,7 @@ import kernel.registry as Registry
 from objects.discordmessage import DiscordMessageWrapper
 
 # 이 함수는 사용자 명령어 `services configure <service> args...` 가 실행되었을 때 호출됩니다.
-async def main(args: list, message: DiscordMessageWrapper):
+async def mainAsync(args: list, message: DiscordMessageWrapper):
    
     # 명령어가 올바르게 입력되었는지 확인합니다.
     if len(args) < 2:
@@ -51,9 +53,11 @@ def main():
 service.json
 ```json
 {
+    "id": "com.example.servicename",
+    "role": "critical",
+    "name": "example",
     "sdk": 2,
     "stage": 3,
-    "name": "example",
     "sync": false
 }
 ```

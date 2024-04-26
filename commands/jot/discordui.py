@@ -56,7 +56,7 @@ async def createNote(args, messageWrapper: DiscordMessageWrapper):
     await messageWrapper.reply(f"Note {'overwritten' if fileExists else 'added'}. Title: {title}", mention_author=True)
 
 
-async def main(args, message: discord.Message):
+async def mainAsync(args, message: discord.Message):
     try:
 
         # Drop first argument

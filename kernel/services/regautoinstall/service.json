@@ -1,4 +1,7 @@
 {
+    "id": "me.410-dev.NanoPyOS.RegAutoInstall",
+    "name": "Registry Automatic Installer",
+    "role": "critical",
     "sdk": 1,
     "stage": 1,
     "sync": false

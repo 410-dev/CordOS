@@ -19,7 +19,7 @@ async def chkPermission(message: DiscordMessageWrapper):
     return True
 
 
-async def main(args, message: DiscordMessageWrapper):
+async def mainAsync(args, message: DiscordMessageWrapper):
     try:
         # Check if user has permission to use this command
         if not await chkPermission(message):

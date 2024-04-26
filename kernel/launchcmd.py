@@ -3,21 +3,23 @@ import json
 
 import kernel.registry as Registry
 
-def getRunnableModule(args: list):
+def getRunnableModule(args: list, targetExecutive: str = "main"):
     commandsPaths: list = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
     appropriateCommandPath: str = ""
+
     for commandPath in commandsPaths:
         try:
-            with open(os.path.join(commandPath, args[0], "main.py"), 'r') as f:
-                appropriateCommandPath = commandPath
-                break
+            if not os.path.isfile(os.path.join(commandPath, args[0], f"{targetExecutive}.py")):
+                continue
+            appropriateCommandPath = commandPath
+            break
         except:
             pass
     
     if appropriateCommandPath == "":
         return None
     
-    return os.path.join(appropriateCommandPath, args[0], "main").replace("/", ".").replace("\\", ".")
+    return os.path.join(appropriateCommandPath, args[0], targetExecutive).replace("/", ".").replace("\\", ".")
 
 def getCommand(args: list):
     return args[0]
@@ -39,7 +41,8 @@ def splitArguments(string: str) -> list:
         words.append(current_word)
     return words
 
-async def runRunnableModule(module: str, args: list, message):
+
+def launchRunnable(module: str, args: list):
     import importlib
     module = importlib.import_module(module)
 
@@ -49,15 +52,14 @@ async def runRunnableModule(module: str, args: list, message):
     # Try with class structure
     try:
         commandClass = getattr(module, args[0].capitalize())
-        command = commandClass(args, message)
-        await command.exec()
+        command = commandClass(args)
+        command.main()
 
     except Exception as ignored:
         # Try with function structure
         # Call the function where signature is async def main(lineArgs: list, message) -> None:
         try:
-            await module.main(args, message)
+            module.main(args)
         except Exception as e:
-            await message.reply(f"Error while running executive. e: {e}", mention_author=True)
+            print(f"Error while running executive. e: {e}")
             return
-

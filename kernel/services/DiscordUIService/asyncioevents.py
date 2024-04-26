@@ -3,18 +3,12 @@ import asyncio
 import kernel.registry as Registry
 import os
 
-
-def main():
-    # Does nothing in the background.
-    pass
-
-
 def printIfEnabled(msg: str):
     if Registry.read("SOFTWARE.CordOS.Kernel.Services.ioeventsmgr.Print", default="0") == "1":
         print(msg)
 
 
-async def runModule(message: str, scope: str):
+async def runModule(message, scope: str):
     # List directories in kernel/events/interaction and value of SOFTWARE.CordOS.Events.EventsBundleContainer
     try:
         eventBundles: list = []
@@ -60,7 +54,7 @@ async def runModule(message: str, scope: str):
         # Check if the event is in the eventBundles
         for idx, eventBundle in enumerate(eventBundles):
             printIfEnabled(f"Checking event bundle {eventBundle}...")
-            if not os.path.isfile(os.path.join(eventBundle, "main.py")):
+            if not os.path.isfile(os.path.join(eventBundle, "discordui.py")):
                 eventBundles.pop(idx)
                 printIfEnabled(f"Event bundle {eventBundle} does not have a main.py file.")
 
@@ -68,9 +62,9 @@ async def runModule(message: str, scope: str):
         executedTasks: list = []
         for eventBundle in eventBundles:
             try:
-                module = importlib.import_module(eventBundle.replace("/", ".").replace("\\", ".") + ".main")
+                module = importlib.import_module(eventBundle.replace("/", ".").replace("\\", ".") + ".discordui")
                 importlib.reload(module)
-                executedTasks.append(asyncio.create_task(module.main(message)))
+                executedTasks.append(asyncio.create_task(module.mainAsync(message)))
                 printIfEnabled(f"Event bundle {eventBundle} started in a new thread.")
             except Exception as e:
                 printIfEnabled(f"Error while running event bundle {eventBundle}: {e}")
@@ -82,21 +76,21 @@ async def runModule(message: str, scope: str):
         printIfEnabled(f"Error while running event bundles: {e}")
 
 
-def onInteractiveInputEvent(message: str):
-    runModule(message, "interaction")
+async def onInteractiveInputEvent(message):
+    await runModule(message, "interaction")
 
 
-def onPassiveInputEvent(message: str):
-    runModule(message, "passive")
+async def onPassiveInputEvent(message):
+    await runModule(message, "passive")
 
 
-def onReplyOutputEvent(message: str):
-    runModule(message, "reply")
+async def onReplyOutputEvent(message):
+    await runModule(message, "reply")
 
 
-def onSendOutputEvent(message: str):
-    runModule(message, "send")
+async def onSendOutputEvent(message):
+    await runModule(message, "send")
 
 
-def onOutputEvent(message: str):
-    runModule(message, "output")
+async def onOutputEvent(message):
+    await runModule(message, "output")

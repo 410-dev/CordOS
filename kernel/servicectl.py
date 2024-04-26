@@ -5,6 +5,52 @@ import json
 import kernel.registry as Registry
 import kernel.partitionmgr as PartitionMgr
 
+class ServicesContainer:
+    kernelServices: dict = {
+    }
+
+    thirdPartyServices: dict = {
+    }
+
+    def addService(scope: str, stage: int, service: dict):
+        if scope == "kernel":
+            if stage not in ServicesContainer.kernelServices:
+                ServicesContainer.kernelServices[stage] = []
+            ServicesContainer.kernelServices[stage].append(service)
+        else:
+            if stage not in ServicesContainer.thirdPartyServices:
+                ServicesContainer.thirdPartyServices[stage] = []
+            ServicesContainer.thirdPartyServices[stage].append(service)
+
+    def getService(scope: str, id: str):
+        toSearch: dict = {}
+        if scope == "kernel":
+            toSearch = ServicesContainer.kernelServices
+        else:
+            toSearch = ServicesContainer.thirdPartyServices
+
+        for stage in toSearch:
+            for service in toSearch[stage]:
+                if service['id'] == id:
+                    return service
+        return None
+
+
+def isEnabled(serviceId: str):
+    return ServicesContainer.getService("kernel", serviceId) is not None or ServicesContainer.getService("thirdparty", serviceId) is not None
+
+
+def hasServiceAsRole(role: str) -> str:
+    for stage in ServicesContainer.kernelServices:
+        for service in ServicesContainer.kernelServices[stage]:
+            if service['profile']['role'] == role:
+                return service['id']
+    for stage in ServicesContainer.thirdPartyServices:
+        for service in ServicesContainer.thirdPartyServices[stage]:
+            if service['profile']['role'] == role:
+                return service['id']
+    return None
+
 
 def start(stage: int, safeMode: bool):
     if Registry.read("SOFTWARE.CordOS.Kernel.Services.Enabled") == "0":
@@ -53,6 +99,7 @@ def start(stage: int, safeMode: bool):
 
         runSync: bool = False
 
+        serviceData: dict = {}
         try:
             with open(f"{service}/service.json", 'r') as f:
                 serviceData = json.loads(f.read())
@@ -87,20 +134,26 @@ def start(stage: int, safeMode: bool):
                     print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
                     continue
 
+                if "critical.unique." in serviceData['role'] and hasServiceAsRole(serviceData['role']) is not None:
+                    print(f"Service Failed: Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
+                    continue
+
                 if serviceData['sync']:
                     runSync = True
 
                 if service.startswith("kernel/services"):
-                    if Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service}.Enabled") == "0":
+                    if Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled") == "0":
                         continue
 
-                    Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{service}.Enabled", "1")
+                    Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled", "1")
 
                 else:
-                    if Registry.read(f"SOFTWARE.CordOS.Services.{service}.Enabled") == "0":
+                    serviceName = service.replace(thirdPartyServicesLoc.replace("/", ".").replace("\\", "."), "")
+                    if Registry.read(f"SOFTWARE.CordOS.Services.{serviceName}.Enabled") == "0":
                         continue
 
-                    Registry.write(f"SOFTWARE.CordOS.Services.{service}.Enabled", "1")
+                    Registry.write(f"SOFTWARE.CordOS.Services.{serviceName}.Enabled", "1")
+
         except:
             pass
 
@@ -124,6 +177,16 @@ def start(stage: int, safeMode: bool):
                 continue
 
             thread.start()
+
+            serviceObject: dict = {
+                "id": serviceData['id'],
+                "name": serviceData['name'],
+                "module": module,
+                "thread": thread,
+                "profile": serviceData
+            }
+
+            ServicesContainer.addService("kernel" if service.startswith("kernel.services") else "thirdparty", stage, serviceObject)
 
             print(f"Started service (Stage {stage}) '{service}'.")
 

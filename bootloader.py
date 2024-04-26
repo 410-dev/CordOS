@@ -116,7 +116,7 @@ def main(args):
     # Check if python3 is available as a command
     completion = subprocess.run([python3, 'system.py'] + args)
 
-    if "--clear-cache" in args:
+    if "--no-clear-cache" not in args:
         print(f"{Colors.YELLOW}Clearing cache...{Colors.NC}")
         clear_cache()
 

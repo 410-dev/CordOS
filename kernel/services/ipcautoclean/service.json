@@ -1,4 +1,7 @@
 {
+    "id": "me.410-dev.NanoPyOS.IPCAutoClean",
+    "name": "IPC Auto Clean",
+    "role": "critical",
     "sdk": 1,
     "stage": 1,
     "sync": false
