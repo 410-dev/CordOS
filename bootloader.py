@@ -114,15 +114,21 @@ def main(args):
     print(f"{Colors.NC}Starting bot...{Colors.NC}")
 
     # Check if python3 is available as a command
-    completion = subprocess.run([python3, 'system.py'] + args)
+    import importlib
+    module = importlib.import_module('kernel.system')
+    importlib.reload(module)
+    completion = 0
+    if __name__ == '__main__':
+        completion = module.main(args)
+
 
     if "--no-clear-cache" not in args:
         print(f"{Colors.YELLOW}Clearing cache...{Colors.NC}")
         clear_cache()
 
-    print(f"{Colors.NC}Bot exited with code {completion.returncode}.{Colors.NC}")
+    print(f"{Colors.NC}Bot exited with code {completion}.{Colors.NC}")
 
-    sys.exit(completion.returncode)
+    sys.exit(completion)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
