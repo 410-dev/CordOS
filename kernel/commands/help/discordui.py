@@ -1,20 +1,19 @@
 
 import traceback
 from typing import List
+from objects.embedmsg import EmbeddedMessage
 
 import kernel.registry as Registry
-import kernel.io as IO
-
 import os
 
-def main(args: list, message) -> None:
+async def mainAsync(args: list, message) -> None:
     try:
         commandPaths: List[str] = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
 
         if len(args) < 2:
             # Print current manual
             with open("kernel/commands/help/manual.txt", 'r') as f:
-                IO.println(f.read())
+                await message.reply(f.read(), mention_author=True)
                 return
 
         # Find executable bundle
@@ -31,9 +30,14 @@ def main(args: list, message) -> None:
         if helpString == "":
             return Registry.read("SOFTWARE.CordOS.Kernel.Proc.CommandNotFound")
 
-        IO.println(helpString)
+        if Registry.read("SOFTWARE.CordOS.Experimental.EmbeddedMessage", default="0") == "0":
+            await message.reply(helpString, mention_author=True)
+            return
+
+        else:
+            msg = EmbeddedMessage(message, title=args[1], description=helpString, footer="CordOS")
+            await msg.sendAsReply()
 
     except Exception as e:
         if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
-        IO.println(f"Error in settings. e: {e}")
-
+        await message.reply(f"Error in settings. e: {e}", mention_author=True)

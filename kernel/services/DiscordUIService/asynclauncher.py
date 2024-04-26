@@ -16,7 +16,7 @@ async def runRunnableModule(module: str, args: list, message):
 
     except Exception as ignored:
         # Try with function structure
-        # Call the function where signature is async def mainAsync(lineArgs: list, message) -> None:
+        # Call the function where signature is async def main(lineArgs: list, message) -> None:
         try:
             await module.mainAsync(args, message)
         except Exception as e:

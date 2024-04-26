@@ -96,9 +96,9 @@ def main():
                         args: list = Launcher.splitArguments(msgContent)
                         cmd: str = Launcher.getCommand(args)
                         runnablePath: str = Launcher.getRunnableModule(args)
+                        runnablePath = runnablePath[:-(len(".main"))] + ".discordui"
                     except Exception as e:
-                        await message.reply(f"Failed looking up for command. This should not occur. {e}",
-                                            mention_author=True)
+                        await message.reply(f"Failed looking up for command. This should not occur. {e}", mention_author=True)
                         return
 
                     if runnablePath == "" or runnablePath is None:
@@ -114,7 +114,6 @@ def main():
                         await message.reply(f"Error executing command '{cmd}': {e}", mention_author=True)
 
             except Exception as e:
-
                 # Set everything default mode. Try not loading registry.
                 if message.content.startswith("."):
                     if message.content == ".regrestore":
