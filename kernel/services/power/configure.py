@@ -62,7 +62,7 @@ async def mainAsync(args: list, message):
 def main(args: list):
 
     if len(args) < 1:
-        IO.println("Usage: power off")
+        IO.println("Usage: power <off|reboot|halt|reset>")
         return
 
     if args[0] == "off":
@@ -84,7 +84,7 @@ def main(args: list):
         sys.exit(1)
 
     else:
-        IO.println("Usage: power off")
+        IO.println("Usage: power <off|reboot|halt|reset>")
         return
 
 
