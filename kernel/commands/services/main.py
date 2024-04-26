@@ -9,7 +9,7 @@ def main(args: list):
 
     # Check if args are present
     if len(args) < 2:
-        IO.println(f"Missing arguments. \nUsage: services <configure|list> [service] args...")
+        IO.println(f"Missing arguments. \nUsage: services <configure|list|enable-ksrv|disable-ksrv|enable-usrv|disable-usrv> [service] args...")
         return
 
     # Check if command is configure
@@ -113,7 +113,19 @@ def main(args: list):
 
         IO.println(f"{response}")
 
+    elif args[1] == "enable-ksrv":
+        Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{args[2]}.Enabled", "1")
+        IO.println("Registry updated.")
+    elif args[1] == "disable-ksrv":
+        Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{args[2]}.Enabled", "0")
+        IO.println("Registry updated.")
+    elif args[1] == "enable-usrv":
+        Registry.write(f"SOFTWARE.CordOS.Services.{args[2]}.Enabled", "1")
+        IO.println("Registry updated.")
+    elif args[1] == "disable-usrv":
+        Registry.write(f"SOFTWARE.CordOS.Services.{args[2]}.Enabled", "0")
+        IO.println("Registry updated.")
     else:
-        IO.println(f"Unknown action: {args[0]}\nUsage: services <configure|list> [service] args...")
+        IO.println(f"Unknown action: {args[0]}\nUsage: services <configure|list|enable-ksrv|disable-ksrv|enable-usrv|disable-usrv> [service] args...")
         return
     return

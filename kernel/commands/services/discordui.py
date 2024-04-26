@@ -30,7 +30,7 @@ class Services:
 
         # Check if args are present
         if len(self.args) < 2:
-            await self.message.reply(f"Missing arguments. \nUsage: services <configure|list> [service] args...",
+            await self.message.reply(f"Missing arguments. \nUsage: services <configure|list|enable-ksrv|disable-ksrv|enable-usrv|disable-usrv> [service] args...",
                                      mention_author=True)
             return
 
@@ -98,7 +98,7 @@ class Services:
             userServices: list = []
             if os.path.isdir(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices")):
                 userServices: list = os.listdir(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices"))
-            services = "Kernel Services:\n```"
+            services = "Kernel Services:\n```\n"
             for service in kernelServices:
                 try:
                     if "main.py" not in os.listdir(f"kernel/services/{service}"):
@@ -107,7 +107,7 @@ class Services:
                     continue
                 services += f"{service}\n"
 
-            services += "```\nUser Services:\n```"
+            services += "```\nUser Services:\n```\n"
             for service in userServices:
                 try:
                     if "main.py" not in os.listdir(
@@ -142,9 +142,20 @@ class Services:
 
             await self.message.reply(f"```{response}```", mention_author=True)
 
+        elif self.args[1] == "enable-ksrv":
+            Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{self.args[2]}.Enabled", "1")
+            await self.message.reply("Registry updated.")
+        elif self.args[1] == "disable-ksrv":
+            Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{self.args[2]}.Enabled", "0")
+            await self.message.reply("Registry updated.")
+        elif self.args[1] == "enable-usrv":
+            Registry.write(f"SOFTWARE.CordOS.Services.{self.args[2]}.Enabled", "1")
+            await self.message.reply("Registry updated.")
+        elif self.args[1] == "disable-usrv":
+            Registry.write(f"SOFTWARE.CordOS.Services.{self.args[2]}.Enabled", "0")
+            await self.message.reply("Registry updated.")
+
         else:
-            await self.message.reply(
-                f"Unknown action: {self.args[0]}\nUsage: services <configure|list> [service] args...",
-                mention_author=True)
+            await self.message.reply(f"Unknown action: {self.args[0]}\nUsage: services <configure|list|enable-ksrv|disable-ksrv|enable-usrv|disable-usrv> [service] args...", mention_author=True)
             return
         return
