@@ -1,6 +1,8 @@
 {
-    "api": 2,
+    "id": "me.410-dev.NanoPyOS.Versioning",
+    "name": "Versioning",
+    "role": "critical",
+    "sdk": 1,
     "stage": 0,
-    "name": "versioning",
     "sync": true
 }

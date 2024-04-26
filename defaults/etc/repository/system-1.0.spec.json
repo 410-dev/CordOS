@@ -1,0 +1,21 @@
+{
+    "spec": "CordOSInstallablePackage",
+    "specv": 1,
+    "sdk": 1,
+    "name": "CordOS System Layer",
+    "version": "1.0.0",
+    "author": "410-dev",
+    "build": 1,
+    "description": "System file for CordOS",
+    "package": {
+        "zip": "self"
+    },
+    "dependencies": {},
+    "conflicts": {},
+    "pip": [],
+    "packageMaps": {},
+    "taskmap": [],
+    "flags": {
+        "removable": false
+    }
+}

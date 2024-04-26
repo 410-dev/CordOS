@@ -1,0 +1,4 @@
+
+
+def uninstall(packages):
+    pass

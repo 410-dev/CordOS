@@ -1,11 +1,37 @@
 @echo off
-:begin
-if exist restart del /q restart
+:loop
+if exist ".\restart" (
+    del ".\restart"
+)
 
-if exist venv\Scripts\activate.bat call venv\Scripts\activate.bat
-python ./bootloader.py %*
-set PYTHON_ERRORLEVEL=%ERRORLEVEL%
-if %PYTHON_ERRORLEVEL%==1 echo > restart
-rd /s /q data\cache
+if exist ".\venv" (
+    call .\venv\Scripts\activate.bat
+)
 
-if exist restart goto begin
+if exist ".\safe_restart" (
+    del ".\safe_restart"
+    call python .\bootloader.py --safe %*
+) else (
+    call python .\bootloader.py %*
+)
+
+:: Directly check the errorlevel
+if errorlevel 1 (
+    if errorlevel 3 (
+        echo. > .\safe_restart
+    ) else (
+        echo. > .\restart
+    )
+)
+
+if exist ".\data\cache" (
+    rmdir /s /q ".\data\cache"
+)
+
+if not exist ".\restart" (
+    if not exist ".\safe_restart" (
+        goto :eof
+    )
+)
+
+goto loop

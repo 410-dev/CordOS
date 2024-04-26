@@ -16,7 +16,7 @@ class Note:
         self.SVNOTEREG = "SOFTWARE.CordOS.Plugins.Note.$server."
         self.USRNOTEREG = "SOFTWARE.CordOS.Plugins.Note.$server.$user."
     
-    async def exec(self):
+    async def mainAsync(self):
         
         action: str = ""
         targreg: str = ""

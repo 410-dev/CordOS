@@ -11,7 +11,7 @@ class Vc:
         self.args: list = lineArgs
         self.message = message
     
-    async def exec(self):
+    async def mainAsync(self):
         """
         Directs the parameters to the correct function.
         """

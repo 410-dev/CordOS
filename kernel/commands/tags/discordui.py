@@ -12,7 +12,7 @@ class Tags:
         self.message = message
         self.user: User = Servers.getUserAtServer(self.message.guild.id, self.message.author.id)
 
-    async def exec(self):
+    async def mainAsync(self):
         
         try:
             if len(self.args) > 0:

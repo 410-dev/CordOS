@@ -1,0 +1,8 @@
+{
+    "id": "me.410-dev.NanoPyOS.SafeShutdownTracker",
+    "name": "Safe Shutdown Tracker",
+    "role": "important",
+    "sdk": 1,
+    "stage": 1,
+    "sync": false
+}

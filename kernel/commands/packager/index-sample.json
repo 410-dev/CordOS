@@ -1,0 +1,37 @@
+{
+    "spec": "CordOSInstallablePackageRepositoryIndex",
+    "specv": 1,
+    "name": "Local Repository",
+    "id": "localrom",
+    "description": "Repository description here",
+    "updateTime": 0,
+    "source": "http://example.com/repo/{name}-{version}.spec.json",
+    "index": "http://example.com/repo/index.json",
+    "packages": [
+        {
+            "name": "com.example.app",
+            "version": "1.0",
+            "build": 1,
+            "description": "Example app",
+            "sdk": 1,
+            "arch": "any",
+            "dependencies": [
+                {
+                    "name": "com.example.lib",
+                    "version": "1.0"
+                }
+            ],
+            "conflicts": []
+        },
+        {
+            "name": "com.example.lib",
+            "version": "1.0",
+            "build": 1,
+            "description": "Example library",
+            "sdk": 1,
+            "arch": "any",
+            "dependencies": [],
+            "conflicts": []
+        }
+    ]
+}

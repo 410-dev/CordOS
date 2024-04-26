@@ -1,7 +1,9 @@
+import sys
 import kernel.ipc as IPC
 import kernel.registry as Registry
+import kernel.io as IO
 
-async def main(args: list, message):
+async def mainAsync(args: list, message):
 
     if len(args) < 1:
         await message.reply("Usage: power off")
@@ -26,7 +28,9 @@ async def main(args: list, message):
 
         else:
             await message.reply(f"System will now be force terminated. Goodbye.")
-            exit(0)
+            IPC.set("power.off", True)
+            IPC.set("power.off.state", "OFF")
+            sys.exit(0)
 
     elif args[0] == "reset":
         resetKey = f"KernelResetSignal.{message.author.id}"
@@ -36,10 +40,10 @@ async def main(args: list, message):
             await message.reply(f"!!!!! EXTREME SENSITIVE WARNING !!!!!\nYou have triggered system reset. ***This will stop the system immediately and may cause data loss***. If you are sure, type the trigger command again. If you are not sure, type `power off` to shutdown the system. To cancel the confirmation, type `power reset-cancel`.")
 
         else:
-            # with open("restart", 'w') as f:
-            #     f.write("")
             await message.reply(f"System will now be reset.")
-            exit(1)
+            IPC.set("power.off", True)
+            IPC.set("power.off.state", "REBOOT")
+            sys.exit(1)
 
     elif args[0] == "halt-cancel":
         haltKey = f"KernelHaltSignal.{message.author.id}"
@@ -55,5 +59,33 @@ async def main(args: list, message):
         await message.reply("Usage: power off")
         return
 
+
+def main(args: list):
+
+    if len(args) < 1:
+        IO.println("Usage: power <off|reboot|halt|reset>")
+        return
+
+    if args[0] == "off":
+        IPC.set("power.off", True)
+        IPC.set("power.off.state", "OFF")
+        IO.println(f"Shutdown signal published. System will shutdown after all services have stopped.")
+
+    elif args[0] == "reboot":
+        IPC.set("power.off", True)
+        IPC.set("power.off.state", "REBOOT")
+        IO.println(f"Reboot signal published. System will reboot after all services have stopped.")
+
+    elif args[0] == "halt":
+        IO.println(f"System will now be force terminated. Goodbye.")
+        sys.exit(0)
+
+    elif args[0] == "reset":
+        IO.println(f"System will now be reset.")
+        sys.exit(1)
+
+    else:
+        IO.println("Usage: power <off|reboot|halt|reset>")
+        return
 
 

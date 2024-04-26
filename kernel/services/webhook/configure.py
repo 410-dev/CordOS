@@ -3,7 +3,7 @@ import kernel.webhook as Webhook
 
 import os
 
-async def main(args: list, message):
+async def mainAsync(args: list, message):
 
     # Args:
     #    link <url> <webhookid>
