@@ -231,6 +231,10 @@ def main():
                 # Sleep
                 time.sleep(1)
 
+        # Push client to IPC
+        Journaling.record("INFO", "Pushing client to IPC.")
+        IPC.set("discord.client", client)
+
         # Start the shutdown listener
         def start_async_loop():
             loop = asyncio.new_event_loop()
