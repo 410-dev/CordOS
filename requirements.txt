@@ -2,4 +2,3 @@ discord
 discord-ext-bot
 discord-webhook
 requests
-google-generativeai
