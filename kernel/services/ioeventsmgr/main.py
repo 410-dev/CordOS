@@ -8,14 +8,7 @@ def main():
     # Does nothing in the background.
     pass
 
-
-def printIfEnabled(msg: str):
-    Journaling.record("INFO", msg)
-    if Registry.read("SOFTWARE.CordOS.Kernel.Services.ioeventsmgr.Print", default="0") == "1":
-        print(msg)
-
-
-async def runModule(message: str, scope: str):
+def runModule(message: str, scope: str):
     # List directories in kernel/events/interaction and value of SOFTWARE.CordOS.Events.EventsBundleContainer
     try:
         Journaling.record("INFO", f"Running event bundles for {scope} scope.")
@@ -32,6 +25,10 @@ async def runModule(message: str, scope: str):
             if os.path.isdir(f"kernel/events/{scope}"):
                 kernelBundles: list = os.listdir(f"kernel/events/{scope}")
                 for idx, eventBundle in enumerate(kernelBundles):
+                    if ".disabled" in eventBundle:
+                        kernelBundles.pop(idx)
+                        Journaling.record("INFO", f"Kernel event bundle {eventBundle} is disabled.")
+                        continue
                     kernelBundles[idx] = f"kernel/events/{scope}/{eventBundle}"
                     Journaling.record("INFO", f"Kernel event bundle {kernelBundles[idx]} found.")
 
@@ -53,23 +50,35 @@ async def runModule(message: str, scope: str):
                     continue
                 userBundles.append(eventBundle)
             for idx, eventBundle in enumerate(userBundles):
+                if ".disabled" in eventBundle:
+                    userBundles.pop(idx)
+                    Journaling.record("INFO", f"User event bundle {eventBundle} is disabled.")
+                    continue
                 userBundles[idx] = f"{eventBundle}/{scope}"
                 Journaling.record("INFO", f"User event bundle {eventBundle} found.")
 
         eventBundles.extend(kernelBundles)
         eventBundles.extend(userBundles)
 
-        printIfEnabled(f"Event bundles: {eventBundles}")
+        Journaling.record("INFO", f"Event bundles: {eventBundles}")
 
         if len(eventBundles) == 0:
             return
 
         # Check if the event is in the eventBundles
         for idx, eventBundle in enumerate(eventBundles):
-            printIfEnabled(f"Checking event bundle {eventBundle}...")
+            if "kernel/" in eventBundle:
+                Journaling.record("INFO",  f"Checking if bundle is disabled: SOFTWARE.CordOS.Events.Kernel.{eventBundle.replace('/', '.').replace('\\', '.').split(".")[-1]}.Disabled={Registry.read(f'SOFTWARE.CordOS.Events.Kernel.{eventBundle.replace("/", ".").replace("\\", ".").split(".")[-1]}.Disabled', default="0")}")
+            else:
+                Journaling.record("INFO",  f"Checking if bundle is disabled: SOFTWARE.CordOS.Events.User.{eventBundle.replace('/', '.').replace('\\', '.').split(".")[-1]}.Disabled={Registry.read(f'SOFTWARE.CordOS.Events.User.{eventBundle.replace("/", ".").replace("\\", ".").split(".")[-1]}.Disabled', default="0")}")
+
+            if ".disabled" in eventBundle or (Registry.read(f"SOFTWARE.CordOS.Events.User.{eventBundle.replace('/', '.').replace('\\', '.').split(".")[-1]}.Disabled", default="0") == "1" or Registry.read(f"SOFTWARE.CordOS.Events.Kernel.{eventBundle.replace('/', '.').replace('\\', '.').split(".")[-1]}.Disabled", default="0") == "1"):
+                eventBundles.pop(idx)
+                Journaling.record("INFO", f"Event bundle {eventBundle} is disabled.")
+            Journaling.record("INFO", f"Checking event bundle {eventBundle}...")
             if not os.path.isfile(os.path.join(eventBundle, "main.py")):
                 eventBundles.pop(idx)
-                printIfEnabled(f"Event bundle {eventBundle} does not have a main.py file.")
+                Journaling.record("INFO", f"Event bundle {eventBundle} does not have a main.py file.")
 
         import importlib
         executedTasks: list = []
@@ -78,15 +87,15 @@ async def runModule(message: str, scope: str):
                 module = importlib.import_module(eventBundle.replace("/", ".").replace("\\", ".") + ".main")
                 importlib.reload(module)
                 executedTasks.append(asyncio.create_task(module.main(message)))
-                printIfEnabled(f"Event bundle {eventBundle} started in a new thread.")
+                Journaling.record("INFO", f"Event bundle {eventBundle} started in a new thread.")
             except Exception as e:
-                printIfEnabled(f"Error while running event bundle {eventBundle}: {e}")
+                Journaling.record("INFO", f"Error while running event bundle {eventBundle}: {e}")
 
         for task in executedTasks:
-            await task
+            task
 
     except Exception as e:
-        printIfEnabled(f"Error while running event bundles: {e}")
+        Journaling.record("INFO", f"Error while running event bundles: {e}")
 
 
 def onInteractiveInputEvent(message: str):
