@@ -1,9 +1,11 @@
 import asyncio
-
-import kernel.registry as Registry
 import os
 
+import kernel.journaling as Journaling
+import kernel.registry as Registry
+
 def printIfEnabled(msg: str):
+    Journaling.record("INFO", msg)
     if Registry.read("SOFTWARE.CordOS.Kernel.Services.ioeventsmgr.Print", default="0") == "1":
         print(msg)
 
@@ -11,6 +13,7 @@ def printIfEnabled(msg: str):
 async def runModule(message, scope: str):
     # List directories in kernel/events/interaction and value of SOFTWARE.CordOS.Events.EventsBundleContainer
     try:
+        Journaling.record("INFO", f"Running event bundles for {scope} scope.")
         eventBundles: list = []
 
         kernelBundles: list = []
@@ -20,10 +23,12 @@ async def runModule(message, scope: str):
         kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.Kernel.OutboundSendEnabled") == "1" and scope == "send")
         kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.Kernel.OutboundGlobalEnabled") == "1" and scope == "output")
         if kernelBundleEnabled:
+            Journaling.record("INFO", f"Kernel event bundles enabled for {scope} scope.")
             if os.path.isdir(f"kernel/events/{scope}"):
                 kernelBundles: list = os.listdir(f"kernel/events/{scope}")
                 for idx, eventBundle in enumerate(kernelBundles):
                     kernelBundles[idx] = f"kernel/events/{scope}/{eventBundle}"
+                    Journaling.record("INFO", f"Kernel event bundle {kernelBundles[idx]} found.")
 
         userBundles: list = []
         userBundleEnabled: bool = Registry.read("SOFTWARE.CordOS.Events.User.InboundPassiveEnabled") == "1" and scope == "passive"
@@ -32,7 +37,9 @@ async def runModule(message, scope: str):
         userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.User.OutboundSendEnabled") == "1" and scope == "send")
         userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.User.OutboundGlobalEnabled") == "1" and scope == "output")
         if userBundleEnabled:
+            Journaling.record("INFO", f"User event bundles enabled for {scope} scope.")
             eventBundlesContainers: list = Registry.read("SOFTWARE.CordOS.Events.EventsBundleContainer", default="").replace(", ", ",").split(",")
+            Journaling.record("INFO", f"Event bundle containers: {eventBundlesContainers}")
             for eventBundle in eventBundlesContainers:
                 if not os.path.isdir(eventBundle):
                     continue
@@ -42,6 +49,7 @@ async def runModule(message, scope: str):
                 userBundles.append(eventBundle)
             for idx, eventBundle in enumerate(userBundles):
                 userBundles[idx] = f"{eventBundle}/{scope}"
+                Journaling.record("INFO", f"User event bundle {eventBundle} found.")
 
         eventBundles.extend(kernelBundles)
         eventBundles.extend(userBundles)
