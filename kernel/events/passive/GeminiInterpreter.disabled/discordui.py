@@ -14,7 +14,9 @@ import traceback
 import json
 
 async def mainAsync(message: DiscordMessage.DiscordMessageWrapper):
-    Journaling.record("INFO", f"Message received from {message.author.name}#{message.author.discriminator} in {message.guild.name}: {message.content}")
+    if Registry.read("SOFTWARE.CordOS.Experimental.LLMAssistant.Enabled", default="0") != "1":
+        return
+    Journaling.record("INFO", "Experimental feature LLM Assistant is enabled.")
     discordClient: discord.Client = IPC.read("discord.client")
     llmCommand: str = message.content
     IO.println(f"Comparing discord id with bot id: {discordClient.user.id}...")
