@@ -3,6 +3,7 @@ from discord import message as DiscordMessage
 import kernel.services.DiscordUIService.asyncioevents as IOEventsMgr
 import kernel.registry as Registry
 
+import kernel.drivers.StandardIODevice as IODriver
 
 class DiscordMessageWrapper:
     def __init__(self, message: DiscordMessage) -> None:
@@ -10,6 +11,12 @@ class DiscordMessageWrapper:
         self.content = message.content
         self.author = message.author
         self.guild = message.guild
+        self.channel = message.channel
+
+        self.outdrv = IODriver.stdio_output
+        self.indrv = IODriver.stdio_input
+        self.useStdIO = False
+
 
     async def replyEvent(self):
         await IOEventsMgr.onOutputEvent(self.message)
@@ -22,13 +29,23 @@ class DiscordMessageWrapper:
     async def anyOutputEvent(self):
         await IOEventsMgr.onOutputEvent(self.message)
 
-    async def reply(self, content: str, mention_author: bool = True):
+    async def reply(self, content: str = None, mention_author: bool = True, embed=None, delete_after=None, embeddedMessageWrapper=None):
         await self.replyEvent()
-        await self.message.reply(content, mention_author=mention_author)
+        if self.useStdIO:
+            if content is None and embeddedMessageWrapper is not None:
+                content = embeddedMessageWrapper.stringifySimpler()
+            self.outdrv(content)
+        else:
+            await self.message.reply(content=content, mention_author=mention_author, embed=embed, delete_after=delete_after)
 
-    async def send(self, content: str):
+    async def send(self, content: str = None, embed=None, delete_after=None, embeddedMessageWrapper=None):
         await self.sendEvent()
-        await self.message.channel.send(content)
+        if self.useStdIO:
+            if content is None and embeddedMessageWrapper is not None:
+                content = embeddedMessageWrapper.stringifySimpler()
+            self.outdrv(content)
+        else:
+            await self.message.channel.send(content=content, embed=embed, delete_after=delete_after)
 
     async def delete(self):
         if Registry.read("SOFTWARE.CordOS.Events.OutboundEventList.Delete", default="0") == "1":

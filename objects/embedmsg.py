@@ -19,15 +19,24 @@ class EmbeddedMessage:
     async def send(self):
         embed = self.getEmbed()
         await self.messageWrapper.sendEvent()
-        await self.message.channel.send(embed=embed, delete_after=self.expire)
+        await self.messageWrapper.send(embed=embed, delete_after=self.expire, embeddedMessageWrapper=self)
 
     async def sendAsReply(self, mention_author=True):
         embed = self.getEmbed()
         await self.messageWrapper.replyEvent()
-        await self.message.reply(embed=embed, mention_author=mention_author, delete_after=self.expire)
+        await self.messageWrapper.reply(embed=embed, mention_author=mention_author, delete_after=self.expire, embeddedMessageWrapper=self)
 
     def getEmbed(self):
         embed = discord.Embed(title=self.title, description=self.description, color=self.color)
         embed.set_footer(text=self.footer)
         embed.timestamp = self.timestamp
         return embed
+
+    def stringify(self):
+        return f"[Color: {self.color}, Time: {self.timestamp}] {self.title}: {self.description} ({self.footer})"
+
+    def stringifySimpler(self):
+        return f"{self.title}: {self.description}"
+
+    def stringifySimplest(self):
+        return self.description
