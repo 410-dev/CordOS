@@ -25,7 +25,11 @@ async def mainAsync(message: DiscordMessage.DiscordMessageWrapper):
     else:
         return
 
-    await message.reply("LLM is currently working... Please wait.", mention_author=True)
+    if Registry.read("SOFTWARE.CordOS.Experimental.LLMAssistant.DisableExperimentalWarning", default="0") != "1":
+        await message.reply("This feature is experimental and may not work as intended. Use at your own risk. Any response from this does not mean or intended by developer of CordOS or any related components of this feature.", mention_author=True)
+
+    if Registry.read("SOFTWARE.CordOS.Experimental.LLMAssistant.DisableWorkingStartMessage", default="0") != "1":
+        await message.reply("LLM is currently working... Please wait.", mention_author=True)
 
     # Copy message instance to a new instance
     modifiableWrapper = DiscordMessage.DiscordMessageWrapper(message.message)
@@ -89,7 +93,9 @@ async def mainAsync(message: DiscordMessage.DiscordMessageWrapper):
     reasoning: str = output["reasoning"]
     generated: list = output["generated"]
 
-    await message.reply(f"LLM concluded to execute `{generated}` with following reasoning:\n`{reasoning}`", mention_author=True)
+    if Registry.read("SOFTWARE.CordOS.Experimental.LLMAssistant.DisableReasoningStepMessage", default="0") != "1":
+        await message.reply(f"LLM concluded to execute `{generated}` with following reasoning:\n`{reasoning}`", mention_author=True)
+
     for cmd in generated:
         message.content = cmd
         await interpreter(message)
