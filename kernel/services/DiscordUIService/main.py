@@ -204,7 +204,7 @@ def main():
         async def shutdownListener():
             while True:
                 try:
-                    Journaling.record("INFO", "Checking for shutdown signal.")
+                    # Journaling.record("INFO", "Checking for shutdown signal.")
                     powerOffTrigger: bool = bool(IPC.read("power.off", default=False))
                     if powerOffTrigger:
                         Journaling.record("INFO", "Received shutdown signal. Recognizing the signal.")
