@@ -5,5 +5,5 @@ Required permissions:
     
 ```
 Usage:
-    vc <@user mention> <@user mention> ...  : Open private temporary voice channel for specific people
+    vc <@user mention> <@user mention> ...  : Open private temporary voice channel for specific people. Make sure to include all user (even command issuer, if involved)!
 ```
