@@ -5,7 +5,53 @@ import os
 import kernel.clock as Clock
 import kernel.partitionmgr as PartitionMgr
 
+
+
+class JournalingContainer:
+
+    journals = {
+        "global": {
+            "scriptPath": "_",
+            "entries": []
+        },
+        "_registry_access_records": {
+            "scriptPath": "kernel.registry",
+            "entries": []
+        }
+    }
+
+    @staticmethod
+    def addJournal(journal, scriptPath):
+        JournalingContainer.journals[journal] = {
+            "scriptPath": scriptPath,
+            "entries": []
+        }
+
+    @staticmethod
+    def addEntry(journal, entry):
+        JournalingContainer.journals[journal]["entries"].append(entry)
+
+    @staticmethod
+    def getJournal(journal):
+        return JournalingContainer.journals[journal]
+
+    @staticmethod
+    def getJournalAsString(journal):
+        journalData = JournalingContainer.journals[journal]
+        journalString = f"Script Location: {journalData['scriptPath']}\n"
+        for entry in journalData["entries"]:
+            journalString += entry
+        return journalString
+
+    @staticmethod
+    def dump(to: str = f"{PartitionMgr.data()}/etc/journals/dump@{Clock.getStartTime().split('.')[0]}.json"):
+        import json
+        with open(to, "w") as f:
+            json.dump(JournalingContainer.journals, f, indent=4)
+
+
 def record(state: str, text: str):
+    import kernel.registry as Registry
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     caller = traceback.extract_stack(None, 2)[0]
 
@@ -26,18 +72,29 @@ def record(state: str, text: str):
     directory = os.path.dirname(specificJournal)
     os.makedirs(directory, exist_ok=True)
 
-    # Write to file if not exists
-    if not os.path.exists(specificJournal):
-        with open(specificJournal, "w") as f:
-            f.write(f"Script Location: {scriptPath}\n")
-            f.write(f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
-    else:
-        with open(specificJournal, "a") as f:
-            f.write(f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
+    if Registry.read("SOFTWARE.CordOS.Kernel.UseOnMemoryJournaling") == "1":
+        if callerName not in JournalingContainer.journals:
+            JournalingContainer.addJournal(callerName, scriptPath)
+        JournalingContainer.addEntry(callerName, f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
+        JournalingContainer.addEntry("global", f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
 
-    if not os.path.exists(globalJournal):
-        with open(globalJournal, "w") as f:
-            f.write(f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
-    else:
-        with open(globalJournal, "a") as f:
-            f.write(f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
+        maxSize = int(Registry.read("SOFTWARE.CordOS.Kernel.OnMemoryJournalingMaxEntryPerProcess", default="32767"))
+        while len(JournalingContainer.journals[callerName]["entries"]) > maxSize:
+            JournalingContainer.journals[callerName]["entries"].pop(0)
+
+    if Registry.read("SOFTWARE.CordOS.Kernel.DisableOnDiskJournaling", default="0") == "0":
+        # Write to file if not exists
+        if not os.path.exists(specificJournal):
+            with open(specificJournal, "w") as f:
+                f.write(f"Script Location: {scriptPath}\n")
+                f.write(f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
+        else:
+            with open(specificJournal, "a") as f:
+                f.write(f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
+
+        if not os.path.exists(globalJournal):
+            with open(globalJournal, "w") as f:
+                f.write(f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
+        else:
+            with open(globalJournal, "a") as f:
+                f.write(f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
