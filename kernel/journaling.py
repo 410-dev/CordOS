@@ -9,12 +9,16 @@ def record(state: str, text: str):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     caller = traceback.extract_stack(None, 2)[0]
 
-    callerName = caller.name
-    if "<" in callerName or "main" == callerName or "mainAsync" in callerName:
-        bundleName = os.path.dirname(caller.filename).replace("//", "/").replace("\\", "/").split("/")[-1]
-        scriptFileName = os.path.basename(caller.filename).replace(".py", "")
-        callerName = f"{bundleName}.{scriptFileName}"
+    # callerName = caller.name
+    scriptPath = caller.filename.replace("//", "/").replace("\\", "/").replace(os.path.abspath(PartitionMgr.root()).replace("//", "/").replace("\\", "/"), "")
+    scriptBundleScope = scriptPath.split("/")[-2] + "." + scriptPath.split("/")[-1].replace(".py", "")
 
+    # if "<" in callerName or "main" == callerName or "mainAsync" in callerName:
+    #     bundleName = os.path.dirname(caller.filename).replace("//", "/").replace("\\", "/").split("/")[-1]
+    #     scriptFileName = os.path.basename(caller.filename).replace(".py", "")
+    #     callerName = f"{bundleName}.{scriptFileName}"
+
+    callerName = scriptBundleScope
     specificJournal = f"{PartitionMgr.data()}/etc/journals/{Clock.getStartTime().split(".")[0]}/{callerName}.journal"
     globalJournal = f"{PartitionMgr.data()}/etc/journals/{Clock.getStartTime().split(".")[0]}/_.journal"
 
@@ -25,7 +29,6 @@ def record(state: str, text: str):
     # Write to file if not exists
     if not os.path.exists(specificJournal):
         with open(specificJournal, "w") as f:
-            scriptPath = caller.filename.replace("//", "/").replace("\\", "/").replace(os.path.abspath(PartitionMgr.root()).replace("//", "/").replace("\\", "/"), "")
             f.write(f"Script Location: {scriptPath}\n")
             f.write(f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
     else:
