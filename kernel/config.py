@@ -10,18 +10,18 @@ def load() -> dict:
         envVarKeyword = config_parser['env_trigger']
 
         for key in config:
-            get = config[key]
-            if isinstance(get, str):
-                if get.startswith(envVarKeyword):
-                    envVar = get.replace(envVarKeyword, '')
+            value = config[key]
+            if isinstance(value, str):
+                if value.startswith(envVarKeyword):
+                    envVar = value.replace(envVarKeyword, '')
                     config[key] = os.environ[envVar]
         
         return config
 
 
-def get(key: str) -> str:
+def get(key: str, default=None):
     config = load()
-    return config[key]
+    return config[key] if key in config else default
     
 
 def save(config: dict):

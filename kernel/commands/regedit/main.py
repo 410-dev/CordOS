@@ -16,30 +16,30 @@ def main(args: list):
                 key = args[1]
                 var = Registry.read(key)
                 if var == None:
-                    IO.println(f"Registry key `{key}` does not exist.")
+                    IO.println(f"Registry key {key} does not exist.")
                 else:
                     Registry.delete(key)
-                    IO.println(f"Registry `{key}` erased.")
+                    IO.println(f"Registry {key} erased.")
             elif args[0] == "-df":
                 key = args[1]
                 var = Registry.read(key)
                 if var == None:
-                    IO.println(f"Registry key `{key}` does not exist.")
+                    IO.println(f"Registry key {key} does not exist.")
                 else:
                     Registry.delete(key, deleteSubkeys=True)
-                    IO.println(f"Registry `{key}` erased.")
+                    IO.println(f"Registry {key} erased.")
             else:
                 key = args[0]
                 val = args[1]
                 var = Registry.read(key)
                 Registry.write(key, val)
-                IO.println(f"Registry Updated\n`{key}` = `{var}` -> `{val}`")
+                IO.println(f"Registry Updated\n{key} = {var} -> {val}")
 
         elif len(args) == 1:
             key = args[0]
             regType = Registry.isKey(key)
             if regType == 2:
-                IO.println(f"Registry value `{key}` is `{Registry.read(key)}`")
+                IO.println(f"Registry value {key} is {Registry.read(key)}")
             elif regType == 1:
                 l = Registry.read(key)
                 for i in range(len(l)):
@@ -48,7 +48,7 @@ def main(args: list):
                     else:
                         l[i] = "[Key] " + l[i]
                 l = "\n".join(l)
-                IO.println(f"Registry key `{key}` contains:\n\n```{l}```")
+                IO.println(f"Registry key {key} contains:\n\n{l}")
             else:
                 IO.println(f"Registry key does not exist.")
 

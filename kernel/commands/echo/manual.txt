@@ -1,0 +1,9 @@
+Print the given string after this command
+
+```
+Usage:
+    echo <string>
+
+Example:
+    echo Hello, World!
+```

@@ -7,7 +7,7 @@ import kernel.io as IO
 
 import os
 
-def main(args: list, message) -> None:
+def main(args: list) -> None:
     try:
         commandPaths: List[str] = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
 
