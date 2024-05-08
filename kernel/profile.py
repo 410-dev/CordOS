@@ -20,3 +20,15 @@ def getArch():
 
 def isArchCompatible(archStr: str):
     return getArch() == archStr or archStr == "any" or archStr in getArch()
+
+
+def getKernelVersion():
+    return Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")
+
+
+def getKernelName():
+    return Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Name")
+
+
+def getKernelBuild():
+    return Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Build")
