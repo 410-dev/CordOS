@@ -17,28 +17,29 @@ def files() -> str:
 def root() -> str:
     return f"./"
 
+class DataPartition:
+    @staticmethod
+    def read(path: str) -> str:
+        with open(os.path.join(data(), path), "r") as f:
+            return f.read()
 
-def write(path: str, content: str):
-    with open(os.path.join(data(), path), "w") as f:
-        f.write(content)
+    @staticmethod
+    def write(path: str, content: str):
+        with open(os.path.join(data(), path), "w") as f:
+            f.write(content)
 
+    @staticmethod
+    def isFile(path: str) -> bool:
+        return os.path.isfile(os.path.join(data(), path))
 
-def read(path: str) -> str:
-    with open(os.path.join(data(), path), "r") as f:
-        return f.read()
+    @staticmethod
+    def isDir(path: str) -> bool:
+        return os.path.isdir(os.path.join(data(), path))
 
+    @staticmethod
+    def exists(path: str) -> bool:
+        return os.path.exists(os.path.join(data(), path))
 
-def isFile(path: str) -> bool:
-    return os.path.isfile(os.path.join(data(), path))
-
-
-def isDir(path: str) -> bool:
-    return os.path.isdir(os.path.join(data(), path))
-
-
-def exists(path: str) -> bool:
-    return os.path.exists(os.path.join(data(), path))
-
-
-def mkdir(path: str):
-    os.makedirs(os.path.join(data(), path), exist_ok=True)
+    @staticmethod
+    def mkdir(path: str):
+        os.makedirs(os.path.join(data(), path), exist_ok=True)

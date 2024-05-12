@@ -21,5 +21,5 @@ def main(args: list):
             shutil.copytree(os.path.join("defaults/data", d), os.path.join(PartitionMgr.data(), d))
 
     IO.println("Default directories copied successfully.")
-    PartitionMgr.write("etc/var/installed", "true")
+    PartitionMgr.DataPartition.write("etc/var/installed", "true")
     IO.println("Operation completed.")
