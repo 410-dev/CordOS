@@ -2,7 +2,7 @@
     "id": "me.410-dev.NanoPyOS.Power",
     "name": "Power",
     "role": "critical",
-    "sdk": 1,
+    "sdk": 2,
     "stage": 1, 
     "sync": false
 }

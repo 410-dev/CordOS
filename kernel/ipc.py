@@ -55,3 +55,23 @@ def removeExpired():
 
     for key in toDelete:
         IPCMemory.delete(key)
+
+
+def repeatUntilShutdown(delay: float, function, delayFirst=False):
+    def wait():
+        milliseconds = delay % 1
+        seconds = delay - milliseconds
+        for i in range(int(seconds)):
+            if not read("power.off", False):
+                time.sleep(1)
+            else:
+                break
+        if not read("power.off", False):
+            time.sleep(milliseconds)
+
+    while not read("power.off", False):
+        if delayFirst:
+            wait()
+        function()
+        if not delayFirst:
+            wait()

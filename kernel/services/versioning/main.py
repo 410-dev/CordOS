@@ -50,7 +50,7 @@ def main():
         cp(upgradeFile, os.getcwd())
 
         # If posix
-        if Host.isHostPOSIX():
+        if Host.isPOSIX():
             print("Setting bootable.")
             Host.executeCommand("chmod +x boot.sh")
 

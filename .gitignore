@@ -1,6 +1,7 @@
 
 ## Local Data
 data/*
+storage/*
 */__pycache__/*
 *.pyc
 

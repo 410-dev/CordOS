@@ -1,7 +1,10 @@
+import signal
 import sys
+import os
 import kernel.ipc as IPC
 import kernel.registry as Registry
 import kernel.io as IO
+import kernel.host as Host
 
 async def mainAsync(args: list, message):
 
@@ -30,7 +33,11 @@ async def mainAsync(args: list, message):
             await message.reply(f"System will now be force terminated. Goodbye.")
             IPC.set("power.off", True)
             IPC.set("power.off.state", "OFF")
-            sys.exit(0)
+            if Host.isPOSIX():
+                os.kill(os.getpid(), signal.SIGINT)
+            else:
+                pid = os.getpid()
+                Host.executeCommand("taskkill /F /PID " + str(pid))
 
     elif args[0] == "reset":
         resetKey = f"KernelResetSignal.{message.author.id}"
@@ -43,7 +50,13 @@ async def mainAsync(args: list, message):
             await message.reply(f"System will now be reset.")
             IPC.set("power.off", True)
             IPC.set("power.off.state", "REBOOT")
-            sys.exit(1)
+            with open("restart", "w") as f:
+                f.write("reboot")
+            if Host.isPOSIX():
+                os.kill(os.getpid(), signal.SIGINT)
+            else:
+                pid = os.getpid()
+                Host.executeCommand("taskkill /F /PID " + str(pid))
 
     elif args[0] == "halt-cancel":
         haltKey = f"KernelHaltSignal.{message.author.id}"
@@ -78,11 +91,25 @@ def main(args: list):
 
     elif args[0] == "halt":
         IO.println(f"System will now be force terminated. Goodbye.")
-        sys.exit(0)
+        IPC.set("power.off", True)
+        IPC.set("power.off.state", "OFF")
+        if Host.isPOSIX():
+            os.kill(os.getpid(), signal.SIGINT)
+        else:
+            pid = os.getpid()
+            Host.executeCommand("taskkill /F /PID " + str(pid))
 
     elif args[0] == "reset":
         IO.println(f"System will now be reset.")
-        sys.exit(1)
+        IPC.set("power.off", True)
+        IPC.set("power.off.state", "REBOOT")
+        with open("restart", "w") as f:
+            f.write("reboot")
+        if Host.isPOSIX():
+            os.kill(os.getpid(), signal.SIGINT)
+        else:
+            pid = os.getpid()
+            Host.executeCommand("taskkill /F /PID " + str(pid))
 
     else:
         IO.println("Usage: power <off|reboot|halt|reset>")
