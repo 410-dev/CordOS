@@ -28,8 +28,10 @@ class JournalingContainer:
         }
 
     @staticmethod
-    def addEntry(journal, entry):
+    def addEntry(journal, entry, maxSize: int = 32767):
         JournalingContainer.journals[journal]["entries"].append(entry)
+        while len(JournalingContainer.journals[journal]["entries"]) > maxSize:
+            JournalingContainer.journals[journal]["entries"].pop(0)
 
     @staticmethod
     def getJournal(journal):
