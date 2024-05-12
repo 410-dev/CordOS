@@ -71,6 +71,7 @@ def clear_cache():
                 shutil.rmtree(os.path.join(root, dir))
     if os.path.exists('data/cache'):
         shutil.rmtree('data/cache')
+    os.makedirs('data/cache', exist_ok=True)
     print(f"{Colors.GREEN}Cache cleared.{Colors.NC}")
 
 
@@ -103,6 +104,7 @@ def main(args):
     os.makedirs('data/cache', exist_ok=True)
     os.makedirs('data/files', exist_ok=True)
     os.makedirs('data/commands', exist_ok=True)
+    clear_cache()
 
     if not os.path.isfile("data/pip-done"):
         print(f"{Colors.NC}Installing required components...{Colors.NC}")
