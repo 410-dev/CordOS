@@ -24,6 +24,7 @@ def run(command: str):
     if runnablePath == "" or runnablePath is None:
         Journaling.record("ERROR", f"Command {cmd} not found.")
         IO.println(f"Command {cmd} not found.")
+        return
 
     try:
         Journaling.record("INFO", f"Executing command '{cmd}' with args {args}.")
