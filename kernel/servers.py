@@ -4,7 +4,7 @@ import kernel.registry as Registry
 from kernel.objects.server import Server
 from kernel.objects.user import User
 
-import kernel.objects as Objects
+import kernel.object as Objects
 
 from typing import List
 
