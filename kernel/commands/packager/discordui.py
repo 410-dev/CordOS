@@ -1,5 +1,4 @@
 import traceback
-import kernel.config as Config
 import kernel.registry as Registry
 import kernel.servers as Servers
 
@@ -9,7 +8,7 @@ import kernel.commands.packager.uninstall as Uninstall
 import kernel.commands.packager.sources as Sources
 
 
-from objects.discordmessage import DiscordMessageWrapper
+from kernel.objects.discordmessage import DiscordMessageWrapper
 
 
 async def chkPermission(message: DiscordMessageWrapper):

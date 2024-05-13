@@ -1,5 +1,5 @@
-from objects.user import User
-from objects.server import Server
+from kernel.objects.user import User
+from kernel.objects.server import Server
 
 from typing import List
 

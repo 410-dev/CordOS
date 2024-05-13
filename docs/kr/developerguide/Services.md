@@ -22,22 +22,23 @@ CordOS의 서비스 번들 표준은 다음과 같은 규칙을 가집니다:
 
 ## 개발 예시
 configure.py
+
 ```python
 import kernel.registry as Registry
-from objects.discordmessage import DiscordMessageWrapper
+from kernel.objects.discordmessage import DiscordMessageWrapper
+
 
 # 이 함수는 사용자 명령어 `services configure <service> args...` 가 실행되었을 때 호출됩니다.
 async def mainAsync(args: list, message: DiscordMessageWrapper):
-   
     # 명령어가 올바르게 입력되었는지 확인합니다.
     if len(args) < 2:
         await message.reply("Usage: servicename <configurename> <value>")
         return
-    
+
     # 첫번째 인자가 keyname 일 경우, 레지스트리에 값을 쓰고 응답합니다.
     if args[0] == "keyname":
-       Registry.write("REGKEY", args[1])
-       await message.reply("Key set to " + args[1])
+        Registry.write("REGKEY", args[1])
+        await message.reply("Key set to " + args[1])
     else:
         await message.reply("Invalid configure key")
 ```

@@ -2,8 +2,8 @@ import traceback
 import kernel.registry as Registry
 import kernel.servers as Servers
 
-from objects.user import User
-from objects.server import Server
+from kernel.objects.user import User
+from kernel.objects.server import Server
 
 class Tags:
     

@@ -1,8 +1,8 @@
 import json
 import kernel.registry as Registry
 
-from objects.server import Server
-from objects.user import User
+from kernel.objects.server import Server
+from kernel.objects.user import User
 
 import kernel.objects as Objects
 

@@ -14,7 +14,7 @@ import kernel.io as IO
 import kernel.services.DiscordUIService.asyncioevents as IOEventsMgr
 import kernel.services.power.configure as Power
 
-from objects.discordmessage import DiscordMessageWrapper
+from kernel.objects.discordmessage import DiscordMessageWrapper
 
 def main():
     try:

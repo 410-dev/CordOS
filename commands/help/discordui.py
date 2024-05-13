@@ -1,7 +1,7 @@
 
 import traceback
 from typing import List
-from objects.embedmsg import EmbeddedMessage
+from kernel.objects.embedmsg import EmbeddedMessage
 
 import kernel.registry as Registry
 import os

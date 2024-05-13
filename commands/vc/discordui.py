@@ -1,10 +1,3 @@
-from objects.user import User
-from objects.server import Server
-
-from typing import List
-
-import discord
-
 class Vc:
     
     def __init__(self, lineArgs, message) -> None:

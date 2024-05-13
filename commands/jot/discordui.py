@@ -3,7 +3,7 @@ import os
 
 import kernel.partitionmgr as Partition
 
-from objects.discordmessage import DiscordMessageWrapper
+from kernel.objects.discordmessage import DiscordMessageWrapper
 
 
 def hasFlag(flagFile, flag):

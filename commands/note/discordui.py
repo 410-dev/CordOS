@@ -1,12 +1,6 @@
-from objects.user import User
-from objects.server import Server
-
-from typing import List
-
 import kernel.registry as Registry
 import kernel.servers as Servers
 
-import discord
 
 class Note:
     

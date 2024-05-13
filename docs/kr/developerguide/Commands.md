@@ -21,15 +21,21 @@ CordOS의 명령어 번들 표준은 다음과 같은 규칙을 가집니다:
 
 ## 개발 예시
 discordui.py (Function 구조)
+
 ```python
-from objects.discordmessage import DiscordMessageWrapper
+from kernel.objects.discordmessage import DiscordMessageWrapper
+
+
 async def mainAsync(args: list, message: DiscordMessageWrapper):
-   await message.reply("Hello, world!")
+    await message.reply("Hello, world!")
 ```
 
 discordui.py (Class 구조)
+
 ```python
-from objects.discordmessage import DiscordMessageWrapper
+from kernel.objects.discordmessage import DiscordMessageWrapper
+
+
 class Command:
     def __init__(self, args: list, message: DiscordMessageWrapper):
         self.args = args
