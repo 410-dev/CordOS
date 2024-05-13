@@ -4,6 +4,7 @@ import time
 import kernel.partitionmgr as PartitionMgr
 import kernel.clock as Clock
 import kernel.ipc as IPC
+import kernel.io as IO
 
 def main():
     cache = os.path.join(PartitionMgr.cache(), "krnlsrv")
@@ -13,11 +14,11 @@ def main():
     os.makedirs(os.path.dirname(clockLastFile), exist_ok=True)
 
     if os.path.isfile(clockLastFile):
-        print(f"WARNING: SYSTEM NOT SHUTDOWN PROPERLY. THIS MAY BE DUE TO SYSTEM CRASH.")
+        IO.println(f"WARNING: SYSTEM NOT SHUTDOWN PROPERLY. THIS MAY BE DUE TO SYSTEM CRASH.")
         with open(clockLastFile, "r") as f:
             ltime = f.read()
             ltime = ltime.split("\n")[0]
-            print(f"Last unexpected termination time: {ltime}")
+            IO.println(f"Last unexpected termination time: {ltime}")
 
     try:
         def run():
@@ -28,7 +29,7 @@ def main():
 
         # On shutdown trigger
         os.remove(clockLastFile)
-        print("Safe shutdown tracker stopped.")
+        IO.println("Safe shutdown tracker stopped.")
 
     except KeyboardInterrupt:
         pass

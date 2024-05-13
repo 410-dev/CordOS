@@ -1,5 +1,6 @@
 import kernel.registry as Registry
 import kernel.journaling as Journaling
+import kernel.io as IO
 
 async def mainAsync(message):
     if Registry.read("SOFTWARE.CordOS.Events.Inbound.PrintMessage") == "1":
@@ -12,4 +13,4 @@ async def mainAsync(message):
         formattedMsg = formattedMsg.replace("$servername", str(message.guild.name))
         formattedMsg = formattedMsg.replace("$message", str(message.content))
         Journaling.record("INFO", f"Formatted message: {formattedMsg}")
-        print(formattedMsg)
+        IO.println(formattedMsg)

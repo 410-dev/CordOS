@@ -1,6 +1,7 @@
 import kernel.registry as Registry
 import kernel.ipc as IPC
 import kernel.webhook as Webhook
+import kernel.io as IO
 
 import threading
 
@@ -25,7 +26,7 @@ def main():
             for webhookModule in webhookList:
                 try:
                     if Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.EnableLogging") == "1":
-                        print(f"Running webhook '{webhookModule}'")
+                        IO.println(f"Running webhook '{webhookModule}'")
                     import importlib
                     moduleName = f"{regPath.replace('/', '.')}.{webhookModule}"
                     module = importlib.import_module(moduleName)
@@ -41,14 +42,14 @@ def main():
                     thread.start()
 
                     if Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.EnableLogging") == "1":
-                        print(f"Webhook '{webhookModule}' launch successfully.")
+                        IO.println(f"Webhook '{webhookModule}' launch successfully.")
 
                 except Exception as e:
-                    print(f"Error in running webhook '{webhookModule}'. e: {e}")
+                    IO.println(f"Error in running webhook '{webhookModule}'. e: {e}")
                     pass
 
         IPC.repeatUntilShutdown(int(Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.Interval")), loop)
-        print("Webhook service stopped.")
+        IO.println("Webhook service stopped.")
     except Exception as e:
-        print(f"Error in starting / running service. e: {e}")
+        IO.println(f"Error in starting / running service. e: {e}")
         pass

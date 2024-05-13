@@ -2,6 +2,7 @@ import os
 import shutil
 import kernel.registry as Registry
 import kernel.host as Host
+import kernel.io as IO
 
 """
 
@@ -19,9 +20,9 @@ def cp(src: str, dest: str):
 
             try:
                 os.makedirs(destination_dir)
-                print(f"Directory created: {destination_dir}")
+                IO.println(f"Directory created: {destination_dir}")
             except FileExistsError:
-                print(f"Directory already exists: {destination_dir}")
+                IO.println(f"Directory already exists: {destination_dir}")
 
         # Copy each file
         for file_name in files:
@@ -30,40 +31,40 @@ def cp(src: str, dest: str):
             destination_file = os.path.join(dest, relative_path)
 
             shutil.copy2(source_file, destination_file)
-            print(f"File copied: {source_file} to {destination_file}")
+            IO.println(f"File copied: {source_file} to {destination_file}")
 
 
 def main():
     if Registry.read("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeQueue", default="0") == "0":
         return
 
-    print("Upgrade service started.")
-    print("Removing upgrade queue flag.")
+    IO.println("Upgrade service started.")
+    IO.println("Removing upgrade queue flag.")
     Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeQueue", "0")
 
     try:
-        print("Starting upgrade process.")
+        IO.println("Starting upgrade process.")
         upgradeFile: str = Registry.read("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeMode")
         upgradeFile = os.path.join(os.getcwd(), upgradeFile)
 
-        print(f"Overwriting files from {upgradeFile} to root directory.")
+        IO.println(f"Overwriting files from {upgradeFile} to root directory.")
         cp(upgradeFile, os.getcwd())
 
         # If posix
         if Host.isPOSIX():
-            print("Setting bootable.")
+            IO.println("Setting bootable.")
             Host.executeCommand("chmod +x boot.sh")
 
-        print(f"Upgrade complete.")
+        IO.println(f"Upgrade complete.")
 
-        print(f"Cleaning up upgrade files.")
+        IO.println(f"Cleaning up upgrade files.")
         shutil.rmtree(upgradeFile)
-        print(f"Upgrade files cleaned up.")
+        IO.println(f"Upgrade files cleaned up.")
 
     except Exception as e:
-        print(f"Error upgrading system. e: {e}")
+        IO.println(f"Error upgrading system. e: {e}")
         pass
 
-    print("Upgrade service stopped, and will restart.")
+    IO.println("Upgrade service stopped, and will restart.")
     exit(1)
 
