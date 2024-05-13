@@ -12,6 +12,7 @@ import kernel.ipc as IPC
 import kernel.journaling as Journaling
 import kernel.io as IO
 import kernel.services.DiscordUIService.asyncioevents as IOEventsMgr
+import kernel.services.power.configure as Power
 
 from objects.discordmessage import DiscordMessageWrapper
 
@@ -237,7 +238,7 @@ def main():
         IO.println(f"System will stop now immediately.")
         IO.println(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         Journaling.record("ERROR", f"DiscordUIService has crashed due to Discord login failure: {e}")
-        sys.exit(0)
+        Power.halt()
 
     except Exception as e:
         IO.println(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -253,4 +254,4 @@ def main():
         IO.println(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         Journaling.record("ERROR", f"DiscordUIService has crashed with unhandled exception: {e}")
         time.sleep(3)
-        sys.exit(3)
+        Power.halt()

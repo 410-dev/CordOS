@@ -94,7 +94,7 @@ def main(args: list):
         IPC.set("power.off", True)
         IPC.set("power.off.state", "OFF")
         if Host.isPOSIX():
-            os.kill(os.getpid(), signal.SIGINT)
+            os.kill(os.getpid(), signal.SIGTERM)
         else:
             pid = os.getpid()
             Host.executeCommand("taskkill /F /PID " + str(pid))
@@ -106,7 +106,7 @@ def main(args: list):
         with open("restart", "w") as f:
             f.write("reboot")
         if Host.isPOSIX():
-            os.kill(os.getpid(), signal.SIGINT)
+            os.kill(os.getpid(), signal.SIGTERM)
         else:
             pid = os.getpid()
             Host.executeCommand("taskkill /F /PID " + str(pid))
@@ -116,3 +116,14 @@ def main(args: list):
         return
 
 
+def off():
+    main(["off"])
+
+def reboot():
+    main(["reboot"])
+
+def halt():
+    main(["halt"])
+
+def reset():
+    main(["reset"])
