@@ -5,8 +5,8 @@
     "id": "localrom",
     "description": "Repository description here",
     "updateTime": 0,
-    "source": "file:///defaults/etc/repository/{name}-{version}.spec.json",
-    "index": "file:///defaults/etc/packager/sources/localrom.index.json",
+    "source": "file:///etc/repository/{name}-{version}.spec.json",
+    "index": "file:///etc/packager/sources/localrom.index.json",
     "packages": [
         {
             "name": "system",
