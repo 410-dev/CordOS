@@ -2,7 +2,6 @@ import kernel.registry as Registry
 import kernel.ipc as IPC
 import kernel.webhook as Webhook
 
-import time
 import threading
 
 def main():
@@ -12,11 +11,14 @@ def main():
         return
 
     try:
-        while enabled == "1" and not IPC.read("power.off"):
+        def loop():
             
             # Update enabled
             enabled = Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.Enabled")
             regPath = Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.RegistrationPath")
+
+            if enabled == "0":
+                return
 
             # If enabled, call webhook
             webhookList: list = Webhook.list()
@@ -45,8 +47,7 @@ def main():
                     print(f"Error in running webhook '{webhookModule}'. e: {e}")
                     pass
 
-            # Sleep
-            time.sleep(int(Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.Interval")))
+        IPC.repeatUntilShutdown(int(Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.Interval")), loop)
         print("Webhook service stopped.")
     except Exception as e:
         print(f"Error in starting / running service. e: {e}")

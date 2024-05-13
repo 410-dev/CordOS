@@ -20,10 +20,11 @@ def main():
             print(f"Last unexpected termination time: {ltime}")
 
     try:
-        while not IPC.read("power.off"):
+        def run():
             with open(clockLastFile, "w") as f:
                 f.write(f"TIME:{Clock.getTime()}\nEPOCH:{Clock.getEpoch()}\nUPTIME:{Clock.getUptime()}")
-            time.sleep(1)
+
+        IPC.repeatUntilShutdown(1, run)
 
         # On shutdown trigger
         os.remove(clockLastFile)
