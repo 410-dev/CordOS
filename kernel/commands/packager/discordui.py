@@ -1,6 +1,7 @@
 import traceback
 import kernel.registry as Registry
 import kernel.servers as Servers
+import kernel.journaling as Journaling
 
 import kernel.commands.packager.database as Database
 import kernel.commands.packager.install as Install
@@ -38,11 +39,14 @@ async def mainAsync(args, message: DiscordMessageWrapper):
         # removesource: packager removesource <index.json url>
         # sync: packager sync
 
+        Journaling.record("INFO", f"Running packager command with args: {args}")
+
         if len(args) < 2:
-            await message.reply("Invalid arguments. Usage: packager <install/remove/update> <package-name> <package-name> ...", mention_author=True)
+            await message.reply("Invalid arguments (Too few). Usage: packager <install/remove/update> <package-name> <package-name> ...", mention_author=True)
             return
 
         # Check if the package is installed
+        args = args[1:]
         targetPackages = args[1:]
         unavailablePackages = []
         if args[0] == "install":
@@ -71,7 +75,7 @@ async def mainAsync(args, message: DiscordMessageWrapper):
         elif args[0] == "sync":
             Sources.sync()
         else:
-            await message.reply("Invalid arguments. Usage: packager <install/remove/update> <package-name> <package-name> ...", mention_author=True)
+            await message.reply(f"Invalid arguments (Unknown action: {args[0]}). Usage: packager <install/remove/update> <package-name> <package-name> ...", mention_author=True)
             return
 
         if args[0] == "install":

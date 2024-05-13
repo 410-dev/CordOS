@@ -1,4 +1,3 @@
-from typing import Any
 from kernel.commands.packager.spec import Spec
 
 import requests
