@@ -13,7 +13,7 @@ def main(args: list) -> None:
 
         if len(args) < 2:
             # Print current manual
-            with open("kernel/commands/help/manual.txt", 'r') as f:
+            with open("commands/help/manual.txt", 'r') as f:
                 IO.println(f.read())
                 return
 
