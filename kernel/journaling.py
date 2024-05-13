@@ -10,7 +10,7 @@ import kernel.partitionmgr as PartitionMgr
 class JournalingContainer:
 
     journals = {
-        "global": {
+        "_global": {
             "scriptPath": "_",
             "entries": []
         },
@@ -28,7 +28,7 @@ class JournalingContainer:
         }
 
     @staticmethod
-    def addEntry(journal, entry, maxSize: int = 32767):
+    def addEntry(journal, entry, maxSize: int = 16384):
         JournalingContainer.journals[journal]["entries"].append(entry)
         while len(JournalingContainer.journals[journal]["entries"]) > maxSize:
             JournalingContainer.journals[journal]["entries"].pop(0)
@@ -46,7 +46,7 @@ class JournalingContainer:
         return journalString
 
     @staticmethod
-    def dump(to: str = f"{PartitionMgr.data()}/etc/journals/dump@{Clock.getStartTime().split('.')[0]}.json"):
+    def dump(to: str = f"{PartitionMgr.data()}/etc/journals/dump@{Clock.getTime().split('.')[0]}.json"):
         import json
         with open(to, "w") as f:
             json.dump(JournalingContainer.journals, f, indent=4)
@@ -74,17 +74,17 @@ def record(state: str, text: str):
     directory = os.path.dirname(specificJournal)
     os.makedirs(directory, exist_ok=True)
 
-    if Registry.read("SOFTWARE.CordOS.Kernel.UseOnMemoryJournaling") == "1":
+    if Registry.read("SOFTWARE.CordOS.Kernel.DisableOnMemoryJournaling", default="0") == "0":
         if callerName not in JournalingContainer.journals:
             JournalingContainer.addJournal(callerName, scriptPath)
         JournalingContainer.addEntry(callerName, f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
-        JournalingContainer.addEntry("global", f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
+        JournalingContainer.addEntry("_global", f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
 
-        maxSize = int(Registry.read("SOFTWARE.CordOS.Kernel.OnMemoryJournalingMaxEntryPerProcess", default="32767"))
+        maxSize = int(Registry.read("SOFTWARE.CordOS.Kernel.OnMemoryJournalingMaxEntryPerProcess", default="16384"))
         while len(JournalingContainer.journals[callerName]["entries"]) > maxSize:
             JournalingContainer.journals[callerName]["entries"].pop(0)
 
-    if Registry.read("SOFTWARE.CordOS.Kernel.DisableOnDiskJournaling", default="0") == "0":
+    if Registry.read("SOFTWARE.CordOS.Kernel.EnableOnDiskJournaling", default="0") == "1":
         # Write to file if not exists
         if not os.path.exists(specificJournal):
             with open(specificJournal, "w") as f:
