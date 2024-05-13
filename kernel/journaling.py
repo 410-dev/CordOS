@@ -48,6 +48,7 @@ class JournalingContainer:
     @staticmethod
     def dump(to: str = f"{PartitionMgr.etc()}/journals/dump@{Clock.getTime().split('.')[0]}.json"):
         import json
+        os.makedirs(os.path.dirname(to), exist_ok=True)
         with open(to, "w") as f:
             json.dump(JournalingContainer.journals, f, indent=4)
 
