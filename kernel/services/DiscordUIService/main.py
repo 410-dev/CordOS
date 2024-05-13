@@ -97,8 +97,8 @@ def main():
                     Journaling.record("INFO", "Message does not start with the bot's prefix. Ignoring.")
                     return
 
-                # Update the user's server data
-                Journaling.record("INFO", "Updating server data.")
+                # Update the user's server etc
+                Journaling.record("INFO", "Updating server etc.")
                 Servers.updateServer(message.getMessageObject())
 
                 Journaling.record("INFO", "InboundInteractive events hooker is enabled.")

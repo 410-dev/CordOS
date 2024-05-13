@@ -4,7 +4,7 @@
 CordOS의 입출력 번들 표준은 다음과 같은 규칙을 가집니다:
 
 1. 커널 제공 이벤트 번들은 반드시 `/kernel/events/` 디렉토리에 위치해야 합니다.
-2. 제3자 제공 이벤트 번들은 레지스트리 키 `SOFTWARE.CordOS.Events.EventsBundleContainer` 의 리스트 값중 하나에 위치해야 합니다. (권장 기본 위치: `data/events`)
+2. 제3자 제공 이벤트 번들은 레지스트리 키 `SOFTWARE.CordOS.Events.EventsBundleContainer` 의 리스트 값중 하나에 위치해야 합니다. (권장 기본 위치: `etc/events`)
 3. 이벤트 번들은 반드시 `discordui.py` 파일을 포함해야 합니다. (선택사항: Sync Mode 를 지원하기 위해서 `main.py` 를 포함할 수 있습니다.)
 4. 이벤트의 종류는 Passive Input, Interactive Input, Output 세 종류가 있습니다.
    1. Passive Input: 입력값이 prefix 인지, CordOS 의 response 값인지 확인하지 않은 이벤트입니다. 이 이벤트는 `{event container}/passive/` 디렉토리에 위치해야 합니다.

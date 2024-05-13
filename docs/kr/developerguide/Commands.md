@@ -4,7 +4,7 @@
 CordOS의 명령어 번들 표준은 다음과 같은 규칙을 가집니다:
 
 1. 커널 명령어 번들은 반드시 `/kernel/commands/` 디렉토리에 위치해야 합니다.
-2. 제3자 제공 명령어 번들은 레지스트리 키 `SOFTWARE.CordOS.Kernel.Programs.Paths` 의 리스트 값중 하나에 위치해야 합니다. (권장 기본 위치: `/data/commands`)
+2. 제3자 제공 명령어 번들은 레지스트리 키 `SOFTWARE.CordOS.Kernel.Programs.Paths` 의 리스트 값중 하나에 위치해야 합니다. (권장 기본 위치: `/etc/commands`)
 3. 명령어 번들은 반드시 `discordui.py`, `manual.txt` 파일을 포함해야 합니다. (선택 사항: Sync Mode 실행 지원은 `main.py` 파일을 포함해야 합니다.)
 4. `manual.txt`: help 명령어가 읽어들이는 매뉴얼 텍스트입니다. 명령어의 사용법과 설명을 포함해야 합니다.
 5. `discordui.py`: 명령어가 실행될 때 호출되는 파일이며, 호출되는 대상은 다음과 같습니다.

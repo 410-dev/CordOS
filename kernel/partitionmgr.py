@@ -2,16 +2,23 @@ import os
 import shutil
 
 
+def corestorage() -> str:
+    return "etc"
+
+def etc() -> str:
+    return corestorage()
+
+
 def data() -> str:
     return "storage"
 
 
 def cache() -> str:
-    return f"{data()}/cache"
+    return "tmp"
 
 
-def files() -> str:
-    return f"{data()}/files"
+def appdata() -> str:
+    return f"{data()}/ApplicationData"
 
 
 def root() -> str:

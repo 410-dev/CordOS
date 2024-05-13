@@ -1,7 +1,8 @@
 
 ## Local Data
-data/*
+etc/*
 storage/*
+tmp/*
 */__pycache__/*
 *.pyc
 

@@ -5,6 +5,6 @@ Usage:
     install krnlcmd <url>   : Installs kernel command from the given url (Installs at kernel/commands)
     install krnlsrv <url>   : Installs kernel service from the given url (Installs at kernel/services)
     install krnlmod <url>   : Installs kernel module from the given url (Installs at kernel/)
-    install cmd <url>       : Installs command from the given url (Installs at data/commands)
-    install srv <url>       : Installs service from the given url (Installs at data/services)
+    install cmd <url>       : Installs command from the given url (Installs at etc/commands)
+    install srv <url>       : Installs service from the given url (Installs at etc/services)
 ```

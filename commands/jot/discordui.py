@@ -32,7 +32,7 @@ async def createNote(args, messageWrapper: DiscordMessageWrapper):
     fetchedMessage = await message.channel.fetch_message(message.reference.message_id)
 
     # Write the note
-    bundle = Partition.files() + f"/jot-notes/{title}.jnote"
+    bundle = Partition.appdata() + f"/jot-notes/{title}.jnote"
     flagsFile = bundle + "/flags"
     contentFile = bundle + "/content"
 
@@ -63,8 +63,8 @@ async def mainAsync(args, message: discord.Message):
         args = args[1:]
 
         # Create base directory
-        if not os.path.exists(Partition.files() + "/jot-notes"):
-            os.mkdir(Partition.files() + "/jot-notes")
+        if not os.path.exists(Partition.appdata() + "/jot-notes"):
+            os.mkdir(Partition.appdata() + "/jot-notes")
 
         if len(args) < 1:
             await message.reply("Usage: jot <note title> or jot get <note title> or jot list", mention_author=True)
@@ -77,7 +77,7 @@ async def mainAsync(args, message: discord.Message):
 
             # Fetch the note
             title = " ".join(args[1:])
-            bundle = Partition.files() + f"/jot-notes/{title}.jnote"
+            bundle = Partition.appdata() + f"/jot-notes/{title}.jnote"
             flagsFile = bundle + "/flags"
             contentFile = bundle + "/content"
 
@@ -98,7 +98,7 @@ async def mainAsync(args, message: discord.Message):
             return
 
         if args[0] == "list":
-            notes = os.listdir(Partition.files() + "/jot-notes")
+            notes = os.listdir(Partition.appdata() + "/jot-notes")
             await message.reply(f"Notes:\n```{'\n'.join([note.split('.')[0] for note in notes])} ```", mention_author=True)
             return
 

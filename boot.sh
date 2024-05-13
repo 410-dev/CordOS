@@ -24,7 +24,7 @@ while true; do
         touch ./safe_restart
     fi
 
-    rm -rf ./data/cache
+    rm -rf ./tmp
 
     if [ ! -f "./restart" ]; then
         break

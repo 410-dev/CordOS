@@ -16,7 +16,7 @@ def load() -> List[Server]:
     Returns:
         List[Server]: A dictionary object representing the servers file.
     """
-    with open('data/servers.json') as f:
+    with open('etc/servers.json') as f:
         servers = json.load(f)['servers']
         
         if servers is None:
@@ -39,7 +39,7 @@ def save(servers: List[Server]):
     Parameters:
         servers (list): A dictionary object representing the servers file.
     """
-    with open('data/servers.json', 'w') as f:
+    with open('etc/servers.json', 'w') as f:
         jsonObject: dict = {}
         jsonObject['servers'] = []
         for sv in servers:

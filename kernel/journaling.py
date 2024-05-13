@@ -46,7 +46,7 @@ class JournalingContainer:
         return journalString
 
     @staticmethod
-    def dump(to: str = f"{PartitionMgr.data()}/etc/journals/dump@{Clock.getTime().split('.')[0]}.json"):
+    def dump(to: str = f"{PartitionMgr.etc()}/journals/dump@{Clock.getTime().split('.')[0]}.json"):
         import json
         with open(to, "w") as f:
             json.dump(JournalingContainer.journals, f, indent=4)
@@ -67,12 +67,8 @@ def record(state: str, text: str):
     #     callerName = f"{bundleName}.{scriptFileName}"
 
     callerName = scriptBundleScope
-    specificJournal = f"{PartitionMgr.data()}/etc/journals/{Clock.getStartTime().split(".")[0]}/{callerName}.journal"
-    globalJournal = f"{PartitionMgr.data()}/etc/journals/{Clock.getStartTime().split(".")[0]}/_.journal"
-
-    # Create directory
-    directory = os.path.dirname(specificJournal)
-    os.makedirs(directory, exist_ok=True)
+    specificJournal = f"{PartitionMgr.etc()}/journals/{Clock.getStartTime().split(".")[0]}/{callerName}.journal"
+    globalJournal = f"{PartitionMgr.etc()}/journals/{Clock.getStartTime().split(".")[0]}/_.journal"
 
     if Registry.read("SOFTWARE.CordOS.Kernel.DisableOnMemoryJournaling", default="0") == "0":
         if callerName not in JournalingContainer.journals:
@@ -85,6 +81,10 @@ def record(state: str, text: str):
             JournalingContainer.journals[callerName]["entries"].pop(0)
 
     if Registry.read("SOFTWARE.CordOS.Kernel.EnableOnDiskJournaling", default="0") == "1":
+        # Create directory
+        directory = os.path.dirname(specificJournal)
+        os.makedirs(directory, exist_ok=True)
+
         # Write to file if not exists
         if not os.path.exists(specificJournal):
             with open(specificJournal, "w") as f:

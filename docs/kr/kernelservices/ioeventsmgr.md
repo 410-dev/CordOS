@@ -32,5 +32,5 @@ CordOS 의 메시지 입출력의 이벤트를 관리하는 서비스입니다. 
 | `SOFTWARE.CordOS.Events.User.OutboundReplyEnabled`        | 0                       | 사용자의 Reply 이벤트 활성화 여부            |
 | `SOFTWARE.CordOS.Events.User.OutboundSendEnabled`         | 0                       | 사용자의 Send 이벤트 활성화 여부             |
 | `SOFTWARE.CordOS.Events.User.OutboundGlobalEnabled`       | 1                       | 사용자의 Global 이벤트 활성화 여부           |
-| `SOFTWARE.CordOS.Events.EventsBundleContainer`            | `data/events/, events/` | 사용자 이벤트 번들 디렉토리 경로               |
+| `SOFTWARE.CordOS.Events.EventsBundleContainer`            | `etc/events/, events/` | 사용자 이벤트 번들 디렉토리 경로               |
 
