@@ -1,5 +1,5 @@
 import os
-import json
+import traceback
 
 import kernel.registry as Registry
 import kernel.journaling as Journaling
@@ -67,5 +67,8 @@ def launchRunnable(module: str, args: list):
         try:
             module.main(args)
         except Exception as e:
+            Journaling.record("ERROR", f"Error while running executive: {module} with args: {args}.")
+            tracebackstr = traceback.format_exc()
+            Journaling.record("ERROR", f"Traceback: {tracebackstr}")
             print(f"Error while running executive. e: {e}")
             return
