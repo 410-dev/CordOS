@@ -1,8 +1,14 @@
 import kernel.io as IO
 import kernel.journaling as Journaling
 import kernel.registry as Registry
+import kernel.partitionmgr as PartitionMgr
+import kernel.clock as Clock
+import kernel.ipc as IPC
 
 import traceback
+import json
+import os
+
 
 def journalIndex() -> str:
     labels: list = Journaling.JournalingContainer.journals.keys()
@@ -29,6 +35,18 @@ def main(args: list):
         if args[1] == "dump":
             Journaling.JournalingContainer.dump()
             IO.println("Journal dumped. The dump file is only accessible locally.")
+
+        elif args[1] == "dump-ipc":
+            to: str = f"{PartitionMgr.etc()}/journals/ipcdump@{Clock.getTime().split('.')[0]}.json"
+            os.makedirs(os.path.dirname(to), exist_ok=True)
+            with open(to, "w") as f:
+                ipcobj = {
+                    "memory": IPC.IPCMemory.memory,
+                    "refs": IPC.IPCMemory.referenceTime
+                }
+                json.dump(ipcobj, f, indent=4)
+
+            IO.println("IPC Memory dumped. The dump file is only accessible locally.")
 
         elif args[1] == "list":
             IO.println(journalIndex())
