@@ -62,4 +62,5 @@ def main():
             power.main(["halt"])
 
         else:
-            IO.println(f"System is bootable.")
+            # IO.println(f"System is bootable.")
+            pass
