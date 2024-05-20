@@ -1,0 +1,8 @@
+{
+    "id": "me.410-dev.NanoPyOS.RemoteSystemUI",
+    "name": "RemoteSystemUI",
+    "role": "remotemgmt.unique.shell",
+    "sdk": 1,
+    "stage": 2,
+    "sync": false
+}
