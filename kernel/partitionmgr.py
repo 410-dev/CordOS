@@ -1,7 +1,6 @@
 import os
 import shutil
 
-
 def corestorage() -> str:
     return "etc"
 
@@ -19,6 +18,10 @@ def cache() -> str:
 
 def appdata() -> str:
     return f"{data()}/ApplicationData"
+
+
+def default() -> str:
+    return f"defaults"
 
 
 def root() -> str:
@@ -53,6 +56,11 @@ class Data:
     def path() -> str:
         return data()
 
+    @staticmethod
+    def copyDefault(path: str, existOK: bool = True):
+        RootFS.copy(os.path.join(default(), data(), path), os.path.join(data(), path), existOK)
+
+
 class Etc:
     @staticmethod
     def read(path: str) -> str:
@@ -82,12 +90,19 @@ class Etc:
     def path() -> str:
         return etc()
 
+    @staticmethod
+    def copyDefault(path: str, existOK: bool = True):
+        RootFS.copy(os.path.join(default(), etc(), path), os.path.join(etc(), path), existOK)
+
 
 class RootFS:
     @staticmethod
     def read(path: str) -> str:
-        with open(os.path.join(root(), path), "r") as f:
-            return f.read()
+        try:
+            with open(os.path.join(root(), path), "r") as f:
+                return f.read()
+        except:
+            return None
 
     @staticmethod
     def write(path: str, content: str):
