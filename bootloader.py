@@ -113,7 +113,7 @@ def main(args):
     print(f"{Colors.NC}Checking configuration...{Colors.NC}")
     check_configuration(args)
 
-    print(f"{Colors.NC}Starting bot...{Colors.NC}")
+    print(f"{Colors.NC}Starting system...{Colors.NC}")
 
     # Check if python3 is available as a command
     import importlib
