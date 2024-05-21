@@ -60,7 +60,7 @@ async def mainAsync(args: list, message):
                     await message.reply("Failed to download image.")
                     return
 
-                with open("data/cache/tmpimg.zip", 'wb') as file:
+                with open("tmp/tmpimg.zip", 'wb') as file:
                     file.write(response.content)
 
             except Exception as e:
@@ -71,10 +71,10 @@ async def mainAsync(args: list, message):
             print("Success.")
             print("Process 2/2: Extracting image...", end="")
             try:
-                with zipfile.ZipFile("data/cache/tmpimg.zip", 'r') as file:
+                with zipfile.ZipFile("tmp/tmpimg.zip", 'r') as file:
                     for member in file.namelist():
                         if not member.endswith('/'):
-                            path_to_extract = os.path.join("data/UPGRADE_IMAGE", '/'.join(member.split('/')[1:]))
+                            path_to_extract = os.path.join("etc/UPGRADE_IMAGE", '/'.join(member.split('/')[1:]))
                             os.makedirs(os.path.dirname(path_to_extract), exist_ok=True)
                             with file.open(member) as source, open(path_to_extract, 'wb') as target:
                                 target.write(source.read())
@@ -90,7 +90,7 @@ async def mainAsync(args: list, message):
 
             IPC.set("power.off", True)
             IPC.set("power.off.state", "REBOOT")
-            Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeMode", "data/UPGRADE_IMAGE")
+            Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeMode", "etc/UPGRADE_IMAGE")
             Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeQueue", "1")
 
             if forceReboot == "1":
@@ -130,10 +130,10 @@ async def mainAsync(args: list, message):
             await message.reply(f"Branch set to {args[1]}.")
 
         else:
-            await message.reply("Usage: versioning <upgrade|latest|branch>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause data loss.")
+            await message.reply("Usage: versioning <upgrade|latest|branch>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause etc loss.")
 
     except Exception as e:
-        await message.reply("Usage: versioning <upgrade|latest|branch>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause data loss.")
+        await message.reply("Usage: versioning <upgrade|latest|branch>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause etc loss.")
         return
 
 def main(args: list):
@@ -170,7 +170,7 @@ def main(args: list):
                     IO.println("Failed to download image.")
                     return
 
-                with open("data/cache/tmpimg.zip", 'wb') as file:
+                with open("tmp/tmpimg.zip", 'wb') as file:
                     file.write(response.content)
 
             except Exception as e:
@@ -181,10 +181,10 @@ def main(args: list):
             print("Success.")
             print("Process 2/2: Extracting image...", end="")
             try:
-                with zipfile.ZipFile("data/cache/tmpimg.zip", 'r') as file:
+                with zipfile.ZipFile("tmp/tmpimg.zip", 'r') as file:
                     for member in file.namelist():
                         if not member.endswith('/'):
-                            path_to_extract = os.path.join("data/UPGRADE_IMAGE", '/'.join(member.split('/')[1:]))
+                            path_to_extract = os.path.join("etc/UPGRADE_IMAGE", '/'.join(member.split('/')[1:]))
                             os.makedirs(os.path.dirname(path_to_extract), exist_ok=True)
                             with file.open(member) as source, open(path_to_extract, 'wb') as target:
                                 target.write(source.read())
@@ -200,7 +200,7 @@ def main(args: list):
 
             IPC.set("power.off", True)
             IPC.set("power.off.state", "REBOOT")
-            Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeMode", "data/UPGRADE_IMAGE")
+            Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeMode", "etc/UPGRADE_IMAGE")
             Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeQueue", "1")
 
             if forceReboot == "1":
@@ -240,8 +240,8 @@ def main(args: list):
             IO.println(f"Branch set to {args[1]}.")
 
         else:
-            IO.println("Usage: versioning <upgrade|latest|branch>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause data loss.")
+            IO.println("Usage: versioning <upgrade|latest|branch>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause etc loss.")
 
     except Exception as e:
-        IO.println("Usage: versioning <upgrade|latest|branch>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause data loss.")
+        IO.println("Usage: versioning <upgrade|latest|branch>\n\nWarning: Once upgrade is triggered, it will force reboot the system and may cause etc loss.")
         return

@@ -33,7 +33,7 @@
         {
             "task": "delete",
             "target": [
-                "data/files/thispackagecache"
+                "storage/thispackagecache"
             ],
             "ignoreFail": true
         },
@@ -119,10 +119,10 @@
             "label": "end",
             "task": "copy",
             "source": [
-                "data/files/thispackage"
+                "storage/thispackage"
             ],
             "destination": [
-                "data/files/thispackage"
+                "storage/thispackage"
             ]
         }
     ]

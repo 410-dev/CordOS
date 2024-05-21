@@ -18,7 +18,7 @@ def main(library: str):
     for url in urls:
         Webhook.send(url, "Hello, World!") # 해당 URL 로 "Hello, World!" 라는 메시지를 전송합니다.
 ```
-위와 같은 스크립트를 작성한 후, 해당 스크립트를 웹훅 등록 위치 (기본값: data/webhooks) 에 저장합니다.<br>
+위와 같은 스크립트를 작성한 후, 해당 스크립트를 웹훅 등록 위치 (기본값: storage/webhooks) 에 저장합니다.<br>
 
 
 ## configure
@@ -28,12 +28,12 @@ def main(library: str):
 
 
 ## 레지스트리
-| 키 이름                                                       | 기본 값                      | 설명                         |
-|------------------------------------------------------------|---------------------------|----------------------------|
-| `SOFTWARE.CordOS.Kernel.Services.Webhook.RegistrationPath` | data/webhooks             | 웹훅 스크립트 등록 위치              |
-| `SOFTWARE.CordOS.Kernel.Services.Webhook.LibraryPath`      | data/files/webhooks/<id\> | 웹훅 스크립트가 사용 가능한 전용 스토리지 위치 |
-| `SOFTWARE.CordOS.Kernel.Services.Webhook.Enabled`          | 1                         | 웹훅 서비스 활성화 여부              |
-| `SOFTWARE.CordOS.Kernel.Services.Webhook.ReloadOnCall`     | 1                         | 웹훅 스크립트 실행시 리로드 여부         |
-| `SOFTWARE.CordOS.Kernel.Services.Webhook.Interval`         | 1                         | 웹훅 스크립트 반복 간격 (초)          |
-| `SOFTWARE.CordOS.Kernel.Services.Webhook.EnableLogging`    | 1                         | 웹훅 실행 로그 출력 여부             |
+| 키 이름                                                       | 기본 값                  | 설명                         |
+|------------------------------------------------------------|-----------------------|----------------------------|
+| `SOFTWARE.CordOS.Kernel.Services.Webhook.RegistrationPath` | storage/webhooks      | 웹훅 스크립트 등록 위치              |
+| `SOFTWARE.CordOS.Kernel.Services.Webhook.LibraryPath`      | storage/webhooks/<id\> | 웹훅 스크립트가 사용 가능한 전용 스토리지 위치 |
+| `SOFTWARE.CordOS.Kernel.Services.Webhook.Enabled`          | 1                     | 웹훅 서비스 활성화 여부              |
+| `SOFTWARE.CordOS.Kernel.Services.Webhook.ReloadOnCall`     | 1                     | 웹훅 스크립트 실행시 리로드 여부         |
+| `SOFTWARE.CordOS.Kernel.Services.Webhook.Interval`         | 1                     | 웹훅 스크립트 반복 간격 (초)          |
+| `SOFTWARE.CordOS.Kernel.Services.Webhook.EnableLogging`    | 1                     | 웹훅 실행 로그 출력 여부             |
 

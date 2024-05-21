@@ -1,6 +1,6 @@
 import kernel.registry as Registry
 import kernel.ipc as IPC
-from objects.embedmsg import EmbeddedMessage
+from kernel.objects.embedmsg import EmbeddedMessage
 
 
 async def mainAsync(args: list, message):

@@ -1,7 +1,7 @@
 import discord
 import datetime
 
-from objects.discordmessage import DiscordMessageWrapper
+from kernel.objects.discordmessage import DiscordMessageWrapper
 
 
 class EmbeddedMessage:

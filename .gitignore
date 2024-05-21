@@ -1,6 +1,8 @@
 
 ## Local Data
-data/*
+etc/*
+storage/*
+tmp/*
 */__pycache__/*
 *.pyc
 
@@ -8,5 +10,6 @@ data/*
 *.DS_Store
 krustoken.txt
 token.txt
+localexperiments/*
 
 .idea/*

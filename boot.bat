@@ -24,8 +24,8 @@ if errorlevel 1 (
     )
 )
 
-if exist ".\data\cache" (
-    rmdir /s /q ".\data\cache"
+if exist ".\tmp" (
+    rmdir /s /q ".\tmp"
 )
 
 if not exist ".\restart" (

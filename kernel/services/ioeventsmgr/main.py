@@ -91,8 +91,9 @@ def runModule(message: str, scope: str):
             except Exception as e:
                 Journaling.record("INFO", f"Error while running event bundle {eventBundle}: {e}")
 
-        for task in executedTasks:
-            task
+        # TODO: What is this
+        # for task in executedTasks:
+        #     task
 
     except Exception as e:
         Journaling.record("INFO", f"Error while running event bundles: {e}")

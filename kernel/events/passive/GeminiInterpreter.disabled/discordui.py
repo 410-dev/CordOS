@@ -7,13 +7,12 @@ import kernel.ipc as IPC
 import kernel.io as IO
 import kernel.registry as Registry
 import kernel.launchcmd as Launcher
-import objects.discordmessage as DiscordMessage
 
 import discord
 import traceback
 import json
 
-async def mainAsync(message: DiscordMessage.DiscordMessageWrapper):
+async def mainAsync(message: discordmessage.DiscordMessageWrapper):
     if Registry.read("SOFTWARE.CordOS.Experimental.LLMAssistant.Enabled", default="0") != "1":
         return
     Journaling.record("INFO", "Experimental feature LLM Assistant is enabled.")
@@ -32,7 +31,7 @@ async def mainAsync(message: DiscordMessage.DiscordMessageWrapper):
         await message.reply("LLM is currently working... Please wait.", mention_author=True)
 
     # Copy message instance to a new instance
-    modifiableWrapper = DiscordMessage.DiscordMessageWrapper(message.message)
+    modifiableWrapper = discordmessage.DiscordMessageWrapper(message.message)
     modifiableWrapper.content = "fasthelp"
     modifiableWrapper.useStdIO = True
     modifiableWrapper.indrv = IODrivers.constructiveInput
@@ -101,7 +100,7 @@ async def mainAsync(message: DiscordMessage.DiscordMessageWrapper):
         await interpreter(message)
 
 
-async def interpreter(message: DiscordMessage.DiscordMessageWrapper):
+async def interpreter(message: discordmessage.DiscordMessageWrapper):
     try:
         args: list = Launcher.splitArguments(message.content)
         cmd: str = Launcher.getCommand(args)

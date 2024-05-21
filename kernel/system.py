@@ -8,9 +8,12 @@ import kernel.servicectl as Services
 import kernel.clock as Clock
 import kernel.ipc as IPC
 import kernel.journaling as Journaling
+import kernel.io as IO
+import kernel.profile as Profile
 
 def main(argsList: list) -> int:
     try:
+        IO.println(f"CordOS Kernel {Profile.getKernelVersion()} {Profile.getKernelBuild()}")
 
         # Check commandline arguments
         Clock.init()
@@ -18,7 +21,7 @@ def main(argsList: list) -> int:
 
         foundation = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Foundation")
         version = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")
-        print(f"Starting up {foundation} {version}")
+        IO.println(f"Starting up {foundation} {version}")
         Journaling.record("INFO", f"Starting up {foundation} {version}")
 
         # Load configurations
@@ -58,16 +61,16 @@ def main(argsList: list) -> int:
 
 
     except Exception as e:
-        print(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        print(f"KERNEL CRASHED WITH UNHANDLED EXCEPTION")
-        print(f"---------------------------------------")
-        print(f"Error Time: {time.ctime()}")
-        print(f"Error: {e}")
-        print(f"---------------------------------------")
-        print(f"Stack Trace:")
+        IO.println(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        IO.println(f"KERNEL CRASHED WITH UNHANDLED EXCEPTION")
+        IO.println(f"---------------------------------------")
+        IO.println(f"Error Time: {time.ctime()}")
+        IO.println(f"Error: {e}")
+        IO.println(f"---------------------------------------")
+        IO.println(f"Stack Trace:")
         traceback.print_exc()
-        print(f"---------------------------------------")
-        print(f"System will restart in safe mode after 3 seconds.")
-        print(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        IO.println(f"---------------------------------------")
+        IO.println(f"System will restart in safe mode after 3 seconds.")
+        IO.println(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         time.sleep(3)
         return 3

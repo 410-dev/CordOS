@@ -3,19 +3,20 @@ import json
 
 import kernel.registry as Registry
 import kernel.partitionmgr as PartitionMgr
+import kernel.journaling as Journaling
 
 from kernel.commands.packager.spec import Spec
 
 
 def getPackagesDBPath():
-    path = Registry.read("SOFTWARE.CordOS.Packages.Database.Location", default=f"{PartitionMgr.data()}/etc/packager/database/")
+    path = Registry.read("SOFTWARE.CordOS.Packages.Database.Location", default=f"{PartitionMgr.etc()}/packager/database/")
     if not os.path.exists(path):
         os.mkdir(path)
     return path
 
 
 def getSourcesDBPath():
-    path = Registry.read("SOFTWARE.CordOS.Sources.Database.Location", default=f"{PartitionMgr.data()}/etc/packager/sources/")
+    path = Registry.read("SOFTWARE.CordOS.Sources.Database.Location", default=f"{PartitionMgr.etc()}/packager/sources/")
     if not os.path.exists(path):
         os.mkdir(path)
     return path
@@ -41,6 +42,7 @@ def isInstalled(packageName: str, condition: str = "==", packageVersion: str = "
     databaseLocation = getPackagesDBPath()
 
     packageList = os.listdir(databaseLocation)
+    Journaling.record("INFO", f"Checking if {packageName} is installed in {databaseLocation}")
     for package in packageList:
         if not package == f"{packageName}.cpkg":
             continue

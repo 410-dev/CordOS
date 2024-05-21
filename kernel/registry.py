@@ -83,6 +83,9 @@ def write(key: str, value=None, regloc: str = Config.get("registry"), verbose=Fa
         journal("write", True, "<default-init>" if value is None else value, key, "<none>")
         return
 
+    if key.startswith("?"):
+        key = key[1:]
+
     # If parent directory does not exist, create all parent directories
     for i in range(len(key.split("/"))):
         if not os.path.exists(os.path.join(regloc, os.sep.join(key.split("/")[:i]))):

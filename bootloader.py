@@ -23,7 +23,7 @@ def install_components():
         global pip3
         subprocess.check_call([pip3, 'install', '-r', 'requirements.txt'])
         print(f"{Colors.GREEN}Components installed.{Colors.NC}")
-        open('data/pip-done', 'a').close()  # Create the file to indicate components are installed
+        open('etc/pip-done', 'a').close()  # Create the file to indicate components are installed
     except subprocess.CalledProcessError:
         print(f"{Colors.RED}Error: Failed to install components. Exiting...{Colors.NC}")
         sys.exit(2)
@@ -36,19 +36,19 @@ def check_configuration(args):
     if result.returncode == 0:
         print(f"{Colors.GREEN}Configuration check passed.{Colors.NC}")
     elif result.returncode == 1:
-        print(f"{Colors.YELLOW}data/config.json created. Please edit it and run this script again.{Colors.NC}")
+        print(f"{Colors.YELLOW}etc/config.json created. Please edit it and run this script again.{Colors.NC}")
         sys.exit(0)
     elif result.returncode == 2:
-        print(f"{Colors.RED}Configuration corrupted: Failed loading token value from data/config.json. Exiting...{Colors.NC}")
+        print(f"{Colors.RED}Configuration corrupted: Failed loading token value from etc/config.json. Exiting...{Colors.NC}")
         sys.exit(2)
     elif result.returncode == 3:
-        print(f"{Colors.RED}data/server.json seems to be corrupted. Please delete it and run this script again.{Colors.NC}")
+        print(f"{Colors.RED}etc/server.json seems to be corrupted. Please delete it and run this script again.{Colors.NC}")
         sys.exit(2)
     elif result.returncode == 4:
-        print(f"{Colors.RED}data/config.json seems to be corrupted. Please delete it and run this script again.{Colors.NC}")
+        print(f"{Colors.RED}etc/config.json seems to be corrupted. Please delete it and run this script again.{Colors.NC}")
         sys.exit(2)
     elif result.returncode == 5:
-        print(f"{Colors.RED}data/config.json has missing keys that are necessary. Read the output logs to check which key is missing.{Colors.NC}")
+        print(f"{Colors.RED}etc/config.json has missing keys that are necessary. Read the output logs to check which key is missing.{Colors.NC}")
         sys.exit(2)
     elif result.returncode == 6:
         print(f"{Colors.RED}Registry has missing keys or values that are necessary. Read the output logs to check which key or value is missing.{Colors.NC}")
@@ -69,8 +69,9 @@ def clear_cache():
         for dir in dirs:
             if dir == '__pycache__':
                 shutil.rmtree(os.path.join(root, dir))
-    if os.path.exists('data/cache'):
-        shutil.rmtree('data/cache')
+    if os.path.exists('tmp'):
+        shutil.rmtree('tmp')
+    os.makedirs('tmp', exist_ok=True)
     print(f"{Colors.GREEN}Cache cleared.{Colors.NC}")
 
 
@@ -100,18 +101,19 @@ def main(args):
         sys.exit(2)
 
     print(f"{Colors.NC}Creating required directories...{Colors.NC}")
-    os.makedirs('data/cache', exist_ok=True)
-    os.makedirs('data/files', exist_ok=True)
-    os.makedirs('data/commands', exist_ok=True)
+    os.makedirs('tmp', exist_ok=True)
+    os.makedirs('storage', exist_ok=True)
+    os.makedirs('etc', exist_ok=True)
+    clear_cache()
 
-    if not os.path.isfile("data/pip-done"):
+    if not os.path.isfile("etc/pip-done"):
         print(f"{Colors.NC}Installing required components...{Colors.NC}")
         install_components()
 
     print(f"{Colors.NC}Checking configuration...{Colors.NC}")
     check_configuration(args)
 
-    print(f"{Colors.NC}Starting bot...{Colors.NC}")
+    print(f"{Colors.NC}Starting system...{Colors.NC}")
 
     # Check if python3 is available as a command
     import importlib

@@ -10,7 +10,7 @@ import kernel.partitionmgr as PartitionMgr
 class JournalingContainer:
 
     journals = {
-        "global": {
+        "_global": {
             "scriptPath": "_",
             "entries": []
         },
@@ -28,8 +28,10 @@ class JournalingContainer:
         }
 
     @staticmethod
-    def addEntry(journal, entry):
+    def addEntry(journal, entry, maxSize: int = 16384):
         JournalingContainer.journals[journal]["entries"].append(entry)
+        while len(JournalingContainer.journals[journal]["entries"]) > maxSize:
+            JournalingContainer.journals[journal]["entries"].pop(0)
 
     @staticmethod
     def getJournal(journal):
@@ -44,8 +46,9 @@ class JournalingContainer:
         return journalString
 
     @staticmethod
-    def dump(to: str = f"{PartitionMgr.data()}/etc/journals/dump@{Clock.getStartTime().split('.')[0]}.json"):
+    def dump(to: str = f"{PartitionMgr.etc()}/journals/dump@{Clock.getTime().split('.')[0]}.json"):
         import json
+        os.makedirs(os.path.dirname(to), exist_ok=True)
         with open(to, "w") as f:
             json.dump(JournalingContainer.journals, f, indent=4)
 
@@ -65,24 +68,24 @@ def record(state: str, text: str):
     #     callerName = f"{bundleName}.{scriptFileName}"
 
     callerName = scriptBundleScope
-    specificJournal = f"{PartitionMgr.data()}/etc/journals/{Clock.getStartTime().split(".")[0]}/{callerName}.journal"
-    globalJournal = f"{PartitionMgr.data()}/etc/journals/{Clock.getStartTime().split(".")[0]}/_.journal"
+    specificJournal = f"{PartitionMgr.etc()}/journals/{Clock.getStartTime().split(".")[0]}/{callerName}.journal"
+    globalJournal = f"{PartitionMgr.etc()}/journals/{Clock.getStartTime().split(".")[0]}/_.journal"
 
-    # Create directory
-    directory = os.path.dirname(specificJournal)
-    os.makedirs(directory, exist_ok=True)
-
-    if Registry.read("SOFTWARE.CordOS.Kernel.UseOnMemoryJournaling") == "1":
+    if Registry.read("SOFTWARE.CordOS.Kernel.DisableOnMemoryJournaling", default="0") == "0":
         if callerName not in JournalingContainer.journals:
             JournalingContainer.addJournal(callerName, scriptPath)
         JournalingContainer.addEntry(callerName, f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
-        JournalingContainer.addEntry("global", f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
+        JournalingContainer.addEntry("_global", f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
 
-        maxSize = int(Registry.read("SOFTWARE.CordOS.Kernel.OnMemoryJournalingMaxEntryPerProcess", default="32767"))
+        maxSize = int(Registry.read("SOFTWARE.CordOS.Kernel.OnMemoryJournalingMaxEntryPerProcess", default="16384"))
         while len(JournalingContainer.journals[callerName]["entries"]) > maxSize:
             JournalingContainer.journals[callerName]["entries"].pop(0)
 
-    if Registry.read("SOFTWARE.CordOS.Kernel.DisableOnDiskJournaling", default="0") == "0":
+    if Registry.read("SOFTWARE.CordOS.Kernel.EnableOnDiskJournaling", default="0") == "1":
+        # Create directory
+        directory = os.path.dirname(specificJournal)
+        os.makedirs(directory, exist_ok=True)
+
         # Write to file if not exists
         if not os.path.exists(specificJournal):
             with open(specificJournal, "w") as f:

@@ -22,8 +22,8 @@ do {
         New-Item -ItemType File -Path "./safe_restart" | Out-Null
     }
 
-    if (Test-Path "./data/cache") {
-        Remove-Item "./data/cache" -Recurse
+    if (Test-Path "./tmp") {
+        Remove-Item "./tmp" -Recurse
     }
 
 } while (Test-Path "./restart")

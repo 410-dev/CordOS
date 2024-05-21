@@ -12,7 +12,7 @@
 | SOFTWARE.CordOS.Kernel.Services.Enabled                  | Binary Integer | 1 | No | 커널에서 서비스가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.Services.SafeModeServices         | String | power, | No | 안전 모드에서 활성화될 수 있는 서비스의 쉼표로 구분된 목록입니다. |
 | SOFTWARE.CordOS.Kernel.Services.OthersEnabled            | Binary Integer | 1 | No | 커널 범위 외의 서비스가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
-| SOFTWARE.CordOS.Kernel.Services.OtherServices            | String | data/services | No | 커널 범위 외의 서비스가 위치한 디렉토리의 경로입니다. |
+| SOFTWARE.CordOS.Kernel.Services.OtherServices            | String | etc/services | No | 커널 범위 외의 서비스가 위치한 디렉토리의 경로입니다. |
 | SOFTWARE.CordOS.Kernel.Services.SDKMinimum               | Integer | 1 | Yes | 커널 서비스에서 지원하는 최소 SDK 버전입니다. |
 | SOFTWARE.CordOS.Kernel.Services.SDKMaximum               | Integer | 2 | Yes | 커널 서비스에서 지원하는 최대 SDK 버전입니다. |
 | SOFTWARE.CordOS.Kernel.Services.ReloadOnCall             | Binary Integer | 1 | No | SDK 호출시 서비스를 다시로드할지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
@@ -20,8 +20,8 @@
 | SOFTWARE.CordOS.Kernel.Services.Webhook.ReloadOnCall     | Binary Integer | 1 | No | SDK 호출시 웹훅을 다시로드할지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.Services.Webhook.Interval         | Binary Integer | 1 | No | 웹훅의 시간 동기화가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.Services.Webhook.EnableLogging    | Binary Integer | 1 | No | 웹훅의 로깅이 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
-| SOFTWARE.CordOS.Kernel.Services.Webhook.LibraryPath      | String | data/files/webhooks/\<id> | No | 웹훅 라이브러리의 경로입니다. |
-| SOFTWARE.CordOS.Kernel.Services.Webhook.RegistrationPath | String | data/webhooks | No | 웹훅 등록 디렉토리의 경로입니다. |
+| SOFTWARE.CordOS.Kernel.Services.Webhook.LibraryPath      | String | storage/webhooks/\<id> | No | 웹훅 라이브러리의 경로입니다. |
+| SOFTWARE.CordOS.Kernel.Services.Webhook.RegistrationPath | String | etc/webhooks | No | 웹훅 등록 디렉토리의 경로입니다. |
 | SOFTWARE.CordOS.Kernel.Hooks.Enabled                     | Binary Integer | 1 | No | 후크가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.Hooks.OthersEnabled               | Binary Integer | 1 | No | 커널 범위 외의 후크가 활성화되어 있는지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |
 | SOFTWARE.CordOS.Kernel.ReloadOnCall                      | Binary Integer | 1 | No | SDK 호출시 커널을 다시로드할지 여부를 나타내는 이진 (참=1 또는 거짓=0) 값입니다. |

@@ -1,4 +1,5 @@
 import kernel.registry as Registry
+import kernel.journaling as Journaling
 
 import os
 from discord_webhook import DiscordWebhook
@@ -16,7 +17,7 @@ def list() -> list:
 def send(webhookURL: str, message: str) -> None:
     webhook = DiscordWebhook(url=webhookURL, content=message)
     response = webhook.execute()
-    print(response)
+    Journaling.record("INFO", f"Webhook response: {response} for url {webhookURL}")
 
 def getLibrary(webhookID: str) -> str:
     libraryPath: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.LibraryPath")

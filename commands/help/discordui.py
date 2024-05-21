@@ -1,7 +1,7 @@
 
 import traceback
 from typing import List
-from objects.embedmsg import EmbeddedMessage
+from kernel.objects.embedmsg import EmbeddedMessage
 
 import kernel.registry as Registry
 import os
@@ -12,7 +12,7 @@ async def mainAsync(args: list, message) -> None:
 
         if len(args) < 2:
             # Print current manual
-            with open("kernel/commands/help/manual.txt", 'r') as f:
+            with open("commands/help/manual.txt", 'r') as f:
                 await message.reply(f.read(), mention_author=True)
                 return
 

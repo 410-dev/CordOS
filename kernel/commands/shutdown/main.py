@@ -1,8 +1,7 @@
 import kernel.io as IO
 import kernel.ipc as IPC
 
+import kernel.services.power.configure as power
 
 def main(args):
-    IPC.set("power.off", True)
-    IPC.set("power.off.state", "OFF")
-    IO.println(f"Shutdown signal published. System will shutdown after all services have stopped.")
+    power.off()

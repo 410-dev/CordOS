@@ -2,7 +2,7 @@ import json
 import os
 
 def load() -> dict:
-    with open('data/config.json') as f:
+    with open('etc/config.json') as f:
         
         config = json.load(f)
         
@@ -25,5 +25,5 @@ def get(key: str, default=None):
     
 
 def save(config: dict):
-    with open('data/config.json', 'w') as f:
+    with open('etc/config.json', 'w') as f:
         json.dump(config, f, indent=4)
