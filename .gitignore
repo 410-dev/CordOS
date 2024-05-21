@@ -10,5 +10,6 @@ tmp/*
 *.DS_Store
 krustoken.txt
 token.txt
+localexperiments/*
 
 .idea/*
