@@ -81,16 +81,19 @@ async def mainAsync(args, message: DiscordMessageWrapper):
             return
 
         if args[0] == "install":
-            Install.install(targetPackages, "install")
+            result = Install.install(targetPackages, "install")
+            await message.reply(f"{result[1]}", mention_author=True)
 
         if args[0] == "installurl":
-            Install.install(targetPackages, "install", url=True)
+            result = Install.install(targetPackages, "install", url=True)
+            await message.reply(f"{result[1]}", mention_author=True)
 
         elif args[0] == "remove":
             Uninstall.uninstall(targetPackages)
 
         elif args[0] == "update":
-            Install.install(targetPackages, "update")
+            result = Install.install(targetPackages, "update")
+            await message.reply(f"{result[1]}", mention_author=True)
 
 
     except Exception as e:

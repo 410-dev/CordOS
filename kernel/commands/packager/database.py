@@ -71,7 +71,7 @@ def register(spec: Spec, receipt: list, meta: dict):
         os.mkdir(f"{databaseLocation}/{spec.getName()}.cpkg")
 
     with open(f"{databaseLocation}/{spec.getName()}.cpkg/spec.json", "w") as file:
-        file.write(spec.data)
+        file.write(json.dumps(spec.data, indent=4))
 
     receipt: str = "\n".join(receipt)
     with open(f"{databaseLocation}/{spec.getName()}.cpkg/receipt", "w") as file:

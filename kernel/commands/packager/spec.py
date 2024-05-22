@@ -8,7 +8,8 @@ class Spec:
         if data is not None:
             self.data = data
         else:
-            self.data = json.load(open(path))
+            with open(path, "r") as f:
+                self.data = json.load(f)
 
         # Load from JSON
         self.spec: str = self.data["spec"]
