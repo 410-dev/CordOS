@@ -54,6 +54,8 @@ async def mainAsync(args, message: DiscordMessageWrapper):
                 if Database.isInstalled(package):
                     unavailablePackages.append(package)
             await message.reply(f"Installing packages: {', '.join(targetPackages)}, Installed packages: {', '.join(unavailablePackages)}", mention_author=True)
+        elif args[0] == "installurl":
+            await message.reply(f"Installing packages from URL: {', '.join(targetPackages)}", mention_author=True)
         elif args[0] == "remove":
             for package in targetPackages:
                 if not Database.isInstalled(package):
@@ -80,6 +82,9 @@ async def mainAsync(args, message: DiscordMessageWrapper):
 
         if args[0] == "install":
             Install.install(targetPackages, "install")
+
+        if args[0] == "installurl":
+            Install.install(targetPackages, "install", url=True)
 
         elif args[0] == "remove":
             Uninstall.uninstall(targetPackages)

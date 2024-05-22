@@ -8,6 +8,8 @@ import kernel.partitionmgr
 import kernel.commands.packager.spec as Spec
 import kernel.commands.packager.fetch as Fetch
 import kernel.registry as Registry
+import kernel.io as IO
+import kernel.journaling as Journaling
 import kernel.partitionmgr as PartitionMgr
 import kernel.profile as Profile
 import os
@@ -17,9 +19,23 @@ import json
 from typing import List
 
 
-def install(keywords: list, case: str):
+def install(keywords: list, case: str, url=False):
     # Get sources list
     sourcesList = Sources.getSources()
+
+    # If urls, then download all specs
+    specQueue = []
+    if url:
+        for spec in keywords:
+            spec = Fetch.fetchSpec(spec)
+            if spec["state"] == "SUCCESS":
+                # Register package
+                spec.pop("state")
+                spec = Spec.Spec(spec)
+                specQueue.append(spec)
+            else:
+                IO.println(f"Error while fetching package: {spec}")
+                IO.println(spec["state"])
 
     # Get dependencies
     dependencies: List[dict] = getDependencies(sourcesList, keywords)
@@ -50,45 +66,40 @@ def install(keywords: list, case: str):
 
     # Throw error if conflicts
     if len(conflicts) > 0:
-        print("Error - Package installation cannot be continued due to conflicts.")
-        print("Conflicts found:")
+        IO.println("Error - Package installation cannot be continued due to conflicts.")
+        IO.println("Conflicts found:")
         for conflict in conflicts:
-            print(f"{conflict} conflicts with:")
+            IO.println(f"{conflict} conflicts with:")
             for conflictingPackage in conflicts[conflict]:
-                print(f"  {conflictingPackage}")
+                IO.println(f"  {conflictingPackage}")
         return
 
     # Get packages
-    specURLs = getSpecURLOf(sourcesList, keywords)
-
-    # If URL is contained in keywords, add it to packages
-    for keyword in keywords:
-        if keyword.startswith("http://") or keyword.startswith("https://"):
-            specURLs.append(keyword)
-
-    # Download specs
-    specQueue: List[Spec] = []
-    for spec in specURLs:
-        spec = Fetch.fetchSpec(spec)
-        if spec["state"] == "SUCCESS":
-            # Register package
-            spec.pop("state")
-            spec = Spec.Spec(spec)
-            specQueue.append(spec)
-        else:
-            print(f"Error while fetching package: {spec}")
-            print(spec["state"])
+    if not url:
+        specURLs = getSpecURLOf(sourcesList, keywords)
+    
+        # Download specs
+        for spec in specURLs:
+            spec = Fetch.fetchSpec(spec)
+            if spec["state"] == "SUCCESS":
+                # Register package
+                spec.pop("state")
+                spec = Spec.Spec(spec)
+                specQueue.append(spec)
+            else:
+                IO.println(f"Error while fetching package: {spec}")
+                IO.println(spec["state"])
 
     # Check compatibility
     for spec in specQueue:
         # SDK
         if not Profile.isPackageSDKCompatible(spec.getSDKVersion()):
-            print(f"Error: Package {spec.getName()} is not compatible with current SDK version. Expected SDK version in range: {spec.getVersion()}, package has SDK version: {spec.getSDKVersion()}")
+            IO.println(f"Error: Package {spec.getName()} is not compatible with current SDK version. Expected SDK version in range: {spec.getVersion()}, package has SDK version: {spec.getSDKVersion()}")
             return
 
         # Architecture
         if not spec.getArch() == "any" and not spec.getArch() == Profile.getArch():
-            print(f"Error: Package {spec.getName()} is not compatible with current architecture. Expected architecture: {spec.getArch()}, system architecture: {Profile.getArch()}")
+            IO.println(f"Error: Package {spec.getName()} is not compatible with current architecture. Expected architecture: {spec.getArch()}, system architecture: {Profile.getArch()}")
             return
 
     # Create temporary location for packages
@@ -132,7 +143,7 @@ def install(keywords: list, case: str):
         # Get procedure as list
         procedure = spec.getObject("procedure")
         if procedure is None:
-            print(f"Warning: Package {spec.getName()} does not contain procedure to install, skipping.")
+            IO.println(f"Warning: Package {spec.getName()} does not contain procedure to install, skipping.")
             installFailed.append(spec.getName())
             continue
 
@@ -148,9 +159,9 @@ def install(keywords: list, case: str):
                         os.remove(t)
                 except Exception as e:
                     if instructionObject["ignoreFail"]:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                     else:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                         installFailed.append(spec.getName())
                         break
 
@@ -159,12 +170,12 @@ def install(keywords: list, case: str):
                     package = instructionObject["package"]
                     packageLocation = tempLocation + "/" + spec.getName()
                     if spec.getObject("payloads")[package] is None:
-                        print(f"Skip {idx}: Warning - Package {spec.getName()} does not contain package '{package}'.")
+                        IO.println(f"Skip {idx}: Warning - Package {spec.getName()} does not contain package '{package}'.")
                         continue
                     os.mkdir(packageLocation)
-                    print(f"Get {idx}: ", end="")
+                    IO.println(f"Get {idx}: ", end="")
                     Fetch.fetchPackage(spec, packageLocation, label=package)
-                    print(f"Install {idx}: ", end="")
+                    IO.println(f"Install {idx}: ", end="")
                     # Unpack package
                     packageObjPath: str = str(os.path.join(packageLocation, package))
                     extractTo: str = str(os.path.join(packageLocation, f"extracted-{package}"))
@@ -178,7 +189,7 @@ def install(keywords: list, case: str):
                                 files.append(os.path.join(root, f))
                         return files
 
-                    print(f"Building file lists...")
+                    IO.println(f"Building file lists...")
                     files = recursiveFSSearch(extractTo)
                     meta = {
                         "extracted": extractTo,
@@ -197,9 +208,9 @@ def install(keywords: list, case: str):
 
                 except Exception as e:
                     if instructionObject["ignoreFail"]:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                     else:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                         installFailed.append(spec.getName())
                         break
 
@@ -215,7 +226,7 @@ def install(keywords: list, case: str):
                             continue
 
                         if not os.path.exists(os.path.join(PartitionMgr.root(), fileName)) and exists:
-                            print(f"fck: File {fileName} does not exist.")
+                            IO.println(f"fck: File {fileName} does not exist.")
                             anyFalse = True
                             break
 
@@ -223,7 +234,7 @@ def install(keywords: list, case: str):
                             with open(os.path.join(PartitionMgr.root(), fileName), "r") as file:
                                 content = file.read().strip()
                                 if content != value:
-                                    print(f"fck: File {fileName} does not match value.")
+                                    IO.println(f"fck: File {fileName} does not match value.")
                                     anyFalse = True
                                     break
 
@@ -235,9 +246,9 @@ def install(keywords: list, case: str):
                             dedicatedMemory[key] = instructionObject["true"][key]
                 except Exception as e:
                     if instructionObject["ignoreFail"]:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                     else:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                         installFailed.append(spec.getName())
                         break
 
@@ -249,30 +260,30 @@ def install(keywords: list, case: str):
                     for caseObject in cases:
                         if caseObject['input'] == value:
                             if caseObject['message'] is not None:
-                                print(caseObject['message'])
+                                IO.println(caseObject['message'])
                             if caseObject['set'] is not None:
                                 for key in caseObject['set'].keys():
                                     dedicatedMemory[key] = caseObject['set'][key]
                             break
                 except Exception as e:
                     if instructionObject["ignoreFail"]:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                     else:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                         installFailed.append(spec.getName())
                         break
 
-            if task == "print":
+            if task == "IO.println":
                 try:
                     message: str = instructionObject["message"]
                     for memory in dedicatedMemory:
                         message = message.replace(f"{{{memory}}}", dedicatedMemory[memory])
-                    print(message)
+                    IO.println(message)
                 except Exception as e:
                     if instructionObject["ignoreFail"]:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                     else:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                         installFailed.append(spec.getName())
                         break
 
@@ -286,9 +297,9 @@ def install(keywords: list, case: str):
 
                 except Exception as e:
                     if instructionObject["ignoreFail"]:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                     else:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                         installFailed.append(spec.getName())
                         break
 
@@ -300,14 +311,14 @@ def install(keywords: list, case: str):
                         file.write(content)
                 except Exception as e:
                     if instructionObject["ignoreFail"]:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                     else:
-                        print(f"Error: {e}")
+                        IO.println(f"Error: {e}")
                         installFailed.append(spec.getName())
                         break
 
             else:
-                print(f"Warning: Unknown task: {task}")
+                IO.println(f"Warning: Unknown task: {task}")
 
 
 def getDependencies(sourcesList, keywords: list) -> List[dict]:
@@ -389,7 +400,7 @@ def getConflicts(sourcesList, keywords: list) -> List[dict]:
     return conflicts
 
 
-def getSpecURLOf(sourcesList, keywords: list) -> Spec:
+def getSpecURLOf(sourcesList, keywords: list) -> list:
     # Get packages
     packages = []
     for source in sourcesList:
@@ -403,3 +414,5 @@ def getSpecURLOf(sourcesList, keywords: list) -> Spec:
                 packageUrl = packageUrl.replace("{arch}", str(package["arch"]))
                 packages.append(packageUrl)
                 keywords.remove(package["name"])
+                
+    return packages
