@@ -3,9 +3,12 @@ import kernel.registry as Registry
 
 
 class Spec:
-    def __init__(self, path):
+    def __init__(self, path, data=None):
         self.path = path
-        self.data = json.load(open(path))
+        if data is not None:
+            self.data = data
+        else:
+            self.data = json.load(open(path))
 
         # Load from JSON
         self.spec: str = self.data["spec"]
