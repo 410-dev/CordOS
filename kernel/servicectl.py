@@ -149,9 +149,13 @@ def start(stage: int, safeMode: bool):
                     continue
 
                 if "critical.unique." in serviceData['role'] and hasServiceAsRole(serviceData['role']) is not None:
-                    Journaling.record("ERROR", f"Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
-                    print(f"Service Failed: Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
-                    continue
+                    allowedUniqueUnuniques = Registry.read("SOFTWARE.CordOS.Kernel.Services.AllowedMultipleUniqueRoles", default="").split(",")
+                    if serviceData['role'] not in allowedUniqueUnuniques and not serviceData['id'] in allowedUniqueUnuniques:
+                        Journaling.record("ERROR", f"Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
+                        print(f"Service Failed: Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
+                        continue
+                    else:
+                        Journaling.record("INFO", f"Service '{service}' has the same role as another service, but allowed to be loaded.")
 
                 if serviceData['sync']:
                     Journaling.record("INFO", f"Service '{service}' is configured to run in sync mode.")
