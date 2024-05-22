@@ -52,8 +52,7 @@ class EmbeddedMessage:
             "color": self.color,
             "footer": self.footer,
             "timestamp": self.timestamp,
-            "expire": self.expire,
-            "webhookURL": self.webhookURL
+            "expire": self.expire
         }
 
     def get(self, key):
