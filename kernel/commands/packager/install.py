@@ -21,36 +21,48 @@ from typing import List
 
 def install(keywords: list, case: str, url=False):
     # Get sources list
+    Journaling.record("INFO", "Installing packages: " + ", ".join(keywords))
     sourcesList = Sources.getSources()
+    Journaling.record("INFO", "Sources list: " + str(sourcesList))
 
     # If urls, then download all specs
     specQueue = []
     if url:
+        Journaling.record("INFO", "URL mode enabled.")
         for spec in keywords:
             spec = Fetch.fetchSpec(spec)
+            Journaling.record("INFO", f"Spec: {spec}")
             if spec["state"] == "SUCCESS":
                 # Register package
                 spec.pop("state")
-                spec = Spec.Spec(spec)
+                spec = Spec.Spec("none", data=spec)
                 specQueue.append(spec)
+                Journaling.record("INFO", f"Spec added to SpecQueue.")
             else:
                 IO.println(f"Error while fetching package: {spec}")
                 IO.println(spec["state"])
 
     # Get dependencies
+    Journaling.record("INFO", "Keywords: " + str(keywords))
+    Journaling.record("INFO", "Getting dependencies...")
     dependencies: List[dict] = getDependencies(sourcesList, keywords)
+    Journaling.record("INFO", f"Dependencies: {dependencies}")
 
     # Check if installed
     for dependency in dependencies:
+        Journaling.record("INFO", f"Checking if {dependency['name']} is installed...")
         installed: bool = Database.isInstalled(dependency['name'], condition=dependency['condition'], packageVersion=dependency['version'])
         if installed:
+            Journaling.record("INFO", f"{dependency['name']} is installed.")
             dependencies.remove(dependency)
 
     # check conflicts
     conflicts: dict = {}
     for dependency in dependencies:
+        Journaling.record("INFO", f"Checking conflicts for {dependency['name']}...")
         conflictList: List[str] = Database.getConflicts(dependency['name'], condition=dependency['condition'], version=dependency['version'])
         if len(conflictList) > 0:
+            Journaling.record("INFO", f"Conflicts found for {dependency['name']}: {conflictList}")
             if dependency['name'] in conflicts:
                 conflicts[dependency['name']].append(conflictList)
             else:
@@ -93,49 +105,66 @@ def install(keywords: list, case: str, url=False):
     # Check compatibility
     for spec in specQueue:
         # SDK
+        Journaling.record("INFO", f"Checking compatibility for {spec.getName()}...")
         if not Profile.isPackageSDKCompatible(spec.getSDKVersion()):
+            Journaling.record("ERROR", f"Package {spec.getName()} is not compatible with current SDK version. Expected SDK version in range: {spec.getVersion()}, package has SDK version: {spec.getSDKVersion()}")
             IO.println(f"Error: Package {spec.getName()} is not compatible with current SDK version. Expected SDK version in range: {spec.getVersion()}, package has SDK version: {spec.getSDKVersion()}")
             return
 
         # Architecture
         if not spec.getArch() == "any" and not spec.getArch() == Profile.getArch():
+            Journaling.record("ERROR", f"Package {spec.getName()} is not compatible with current architecture. Expected architecture: {spec.getArch()}, system architecture: {Profile.getArch()}")
             IO.println(f"Error: Package {spec.getName()} is not compatible with current architecture. Expected architecture: {spec.getArch()}, system architecture: {Profile.getArch()}")
             return
 
     # Create temporary location for packages
     randomstr = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
-    tempLocation = PartitionMgr.cache() + "/packages/" + randomstr
-    os.mkdir(tempLocation)
+    tempLocation = "/packages/" + randomstr
+    Journaling.record("INFO", f"Creating temporary location for packages: {tempLocation}")
+
+    PartitionMgr.Cache.mkdir(tempLocation)
+    Journaling.record("INFO", f"Temporary location created.")
 
     installFailed = []
 
     def shouldRunInstruction(instruction: dict, memory: dict):
-        if instruction["if"] is None:
+        if not "if" in instruction or instruction["if"] is None:
+            Journaling.record("INFO", "No if condition found, running instruction.")
             return True
 
         for key in instruction["if"].keys():
             if key not in memory:
+                Journaling.record("INFO", f"Key {key} not found in memory, skipping instruction.")
                 return not instruction["if"][key]['exists']
+
             compare = instruction["if"][key]['compare']
             value = instruction["if"][key]['value']
+            Journaling.record("INFO", f"Comparing {memory[key]} {compare} {value}")
             if compare == "==":
                 if memory[key] != value:
+                    Journaling.record("INFO", "Condition not met, skipping instruction.")
                     return False
             elif compare == "!=":
                 if memory[key] == value:
+                    Journaling.record("INFO", "Condition not met, skipping instruction.")
                     return False
             elif compare == ">":
                 if memory[key] <= value:
+                    Journaling.record("INFO", "Condition not met, skipping instruction.")
                     return False
             elif compare == "<":
                 if memory[key] >= value:
+                    Journaling.record("INFO", "Condition not met, skipping instruction.")
                     return False
             elif compare == ">=":
                 if memory[key] < value:
+                    Journaling.record("INFO", "Condition not met, skipping instruction.")
                     return False
             elif compare == "<=":
                 if memory[key] > value:
+                    Journaling.record("INFO", "Condition not met, skipping instruction.")
                     return False
+        Journaling.record("INFO", "All conditions met, running instruction.")
         return True
 
     # Run install procedures for each package by following its specs
@@ -143,6 +172,7 @@ def install(keywords: list, case: str, url=False):
         # Get procedure as list
         procedure = spec.getObject("procedure")
         if procedure is None:
+            Journaling.record("WARNING", f"Package {spec.getName()} does not contain procedure to install, skipping.")
             IO.println(f"Warning: Package {spec.getName()} does not contain procedure to install, skipping.")
             installFailed.append(spec.getName())
             continue
@@ -168,46 +198,91 @@ def install(keywords: list, case: str, url=False):
             if task == "install":
                 try:
                     package = instructionObject["package"]
+                    Journaling.record("INFO", f"Installing package {package}@{spec.getName()}...")
                     packageLocation = tempLocation + "/" + spec.getName()
+                    packageLocation = PartitionMgr.Cache.path(packageLocation)
+                    Journaling.record("INFO", f"PackageLocation: {packageLocation}")
                     if spec.getObject("payloads")[package] is None:
+                        Journaling.record("WARNING", f"Package {spec.getName()} does not contain package '{package}', skipping.")
                         IO.println(f"Skip {idx}: Warning - Package {spec.getName()} does not contain package '{package}'.")
                         continue
-                    os.mkdir(packageLocation)
-                    IO.println(f"Get {idx}: ", end="")
-                    Fetch.fetchPackage(spec, packageLocation, label=package)
-                    IO.println(f"Install {idx}: ", end="")
+                    PartitionMgr.RootFS.mkdir(packageLocation)
+                    if not os.path.isdir(packageLocation):
+                        Journaling.record("ERROR", f"Failed to create package location: {packageLocation}")
+                        IO.println(f"Error: Failed to create package location: {packageLocation}")
+                        installFailed.append(spec.getName())
+                        break
+                    IO.printf(f"Get {idx}: ")
+                    savedPath, extension = Fetch.fetchPackage(spec, packageLocation, label=package)
+                    Journaling.record("INFO", "Package fetched.")
+                    IO.printf(f"Install {idx}: ")
                     # Unpack package
-                    packageObjPath: str = str(os.path.join(packageLocation, package))
+                    # packageObjPath: str = str(os.path.join(packageLocation, package))
+                    # packageObjPath = PartitionMgr.Cache.path(packageObjPath)
+                    # Journaling.record("INFO", f"PackageObjectPath: {packageObjPath}")
+                    Journaling.record("INFO", f"SavedPath: {savedPath}")
                     extractTo: str = str(os.path.join(packageLocation, f"extracted-{package}"))
-                    shutil.unpack_archive(packageObjPath, extractTo)
+                    Journaling.record("INFO", f"ExtractTo: {extractTo}")
+                    shutil.unpack_archive(savedPath, extractTo)
+                    Journaling.record("INFO", "Package unpacked.")
 
                     # Create receipt
                     def recursiveFSSearch(path: str) -> list:
-                        files = []
-                        for root, dirs, files in os.walk(path):
-                            for f in files:
-                                files.append(os.path.join(root, f))
-                        return files
+                        buildingList = []
+                        if os.path.basename(path).startswith("."):
+                            # remove hidden files
+                            os.remove(path)
+                            return buildingList
+                        if os.path.isdir(path):
+                            for item in os.listdir(path):
+                                buildingList.extend(recursiveFSSearch(os.path.join(path, item)))
+                        else:
+                            buildingList.append(path)
+                        return buildingList
 
-                    IO.println(f"Building file lists...")
+                    Journaling.record("INFO", f"Building file lists...")
                     files = recursiveFSSearch(extractTo)
+
+                    # If spec.json is not available in the root of the package, then search for spec.json - if found, that is the root directory.
+                    if not os.path.exists(os.path.join(extractTo, "spec.json")):
+                        for root, dirs, files in os.walk(extractTo):
+                            if "spec.json" in files:
+                                extractTo = root
+                                break
+
+                    for idx, file in enumerate(files):
+                        files[idx] = file.replace(extractTo, "").replace("\\", "/").strip("/")
+
+                    Journaling.record("INFO", f"Files: {files}")
                     meta = {
                         "extracted": extractTo,
                         "files": files
                     }
+                    with open(os.path.join(packageLocation, "receipt"), "w") as file:
+                        file.write(json.dumps(meta))
 
                     # Copy files to root
-                    shutil.copytree(extractTo, kernel.partitionmgr.root())
+                    Journaling.record("INFO", f"Copying receipt...")
                     shutil.copy(os.path.join(packageLocation, "receipt"), kernel.partitionmgr.root())
+                    Journaling.record("INFO", f"Receipt copied - removing receipt...")
+                    os.remove(os.path.join(packageLocation, "receipt"))
+                    Journaling.record("INFO", f"Copying files to root...")
+                    shutil.copytree(extractTo, kernel.partitionmgr.root(), dirs_exist_ok=True)
+                    Journaling.record("INFO", f"Files copied to root.")
 
                     # Database register
+                    Journaling.record("INFO", f"Registering package to database...")
                     Database.register(spec, meta["files"], meta)
 
                     # Clean up
+                    Journaling.record("INFO", f"Cleaning up...")
                     shutil.rmtree(packageLocation)
+                    Journaling.record("INFO", f"Package {package}@{spec.getName()} installed.")
+
+                    IO.println(f"Package {package}@{spec.getName()} installed.")
 
                 except Exception as e:
-                    if instructionObject["ignoreFail"]:
+                    if "ignoreFail" in instructionObject and instructionObject["ignoreFail"]:
                         IO.println(f"Error: {e}")
                     else:
                         IO.println(f"Error: {e}")
