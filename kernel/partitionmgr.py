@@ -53,8 +53,8 @@ class Data:
         RootFS.mkdir(os.path.join(data(), path))
 
     @staticmethod
-    def path() -> str:
-        return data()
+    def path(subPath: str = "") -> str:
+        return data() + ("/" + subPath if subPath != "" else "")
 
     @staticmethod
     def copyDefault(path: str, existOK: bool = True):
@@ -87,8 +87,8 @@ class Etc:
         RootFS.mkdir(os.path.join(etc(), path))
 
     @staticmethod
-    def path() -> str:
-        return etc()
+    def path(subPath: str = "") -> str:
+        return etc() + ("/" + subPath if subPath != "" else "")
 
     @staticmethod
     def copyDefault(path: str, existOK: bool = True):
@@ -139,3 +139,37 @@ class RootFS:
         if not os.path.exists(os.path.join(root(), src)):
             return
         shutil.move(os.path.join(root(), src), os.path.join(root(), dst))
+
+
+class Cache:
+    @staticmethod
+    def read(path: str) -> str:
+        return RootFS.read(os.path.join(cache(), path))
+
+    @staticmethod
+    def write(path: str, content: str):
+        RootFS.write(os.path.join(cache(), path), content)
+
+    @staticmethod
+    def isFile(path: str) -> bool:
+        return RootFS.isFile(os.path.join(cache(), path))
+
+    @staticmethod
+    def isDir(path: str) -> bool:
+        return RootFS.isDir(os.path.join(cache(), path))
+
+    @staticmethod
+    def exists(path: str) -> bool:
+        return RootFS.exists(os.path.join(cache(), path))
+
+    @staticmethod
+    def mkdir(path: str):
+        RootFS.mkdir(os.path.join(cache(), path))
+
+    @staticmethod
+    def path(subPath: str = "") -> str:
+        return cache() + ("/" + subPath if subPath != "" else "")
+
+    @staticmethod
+    def copyDefault(path: str, existOK: bool = True):
+        RootFS.copy(os.path.join(default(), cache(), path), os.path.join(cache(), path), existOK)
