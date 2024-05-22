@@ -1,6 +1,9 @@
 import discord
 import datetime
 
+import kernel.ipc as IPC
+import kernel.io as IO
+
 from kernel.objects.discordmessage import DiscordMessageWrapper
 
 
@@ -13,7 +16,8 @@ class EmbeddedMessage:
         self.footer = footer
         self.timestamp = timestamp
         self.messageWrapper: DiscordMessageWrapper = message
-        self.message: discord.Message = message.getMessageObject()
+        if message is not None:
+            self.message: discord.Message = message.getMessageObject()
         self.expire = expireAfterSeconds
 
     async def send(self):
@@ -40,3 +44,17 @@ class EmbeddedMessage:
 
     def stringifySimplest(self):
         return self.description
+
+    def toDict(self):
+        return {
+            "title": self.title,
+            "description": self.description,
+            "color": self.color,
+            "footer": self.footer,
+            "timestamp": self.timestamp,
+            "expire": self.expire,
+            "webhookURL": self.webhookURL
+        }
+
+    def get(self, key):
+        return self.toDict()[key]
