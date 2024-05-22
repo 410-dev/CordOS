@@ -408,6 +408,8 @@ def install(keywords: list, case: str, url=False):
         Journaling.record("INFO", "Temporary location cleaned up.")
 
     except Exception as e:
+        IO.println(f"Error: {e}")
+        installFailed.append("Unknown error")
         pass
 
     # Print failed installations
@@ -416,7 +418,7 @@ def install(keywords: list, case: str, url=False):
         strToPrint = "Error: Failed to install packages: "
         for package in installFailed:
             IO.println(f"  {package}")
-            strToPrint += package + ", "
+            strToPrint += str(package) + ", "
         return False, strToPrint[:-2]
     else:
         IO.println("Packages installed successfully.")
