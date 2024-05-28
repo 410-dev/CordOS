@@ -68,7 +68,6 @@ def start(stage: int, safeMode: bool):
     print(f"Starting services for stage {stage}")
 
     servicesList: list = os.listdir("kernel/services")
-    safeServiceList: list = Registry.read("SOFTWARE.CordOS.Kernel.Services.SafeModeServices").split(",")
     for idx, line in enumerate(servicesList):
         servicesList[idx] = "kernel/services/" + line
 
@@ -82,39 +81,37 @@ def start(stage: int, safeMode: bool):
     thirdPartyServiceLoadStage: int = int(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServicesMinimumBootStage", default=3))
     Journaling.record("INFO", f"Third-party service load stage: {thirdPartyServiceLoadStage}")
 
-    loadedKernelService: list = []
-    loadedThirdPartyService: list = []
-
     if not os.path.exists(PartitionMgr.cache() + "/krnlsrv"):
         os.makedirs(PartitionMgr.cache() + "/krnlsrv")
 
     for service in servicesList:
-        launchsvc(service, safeMode, safeServiceList, stage)
+        launchsvc(service, safeMode, stage)
 
 
 
-def launchsvc(service: str, safeMode: bool, safeServiceList: list, stage: int):
+def launchsvc(service: str, safeMode: bool, stage: int) -> bool:
     thirdPartyServicesLoc: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices")
     thirdPartyServiceLoadStage: int = int(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServicesMinimumBootStage", default=3))
+    safeServiceList: list = Registry.read("SOFTWARE.CordOS.Kernel.Services.SafeModeServices").split(",")
 
     if service.endswith(".disabled"):
         Journaling.record("INFO", f"Service '{service}' is disabled. Skipping.")
         print(f"Service '{service}' is disabled. Skipping.")
-        return
+        return False
 
     if safeMode:
         if service not in safeServiceList:
             Journaling.record("INFO", f"Service '{service}' is not in safe mode list. Skipping.")
             print(f"Service '{service}' is not in safe mode list. Skipping.")
-            return
+            return False
 
     if not os.path.isdir(service):
         Journaling.record("INFO", f"Service '{service}' is not a directory. Skipping.")
-        return
+        return False
 
     if "main.py" not in os.listdir(service):
         Journaling.record("INFO", f"Service '{service}' does not have main.py. Skipping.")
-        return
+        return False
 
     runSync: bool = False
 
@@ -141,45 +138,39 @@ def launchsvc(service: str, safeMode: bool, safeServiceList: list, stage: int):
                     continue
 
             if serviceData['stage'] != stage and stage != -1:
-                return
+                return False
 
             # Check if non-kernel service.
             if not service.startswith("kernel/services"):
                 # If current stage did not meet the service's stage, skip.
-                if stage < thirdPartyServiceLoadStage:
-                    Journaling.record("INFO",
-                                      f"Third-party service load is not allowed in stage {stage}. '{service}' is not loadable. Skipping.")
-                    print( f"Third-party service load is not allowed in stage {stage}. '{service}' is not loadable. Skipping.")
-                    return
+                if stage < thirdPartyServiceLoadStage and stage != -1:
+                    Journaling.record("INFO", f"Third-party service load is not allowed in stage {stage}. '{service}' is not loadable. Skipping.")
+                    print(f"Third-party service load is not allowed in stage {stage}. '{service}' is not loadable. Skipping.")
+                    return False
 
             # Check compatibility
             if serviceData['sdk'] < int(Registry.read("SOFTWARE.CordOS.Kernel.Services.SDKMinimum")):
                 Journaling.record("ERROR",
                                   f"Service '{service}' is not compatible with this version of CordOS (Too old). Skipping.")
-                print(
-                    f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too old). Skipping.")
-                return
+                print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too old). Skipping.")
+                return False
 
             if serviceData['sdk'] > int(Registry.read("SOFTWARE.CordOS.Kernel.Services.SDKMaximum")):
                 Journaling.record("ERROR",
                                   f"Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
-                print(
-                    f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
-                return
+                print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
+                return False
 
             if "critical.unique." in serviceData['role'] and hasServiceAsRole(serviceData['role']) is not None:
                 allowedUniqueUnuniques = Registry.read("SOFTWARE.CordOS.Kernel.Services.AllowedMultipleUniqueRoles",
                                                        default="").split(",")
                 if serviceData['role'] not in allowedUniqueUnuniques and not serviceData[
                                                                                  'id'] in allowedUniqueUnuniques:
-                    Journaling.record("ERROR",
-                                      f"Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
-                    print(
-                        f"Service Failed: Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
-                    return
+                    Journaling.record("ERROR", f"Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
+                    print(f"Service Failed: Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
+                    return False
                 else:
-                    Journaling.record("INFO",
-                                      f"Service '{service}' has the same role as another service, but allowed to be loaded.")
+                    Journaling.record("INFO", f"Service '{service}' has the same role as another service, but allowed to be loaded.")
 
             if serviceData['sync']:
                 Journaling.record("INFO", f"Service '{service}' is configured to run in sync mode.")
@@ -188,7 +179,7 @@ def launchsvc(service: str, safeMode: bool, safeServiceList: list, stage: int):
             if service.startswith("kernel/services"):
                 if Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled") == "0":
                     Journaling.record("INFO", f"Service '{service}' is disabled. Skipping.")
-                    return
+                    return False
 
                 Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled", "1")
 
@@ -196,7 +187,7 @@ def launchsvc(service: str, safeMode: bool, safeServiceList: list, stage: int):
                 serviceName = service.replace(thirdPartyServicesLoc.replace("/", ".").replace("\\", "."), "")
                 if Registry.read(f"SOFTWARE.CordOS.Services.{serviceName}.Enabled") == "0":
                     Journaling.record("INFO", f"Service '{service}' is disabled. Skipping.")
-                    return
+                    return False
 
                 Registry.write(f"SOFTWARE.CordOS.Services.{serviceName}.Enabled", "1")
 
@@ -223,7 +214,7 @@ def launchsvc(service: str, safeMode: bool, safeServiceList: list, stage: int):
             Journaling.record("INFO", f"Running service (Stage {stage}) '{service}' in sync mode.")
             print(f"Running service (Stage {stage}) '{service}' in sync mode.")
             thread.run()
-            return
+            return False
 
         Journaling.record("INFO", f"Starting service (Stage {stage}) '{service}'.")
         thread.start()
@@ -250,7 +241,7 @@ def launchsvc(service: str, safeMode: bool, safeServiceList: list, stage: int):
                 mode = 'w'
 
             with open(PartitionMgr.cache() + f"/krnlsrv/stg{stage}_loaded_kernel", mode) as f:
-                f.write(service.replace("kernel/services.", "") + "\n")
+                f.write(service.replace("kernel.services.", "") + "\n")
 
         else:
             if os.path.exists(PartitionMgr.cache() + f"/krnlsrv/stg{stage}_loaded_thirdparty"):
@@ -261,6 +252,7 @@ def launchsvc(service: str, safeMode: bool, safeServiceList: list, stage: int):
             with open(PartitionMgr.cache() + f"/krnlsrv/stg{stage}_loaded_thirdparty", mode) as f:
                 f.write(service.replace(thirdPartyServicesLoc.replace("/", ".").replace("\\", ".") + ".", "") + "\n")
 
+        return True
     except Exception as e:
         print(f"Error in starting service '{service}' e: {e}")
         pass
