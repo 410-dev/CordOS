@@ -59,6 +59,7 @@ def main():
                     webhooks = Registry.read("SOFTWARE.CordOS.Kernel.Services.DiscordUIService.OnReadyWebhooks", default="").replace(", ", ",").split(",")
                     for webhook in webhooks:
                         try:
+                            IO.println(f"Sending on_ready webhook to {webhook}")
                             Webhook.send(webhook, f"DiscordUIService for {client.user} is now online.")
                         except Exception as ex:
                             IO.println("Failed to send on_ready webhook: " + str(ex))
