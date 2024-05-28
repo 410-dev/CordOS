@@ -85,151 +85,182 @@ def start(stage: int, safeMode: bool):
     loadedKernelService: list = []
     loadedThirdPartyService: list = []
 
-    for service in servicesList:
-
-        if service.endswith(".disabled"):
-            Journaling.record("INFO", f"Service '{service}' is disabled. Skipping.")
-            print(f"Service '{service}' is disabled. Skipping.")
-            continue
-
-        if safeMode:
-            if service not in safeServiceList:
-                Journaling.record("INFO", f"Service '{service}' is not in safe mode list. Skipping.")
-                print(f"Service '{service}' is not in safe mode list. Skipping.")
-                continue
-
-        if not os.path.isdir(service):
-            Journaling.record("INFO", f"Service '{service}' is not a directory. Skipping.")
-            continue
-
-        if "main.py" not in os.listdir(service):
-            Journaling.record("INFO", f"Service '{service}' does not have main.py. Skipping.")
-            continue
-
-        runSync: bool = False
-
-        serviceData: dict = {}
-        try:
-            with open(f"{service}/service.json", 'r') as f:
-                serviceData = json.loads(f.read())
-
-                # Check if keys exists
-                keysRequired = ["sdk", "stage", "sync"]
-                keysType = [int, int, bool]
-                for i in range(len(keysRequired)):
-                    if keysRequired[i] not in serviceData:
-                        Journaling.record("ERROR", f"Service '{service}' is missing '{keysRequired[i]}' key. (Not Found) Skipping.")
-                        print(f"Service Failed: Service '{service}' is missing '{keysRequired[i]}' key. (Not Found) Skipping.")
-                        continue
-                    if not isinstance(serviceData[keysRequired[i]], keysType[i]):
-                        Journaling.record("ERROR", f"Service '{service}' has invalid '{keysRequired[i]}' key. (Type Mismatch) Skipping.")
-                        print(f"Service Failed: Service '{service}' has invalid '{keysRequired[i]}' key. (Type Mismatch) Skipping.")
-                        continue
-
-                if serviceData['stage'] != stage:
-                    continue
-
-                # Check if non-kernel service.
-                if not service.startswith("kernel/services"):
-                    # If current stage did not meet the service's stage, skip.
-                    if stage < thirdPartyServiceLoadStage:
-                        Journaling.record("INFO", f"Third-party service load is not allowed in stage {stage}. '{service}' is not loadable. Skipping.")
-                        print(f"Third-party service load is not allowed in stage {stage}. '{service}' is not loadable. Skipping.")
-                        continue
-
-                # Check compatibility
-                if serviceData['sdk'] < int(Registry.read("SOFTWARE.CordOS.Kernel.Services.SDKMinimum")):
-                    Journaling.record("ERROR", f"Service '{service}' is not compatible with this version of CordOS (Too old). Skipping.")
-                    print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too old). Skipping.")
-                    continue
-
-                if serviceData['sdk'] > int(Registry.read("SOFTWARE.CordOS.Kernel.Services.SDKMaximum")):
-                    Journaling.record("ERROR", f"Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
-                    print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
-                    continue
-
-                if "critical.unique." in serviceData['role'] and hasServiceAsRole(serviceData['role']) is not None:
-                    allowedUniqueUnuniques = Registry.read("SOFTWARE.CordOS.Kernel.Services.AllowedMultipleUniqueRoles", default="").split(",")
-                    if serviceData['role'] not in allowedUniqueUnuniques and not serviceData['id'] in allowedUniqueUnuniques:
-                        Journaling.record("ERROR", f"Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
-                        print(f"Service Failed: Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
-                        continue
-                    else:
-                        Journaling.record("INFO", f"Service '{service}' has the same role as another service, but allowed to be loaded.")
-
-                if serviceData['sync']:
-                    Journaling.record("INFO", f"Service '{service}' is configured to run in sync mode.")
-                    runSync = True
-
-                if service.startswith("kernel/services"):
-                    if Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled") == "0":
-                        Journaling.record("INFO", f"Service '{service}' is disabled. Skipping.")
-                        continue
-
-                    Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled", "1")
-
-                else:
-                    serviceName = service.replace(thirdPartyServicesLoc.replace("/", ".").replace("\\", "."), "")
-                    if Registry.read(f"SOFTWARE.CordOS.Services.{serviceName}.Enabled") == "0":
-                        Journaling.record("INFO", f"Service '{service}' is disabled. Skipping.")
-                        continue
-
-                    Registry.write(f"SOFTWARE.CordOS.Services.{serviceName}.Enabled", "1")
-
-        except:
-            pass
-
-        try:
-            import importlib
-            service = service.replace("/", ".").replace("\\", ".")
-            moduleName = f"{service}.main"
-            Journaling.record("INFO", f"Starting service (Stage {stage}) '{service}'.")
-            print(f"Starting service (Stage {stage}) '{service}'.")
-            module = importlib.import_module(moduleName)
-
-            if Registry.read("SOFTWARE.CordOS.Kernel.Services.ReloadOnCall") == "1":
-                if not Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service}.ReloadOnCall") == "0":
-                    Journaling.record("INFO", f"Reloading service '{service}'...")
-                    importlib.reload(module)
-
-            thread = threading.Thread(target=module.main)
-            thread.daemon = True
-
-            if runSync:
-                Journaling.record("INFO", f"Running service (Stage {stage}) '{service}' in sync mode.")
-                print(f"Running service (Stage {stage}) '{service}' in sync mode.")
-                thread.run()
-                continue
-
-            Journaling.record("INFO", f"Starting service (Stage {stage}) '{service}'.")
-            thread.start()
-
-            serviceObject: dict = {
-                "id": serviceData['id'],
-                "name": serviceData['name'],
-                "module": module,
-                "thread": thread,
-                "profile": serviceData
-            }
-
-            Journaling.record("INFO", f"Registering service (Stage {stage}) '{service}'.")
-            ServicesContainer.addService("kernel" if service.startswith("kernel.services") else "thirdparty", stage, serviceObject)
-
-            Journaling.record("INFO", f"Started service (Stage {stage}) '{service}'.")
-            print(f"Started service (Stage {stage}) '{service}'.")
-
-            if service.startswith("kernel.services"):
-                loadedKernelService.append(service.replace("kernel.services.", ""))
-            else:
-                loadedThirdPartyService.append(service.replace(thirdPartyServicesLoc.replace("/", ".").replace("\\", ".") + ".", ""))
-
-        except Exception as e:
-            print(f"Error in starting service '{service}' e: {e}")
-            pass
-
     if not os.path.exists(PartitionMgr.cache() + "/krnlsrv"):
         os.makedirs(PartitionMgr.cache() + "/krnlsrv")
-    with open(PartitionMgr.cache() + f"/krnlsrv/stg{stage}_loaded_kernel", 'w') as f:
-        f.write("\n".join(loadedKernelService))
-    with open(PartitionMgr.cache() + f"/krnlsrv/stg{stage}_loaded_thirdparty", 'w') as f:
-        f.write("\n".join(loadedThirdPartyService))
+
+    for service in servicesList:
+        launchsvc(service, safeMode, safeServiceList, stage)
+
+
+
+def launchsvc(service: str, safeMode: bool, safeServiceList: list, stage: int):
+    thirdPartyServicesLoc: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices")
+    thirdPartyServiceLoadStage: int = int(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServicesMinimumBootStage", default=3))
+
+    if service.endswith(".disabled"):
+        Journaling.record("INFO", f"Service '{service}' is disabled. Skipping.")
+        print(f"Service '{service}' is disabled. Skipping.")
+        return
+
+    if safeMode:
+        if service not in safeServiceList:
+            Journaling.record("INFO", f"Service '{service}' is not in safe mode list. Skipping.")
+            print(f"Service '{service}' is not in safe mode list. Skipping.")
+            return
+
+    if not os.path.isdir(service):
+        Journaling.record("INFO", f"Service '{service}' is not a directory. Skipping.")
+        return
+
+    if "main.py" not in os.listdir(service):
+        Journaling.record("INFO", f"Service '{service}' does not have main.py. Skipping.")
+        return
+
+    runSync: bool = False
+
+    serviceData: dict = {}
+    try:
+        with open(f"{service}/service.json", 'r') as f:
+            serviceData = json.loads(f.read())
+
+            # Check if keys exists
+            keysRequired = ["sdk", "stage", "sync"]
+            keysType = [int, int, bool]
+            for i in range(len(keysRequired)):
+                if keysRequired[i] not in serviceData:
+                    Journaling.record("ERROR",
+                                      f"Service '{service}' is missing '{keysRequired[i]}' key. (Not Found) Skipping.")
+                    print(
+                        f"Service Failed: Service '{service}' is missing '{keysRequired[i]}' key. (Not Found) Skipping.")
+                    continue
+                if not isinstance(serviceData[keysRequired[i]], keysType[i]):
+                    Journaling.record("ERROR",
+                                      f"Service '{service}' has invalid '{keysRequired[i]}' key. (Type Mismatch) Skipping.")
+                    print(
+                        f"Service Failed: Service '{service}' has invalid '{keysRequired[i]}' key. (Type Mismatch) Skipping.")
+                    continue
+
+            if serviceData['stage'] != stage and stage != -1:
+                return
+
+            # Check if non-kernel service.
+            if not service.startswith("kernel/services"):
+                # If current stage did not meet the service's stage, skip.
+                if stage < thirdPartyServiceLoadStage:
+                    Journaling.record("INFO",
+                                      f"Third-party service load is not allowed in stage {stage}. '{service}' is not loadable. Skipping.")
+                    print( f"Third-party service load is not allowed in stage {stage}. '{service}' is not loadable. Skipping.")
+                    return
+
+            # Check compatibility
+            if serviceData['sdk'] < int(Registry.read("SOFTWARE.CordOS.Kernel.Services.SDKMinimum")):
+                Journaling.record("ERROR",
+                                  f"Service '{service}' is not compatible with this version of CordOS (Too old). Skipping.")
+                print(
+                    f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too old). Skipping.")
+                return
+
+            if serviceData['sdk'] > int(Registry.read("SOFTWARE.CordOS.Kernel.Services.SDKMaximum")):
+                Journaling.record("ERROR",
+                                  f"Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
+                print(
+                    f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
+                return
+
+            if "critical.unique." in serviceData['role'] and hasServiceAsRole(serviceData['role']) is not None:
+                allowedUniqueUnuniques = Registry.read("SOFTWARE.CordOS.Kernel.Services.AllowedMultipleUniqueRoles",
+                                                       default="").split(",")
+                if serviceData['role'] not in allowedUniqueUnuniques and not serviceData[
+                                                                                 'id'] in allowedUniqueUnuniques:
+                    Journaling.record("ERROR",
+                                      f"Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
+                    print(
+                        f"Service Failed: Service '{service}' has the same role as another service, while marked to be unique service. Skipping.")
+                    return
+                else:
+                    Journaling.record("INFO",
+                                      f"Service '{service}' has the same role as another service, but allowed to be loaded.")
+
+            if serviceData['sync']:
+                Journaling.record("INFO", f"Service '{service}' is configured to run in sync mode.")
+                runSync = True
+
+            if service.startswith("kernel/services"):
+                if Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled") == "0":
+                    Journaling.record("INFO", f"Service '{service}' is disabled. Skipping.")
+                    return
+
+                Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled", "1")
+
+            else:
+                serviceName = service.replace(thirdPartyServicesLoc.replace("/", ".").replace("\\", "."), "")
+                if Registry.read(f"SOFTWARE.CordOS.Services.{serviceName}.Enabled") == "0":
+                    Journaling.record("INFO", f"Service '{service}' is disabled. Skipping.")
+                    return
+
+                Registry.write(f"SOFTWARE.CordOS.Services.{serviceName}.Enabled", "1")
+
+    except:
+        pass
+
+    try:
+        import importlib
+        service = service.replace("/", ".").replace("\\", ".")
+        moduleName = f"{service}.main"
+        Journaling.record("INFO", f"Starting service (Stage {stage}) '{service}'.")
+        print(f"Starting service (Stage {stage}) '{service}'.")
+        module = importlib.import_module(moduleName)
+
+        if Registry.read("SOFTWARE.CordOS.Kernel.Services.ReloadOnCall") == "1":
+            if not Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service}.ReloadOnCall") == "0":
+                Journaling.record("INFO", f"Reloading service '{service}'...")
+                importlib.reload(module)
+
+        thread = threading.Thread(target=module.main)
+        thread.daemon = True
+
+        if runSync:
+            Journaling.record("INFO", f"Running service (Stage {stage}) '{service}' in sync mode.")
+            print(f"Running service (Stage {stage}) '{service}' in sync mode.")
+            thread.run()
+            return
+
+        Journaling.record("INFO", f"Starting service (Stage {stage}) '{service}'.")
+        thread.start()
+
+        serviceObject: dict = {
+            "id": serviceData['id'],
+            "name": serviceData['name'],
+            "module": module,
+            "thread": thread,
+            "profile": serviceData
+        }
+
+        Journaling.record("INFO", f"Registering service (Stage {stage}) '{service}'.")
+        ServicesContainer.addService("kernel" if service.startswith("kernel.services") else "thirdparty", stage,
+                                     serviceObject)
+
+        Journaling.record("INFO", f"Started service (Stage {stage}) '{service}'.")
+        print(f"Started service (Stage {stage}) '{service}'.")
+
+        if service.startswith("kernel.services"):
+            if os.path.exists(PartitionMgr.cache() + f"/krnlsrv/stg{stage}_loaded_kernel"):
+                mode = 'a'
+            else:
+                mode = 'w'
+
+            with open(PartitionMgr.cache() + f"/krnlsrv/stg{stage}_loaded_kernel", mode) as f:
+                f.write(service.replace("kernel/services.", "") + "\n")
+
+        else:
+            if os.path.exists(PartitionMgr.cache() + f"/krnlsrv/stg{stage}_loaded_thirdparty"):
+                mode = 'a'
+            else:
+                mode = 'w'
+
+            with open(PartitionMgr.cache() + f"/krnlsrv/stg{stage}_loaded_thirdparty", mode) as f:
+                f.write(service.replace(thirdPartyServicesLoc.replace("/", ".").replace("\\", ".") + ".", "") + "\n")
+
+    except Exception as e:
+        print(f"Error in starting service '{service}' e: {e}")
+        pass
