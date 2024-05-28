@@ -12,7 +12,7 @@ def install(urls: list):
         IO.println(f"Installing {url}...")
         success, stage, message = installTask(url)
         if not success:
-            IO.println(message)
+            IO.println(f"Failed to install {url} - {stage}: {message}")
             return
 
 
@@ -36,6 +36,7 @@ def installTask(url: str) -> tuple:
         return False, "VALIDATE_SPEC", f"Spec {url} is not valid"
 
     # Check dependencies and conflicts
+    IO.println("Currently installing: " + spec['name'] + " " + spec['version'])
     IO.println("Checking dependencies...")
     if 'dependencies' in spec:
         for dependency in spec['dependencies']:
@@ -59,16 +60,13 @@ def installTask(url: str) -> tuple:
             Database.dropSpec(spec['name'], spec['scope'])
             update = True
 
-    # Install spec
-    IO.println("Installing spec...")
-    Database.setSpecOf(spec['id'], spec['scope'], spec)
-
     # Run git clone
     IO.println("Updating scope keys...")
     clonePath = spec['scope']
     specialKeys = [
         ("$storage", PartitionManager.data()),
         ("$etc", PartitionManager.etc()),
+        ("$root", PartitionManager.root())
     ]
     for key, value in specialKeys:
         clonePath = clonePath.replace(key, value)
@@ -77,8 +75,11 @@ def installTask(url: str) -> tuple:
     while clonePath.startswith("/"):
         clonePath = clonePath[1:]
 
+    if spec['scope'] != "$root" and ('autowrap' not in spec or spec['autowrap']):
+        clonePath += f"/{spec['name'].replace(' ', '-')}"
+
     if not update:
-        IO.println(f"Installing {spec['name']} {spec['version']} with build {spec['build']}...")
+        IO.println(f"Installing {spec['name']} {spec['version']} to {clonePath}...")
         command = [
             "git",
             "clone",
@@ -86,7 +87,7 @@ def installTask(url: str) -> tuple:
             clonePath
         ]
     else:
-        IO.println(f"Updating {spec['name']} {spec['version']} with build {spec['build']}...")
+        IO.println(f"Updating {spec['name']} {spec['version']} at {clonePath}...")
         command = [
             "git",
             "-C",
@@ -96,4 +97,14 @@ def installTask(url: str) -> tuple:
     subprocessRun: dict = Host.executeCommand2(command)
     if subprocessRun['returncode'] != 0:
         return False, "GIT_CLONE", f"Failed to clone repository {spec['git']} to {clonePath} - return code {subprocessRun['returncode']} with output {subprocessRun['stdout']}"
-    return True, "SUCCESS", f"Successfully installed {spec['name']} {spec['version']} with build {spec['build']}"
+    IO.println("Successfully installed files.")
+
+    # Install spec
+    IO.println("Installing spec...")
+    spec['id'] = spec['id'].replace(" ", "-")
+    spec['installedTarget'] = clonePath
+    Database.setSpecOf(spec['id'], spec['scope'], spec)
+
+    IO.println(f"Installation complete for {spec['name']} {spec['version']}")
+
+    return True, "SUCCESS", f"Successfully installed {spec['name']} {spec['version']}"

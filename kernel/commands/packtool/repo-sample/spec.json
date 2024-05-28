@@ -12,6 +12,7 @@
     "platform": "posix",
     "scope": "/$storage/commands",
     "git": "",
+    "autowrap": true,
     "dependencies": [
         {
             "id": "system",
