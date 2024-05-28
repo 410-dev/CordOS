@@ -112,6 +112,12 @@ def main(args: list):
         IPC.set("power.off.state", "REBOOT")
         IO.println(f"Reboot signal published. System will reboot after all services have stopped.")
 
+    elif args[0] == "reboot-safe":
+        terminationSteps()
+        IPC.set("power.off", True)
+        IPC.set("power.off.state", "REBOOT-SAFE")
+        IO.println(f"Reboot signal published. System will reboot after all services have stopped.")
+
     elif args[0] == "halt":
         terminationSteps()
         IO.println(f"System will now be force terminated. Goodbye.")
@@ -146,6 +152,9 @@ def off():
 
 def reboot():
     main(["reboot"])
+
+def reboot_safe():
+    main(["reboot-safe"])
 
 def halt():
     main(["halt"])
