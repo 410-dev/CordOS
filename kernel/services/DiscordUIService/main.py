@@ -13,6 +13,7 @@ import kernel.journaling as Journaling
 import kernel.io as IO
 import kernel.services.DiscordUIService.asyncioevents as IOEventsMgr
 import kernel.services.power.configure as Power
+import kernel.webhook as Webhook
 
 from kernel.objects.discordmessage import DiscordMessageWrapper
 
@@ -43,15 +44,27 @@ def main():
         Journaling.record("INFO", "Client instantiated.")
 
         # Define a function to send a message to all servers that the bot is connected to
-        async def broadcast_message(message):
-            for guild in client.guilds:
-                for channel in guild.text_channels:
-                    if channel.permissions_for(guild.me).send_messages:
-                        await channel.send(message)
+        # async def broadcast_message(message):
+        #     for guild in client.guilds:
+        #         for channel in guild.text_channels:
+        #             if channel.permissions_for(guild.me).send_messages:
+        #                 await channel.send(message)
 
         # Define an event handler for when the bot is ready to start receiving events
         async def on_ready():
             IO.println(f"Logged in as {client.user}")
+            try:
+                enabled = Registry.read("SOFTWARE.CordOS.Kernel.Services.DiscordUIService.OnReadyMessage", default="0")
+                if enabled == "1":
+                    webhooks = Registry.read("SOFTWARE.CordOS.Kernel.Services.DiscordUIService.OnReadyWebhooks", default="").replace(", ", ",").split(",")
+                    for webhook in webhooks:
+                        try:
+                            Webhook.send(webhook, f"DiscordUIService for {client.user} is now online.")
+                        except Exception as ex:
+                            IO.println("Failed to send on_ready webhook: " + str(ex))
+
+            except Exception as ex:
+                IO.println("Failed to prepare on_ready webhook: " + str(ex))
             # await broadcast_message("I'm online and ready to go!")
 
         Journaling.record("INFO", "Initializing on_message event handler.")
