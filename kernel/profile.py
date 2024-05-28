@@ -25,6 +25,10 @@ def isArchCompatible(archStr: str):
     return getArch() == archStr or archStr == "any" or archStr in getArch()
 
 
+def isPlatformCompatible(platformStr: str):
+    return Host.getHostOSType() == platformStr or platformStr == "any" or platformStr in Host.getHostOSType()
+
+
 def getKernelVersion():
     return Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")
 
