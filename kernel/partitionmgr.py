@@ -60,6 +60,9 @@ class Data:
     def copyDefault(path: str, existOK: bool = True):
         RootFS.copy(os.path.join(default(), data(), path), os.path.join(data(), path), existOK)
 
+    @staticmethod
+    def list(path: str) -> list:
+        return os.listdir(os.path.join(data(), path))
 
 class Etc:
     @staticmethod
@@ -93,6 +96,10 @@ class Etc:
     @staticmethod
     def copyDefault(path: str, existOK: bool = True):
         RootFS.copy(os.path.join(default(), etc(), path), os.path.join(etc(), path), existOK)
+
+    @staticmethod
+    def list(path: str) -> list:
+        return os.listdir(os.path.join(etc(), path))
 
 
 class RootFS:
@@ -140,6 +147,10 @@ class RootFS:
             return
         shutil.move(os.path.join(root(), src), os.path.join(root(), dst))
 
+    @staticmethod
+    def list(path: str) -> list:
+        return os.listdir(os.path.join(root(), path))
+
 
 class Cache:
     @staticmethod
@@ -173,3 +184,7 @@ class Cache:
     @staticmethod
     def copyDefault(path: str, existOK: bool = True):
         RootFS.copy(os.path.join(default(), cache(), path), os.path.join(cache(), path), existOK)
+
+    @staticmethod
+    def list(path: str) -> list:
+        return os.listdir(os.path.join(cache(), path))
