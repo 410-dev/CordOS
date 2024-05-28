@@ -1,0 +1,16 @@
+{
+    "spec": "NanoPyOS.Standards.PackageSpec",
+    "specv": 1,
+    "sdk": 1,
+    "name": "CordOS-System-Foundation",
+    "id": "system",
+    "version": "1.0.0",
+    "author": "LKS410",
+    "description": "CordOS System Foundation",
+    "build": 1,
+    "arch": "any",
+    "platform": "any",
+    "scope": "$root",
+    "git": "https://github.com/410-dev/HTBToB-GoogleDriveTracker.git",
+    "autowrap": false
+}
