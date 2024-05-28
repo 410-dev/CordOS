@@ -3,6 +3,7 @@ import sys
 import kernel.registry as Registry
 import kernel.ipc as IPC
 import kernel.io as IO
+import kernel.services.power.configure as Power
 import requests
 
 def getValueOf(url: str, key: str):
@@ -88,10 +89,10 @@ async def mainAsync(args: list, message):
             print(f"Update is ready to go, and will be rebooted {'once services are closed' if forceReboot != '1' else 'forcefully'}. Check the console for detailed logs.")
             await message.reply(f"Update is ready to go, and will be rebooted {'once services are closed' if forceReboot != '1' else 'forcefully'}. Check the console for detailed logs.")
 
-            IPC.set("power.off", True)
-            IPC.set("power.off.state", "REBOOT")
+
             Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeMode", "etc/UPGRADE_IMAGE")
             Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeQueue", "1")
+            Power.reboot()
 
             if forceReboot == "1":
                 sys.exit(1)
@@ -198,10 +199,9 @@ def main(args: list):
             print(f"Update is ready to go, and will be rebooted {'once services are closed' if forceReboot != '1' else 'forcefully'}. Check the console for detailed logs.")
             IO.println(f"Update is ready to go, and will be rebooted {'once services are closed' if forceReboot != '1' else 'forcefully'}. Check the console for detailed logs.")
 
-            IPC.set("power.off", True)
-            IPC.set("power.off.state", "REBOOT")
             Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeMode", "etc/UPGRADE_IMAGE")
             Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeQueue", "1")
+            Power.reboot()
 
             if forceReboot == "1":
                 sys.exit(1)
