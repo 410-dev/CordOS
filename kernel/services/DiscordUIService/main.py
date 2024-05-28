@@ -138,8 +138,7 @@ def main():
                         await message.reply("Terminating system and restarting kernel in safemode. Set `SOFTWARE.CordOS.Kernel.SafeMode` to 0 after reboot to return to normal mode.", mention_author=True)
                         try:
                             Journaling.record("INFO", "Updating registry / IPC.")
-                            IPC.set("power.off", True)
-                            IPC.set("power.off.state", "REBOOT-SAFE")
+                            Power.reboot_safe()
                             Registry.write("SOFTWARE.CordOS.Kernel.SafeMode", "1")
                             Journaling.record("INFO", "Registry / IPC updated.")
                         except:
@@ -180,7 +179,7 @@ def main():
                             if signal == "OFF":
                                 await client.close()
                                 break
-                            elif signal == "REBOOT":
+                            elif signal.startswith("REBOOT"):
                                 await client.close()
                                 break
                             await client.close()
