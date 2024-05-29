@@ -13,6 +13,7 @@
     "scope": "/$storage/commands",
     "git": "",
     "autowrap": true,
+    "allow-patch-install": false,
     "dependencies": [
         {
             "id": "system",
@@ -31,22 +32,9 @@
             "build": 1
         }
     ],
-    "pip": {
-        "required": true,
-        "file": "requirements.txt",
-        "packages": [
-            {
-                "name": "package-name",
-                "version": "==1.0.0"
-            }
-        ]
-    },
     "triggers": {
-        "pre-install": "",
         "post-install": "",
         "pre-remove": "",
-        "post-remove": "",
-        "pre-update": "",
-        "post-update": ""
+        "post-remove": ""
     }
 }
