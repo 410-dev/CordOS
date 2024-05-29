@@ -2,6 +2,8 @@ import kernel.registry as Registry
 import kernel.servers as Servers
 import kernel.commands.packtool.install as Install
 import kernel.commands.packtool.remove as Remove
+import kernel.commands.packtool.list as List
+
 
 async def checkPermission(message):
     permission = Registry.read("SOFTWARE.CordOS.Security.Services")
@@ -26,16 +28,41 @@ async def mainAsync(args: list, message):
             if len(args) < 3:
                 await message.reply("Usage: packtool install <url>...")
                 return
-            Install.install(args[2:])
+            ignoreDependencies = False
+            ignoreConflicts = False
+            if len(args) > 3 and '--ignore-dependencies' in args:
+                ignoreDependencies = True
+            if len(args) > 3 and '--ignore-conflicts' in args:
+                ignoreConflicts = True
+            Install.install(args[2:], "install", ignoreDependencies, ignoreConflicts)
+
+        elif args[1] == "patch":
+            if len(args) < 3:
+                await message.reply("Usage: packtool patch <url>...")
+                return
+            ignoreDependencies = False
+            ignoreConflicts = False
+            if len(args) > 3 and '--ignore-dependencies' in args:
+                ignoreDependencies = True
+            if len(args) > 3 and '--ignore-conflicts' in args:
+                ignoreConflicts = True
+            Install.install(args[2:], "patch", ignoreDependencies, ignoreConflicts)
 
         elif args[1] == "remove":
             if len(args) < 3:
                 await message.reply("Usage: packtool remove <name>...")
                 return
-            Remove.remove(args[2:])
+            ignoreDependencies = False
+            removeAsChain = False
+            if len(args) > 3 and '--ignore-dependencies' in args:
+                ignoreDependencies = True
+            if len(args) > 3 and '--chain' in args:
+                removeAsChain = True
+            Remove.remove(args[2:], ignoreDependencies, removeAsChain)
 
         elif args[1] == "list":
-            pass
+            output = List.listPackages()
+            await message.reply(output)
 
     except Exception as e:
         await message.reply(f"Error while running executive. e: {e}", mention_author=True)
