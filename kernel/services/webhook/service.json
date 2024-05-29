@@ -1,8 +1,0 @@
-{
-    "id": "me.410-dev.CordOS.DiscordWebhookManager",
-    "name": "Discord Webhook Manager",
-    "role": "critical",
-    "sdk": 1,
-    "stage": 3, 
-    "sync": false
-}

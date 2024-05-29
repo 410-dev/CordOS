@@ -35,16 +35,16 @@ def cp(src: str, dest: str):
 
 
 def main():
-    if Registry.read("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeQueue", default="0") == "0":
+    if Registry.read("SOFTWARE.NanoPyOS.Boot.VersioningIssue.UpgradeQueue", default="0") == "0":
         return
 
     IO.println("Upgrade service started.")
     IO.println("Removing upgrade queue flag.")
-    Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeQueue", "0")
+    Registry.write("SOFTWARE.NanoPyOS.Boot.VersioningIssue.UpgradeQueue", "0")
 
     try:
         IO.println("Starting upgrade process.")
-        upgradeFile: str = Registry.read("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeMode")
+        upgradeFile: str = Registry.read("SOFTWARE.NanoPyOS.Boot.VersioningIssue.UpgradeMode")
         upgradeFile = os.path.join(os.getcwd(), upgradeFile)
 
         IO.println(f"Overwriting files from {upgradeFile} to root directory.")

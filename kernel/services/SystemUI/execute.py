@@ -32,6 +32,6 @@ def run(command: str):
         Journaling.record("INFO", f"Command '{cmd}' executed successfully.")
     except Exception as e:
         Journaling.record("ERROR", f"Error executing command '{cmd}': {e}")
-        if Registry.read("SOFTWARE.CordOS.Kernel.PrintErrors") == "1": IO.println(f"Error executing command '{cmd}': {e}")
-        if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
+        if Registry.read("SOFTWARE.NanoPyOS.Kernel.PrintErrors") == "1": IO.println(f"Error executing command '{cmd}': {e}")
+        if Registry.read("SOFTWARE.NanoPyOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
         IO.println(f"Error executing command '{cmd}': {e}")

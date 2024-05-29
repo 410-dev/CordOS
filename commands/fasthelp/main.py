@@ -7,7 +7,7 @@ import kernel.io as IO
 
 def main(args: list) -> None:
     try:
-        commandPaths: List[str] = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
+        commandPaths: List[str] = Registry.read("SOFTWARE.NanoPyOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
         cmdList: str = "Available Commands:\n"
         for commandPath in commandPaths:
             try:
@@ -25,6 +25,6 @@ def main(args: list) -> None:
 
         IO.println(cmdList)
     except Exception as e:
-        if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
+        if Registry.read("SOFTWARE.NanoPyOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
         IO.println(f"Error in settings. e: {e}")
 

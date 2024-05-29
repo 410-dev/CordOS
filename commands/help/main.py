@@ -9,7 +9,7 @@ import os
 
 def main(args: list) -> None:
     try:
-        commandPaths: List[str] = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
+        commandPaths: List[str] = Registry.read("SOFTWARE.NanoPyOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
 
         if len(args) < 2:
             # Print current manual
@@ -29,11 +29,11 @@ def main(args: list) -> None:
 
         # If not found, return command not found.
         if helpString == "":
-            return Registry.read("SOFTWARE.CordOS.Kernel.Proc.CommandNotFound")
+            return Registry.read("SOFTWARE.NanoPyOS.Kernel.Proc.CommandNotFound")
 
         IO.println(helpString)
 
     except Exception as e:
-        if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
+        if Registry.read("SOFTWARE.NanoPyOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
         IO.println(f"Error in settings. e: {e}")
 

@@ -1,8 +1,0 @@
-Jot down a note by replying to a message.
-
-```
-Usage:
-    jot get <title>  : This will get the jot note.
-    jot list         : This will list all jot notes.
-    jot <title>      : This will create a jot note with content of replied message. If --protected is passed, the note will be protected and will not be overwritten.
-```

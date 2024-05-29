@@ -68,5 +68,5 @@ def main(args: list):
                     return
             IO.println(getLastNLines(target, 10))
     except Exception as e:
-        if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
+        if Registry.read("SOFTWARE.NanoPyOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
         IO.println(f"Error in journalctl. e: {e}")

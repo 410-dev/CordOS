@@ -22,7 +22,7 @@ def main(args: list):
 
         try:
             import importlib
-            userServiceLocation = Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices").replace("/", ".").replace("\\", ".")
+            userServiceLocation = Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.OtherServices").replace("/", ".").replace("\\", ".")
             moduleName = f"{userServiceLocation}.{args[2]}.configure"
             if os.path.isfile(moduleName.replace(".", "/") + ".py"):
                 with open(moduleName.replace(".", "/") + ".py", 'r') as f:
@@ -32,7 +32,7 @@ def main(args: list):
 
             module = importlib.import_module(moduleName)
 
-            if Registry.read("SOFTWARE.CordOS.Kernel.Services.ReloadOnCall") == "1":
+            if Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.ReloadOnCall") == "1":
                 importlib.reload(module)
 
             module.main(args[3:])
@@ -48,7 +48,7 @@ def main(args: list):
                             return
                 module = importlib.import_module(moduleName)
 
-                if Registry.read("SOFTWARE.CordOS.Kernel.Services.ReloadOnCall") == "1":
+                if Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.ReloadOnCall") == "1":
                     importlib.reload(module)
 
                 module.main(args[3:])
@@ -70,8 +70,8 @@ def main(args: list):
     elif args[1] == "list":
         kernelServices: list = os.listdir("kernel/services")
         userServices: list = []
-        if os.path.isdir(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices")):
-            userServices: list = os.listdir(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices"))
+        if os.path.isdir(Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.OtherServices")):
+            userServices: list = os.listdir(Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.OtherServices"))
         services = "Kernel Services:\n"
         for service in kernelServices:
             try:
@@ -84,7 +84,7 @@ def main(args: list):
         services += "\nUser Services:\n"
         for service in userServices:
             try:
-                if "main.py" not in os.listdir(f"{Registry.read('SOFTWARE.CordOS.Kernel.Services.OtherServices')}/{service}"):
+                if "main.py" not in os.listdir(f"{Registry.read('SOFTWARE.NanoPyOS.Kernel.Services.OtherServices')}/{service}"):
                     continue
             except:
                 continue
@@ -115,28 +115,28 @@ def main(args: list):
 
         IO.println(f"{response}")
     elif args[1] == "start-ksrv":
-        safeMode = IPC.read("kernel.safemode", False) or Registry.read("SOFTWARE.CordOS.Kernel.SafeMode") == "1"
+        safeMode = IPC.read("kernel.safemode", False) or Registry.read("SOFTWARE.NanoPyOS.Kernel.SafeMode") == "1"
         if Services.launchsvc("kernel/services/" + args[2], safeMode, -1):
             IO.println(f"Service '{args[2]}' started.")
         else:
             IO.println(f"Service '{args[2]}' failed to start.")
     elif args[1] == "start-usrv":
-        safeMode = IPC.read("kernel.safemode", False) or Registry.read("SOFTWARE.CordOS.Kernel.SafeMode") == "1"
-        if Services.launchsvc(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices") + "/" + args[2], safeMode, -1):
+        safeMode = IPC.read("kernel.safemode", False) or Registry.read("SOFTWARE.NanoPyOS.Kernel.SafeMode") == "1"
+        if Services.launchsvc(Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.OtherServices") + "/" + args[2], safeMode, -1):
             IO.println(f"Service '{args[2]}' started.")
         else:
             IO.println(f"Service '{args[2]}' failed to start.")
     elif args[1] == "enable-ksrv":
-        Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{args[2]}.Enabled", "1")
+        Registry.write(f"SOFTWARE.NanoPyOS.Kernel.Services.{args[2]}.Enabled", "1")
         IO.println("Registry updated.")
     elif args[1] == "disable-ksrv":
-        Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{args[2]}.Enabled", "0")
+        Registry.write(f"SOFTWARE.NanoPyOS.Kernel.Services.{args[2]}.Enabled", "0")
         IO.println("Registry updated.")
     elif args[1] == "enable-usrv":
-        Registry.write(f"SOFTWARE.CordOS.Services.{args[2]}.Enabled", "1")
+        Registry.write(f"SOFTWARE.NanoPyOS.Services.{args[2]}.Enabled", "1")
         IO.println("Registry updated.")
     elif args[1] == "disable-usrv":
-        Registry.write(f"SOFTWARE.CordOS.Services.{args[2]}.Enabled", "0")
+        Registry.write(f"SOFTWARE.NanoPyOS.Services.{args[2]}.Enabled", "0")
         IO.println("Registry updated.")
     else:
         IO.println(f"Unknown action: {args[0]}\nUsage: services <configure|list|enable-ksrv|disable-ksrv|enable-usrv|disable-usrv> [service] args...")

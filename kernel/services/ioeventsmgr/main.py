@@ -9,17 +9,17 @@ def main():
     pass
 
 def runModule(message: str, scope: str):
-    # List directories in kernel/events/interaction and value of SOFTWARE.CordOS.Events.EventsBundleContainer
+    # List directories in kernel/events/interaction and value of SOFTWARE.NanoPyOS.Events.EventsBundleContainer
     try:
         Journaling.record("INFO", f"Running event bundles for {scope} scope.")
         eventBundles: list = []
 
         kernelBundles: list = []
-        kernelBundleEnabled: bool = Registry.read("SOFTWARE.CordOS.Events.Kernel.InboundPassiveEnabled") == "1" and scope == "passive"
-        kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.Kernel.InboundInteractiveEnabled") == "1" and scope == "interaction")
-        kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.Kernel.OutboundReplyEnabled") == "1" and scope == "reply")
-        kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.Kernel.OutboundSendEnabled") == "1" and scope == "send")
-        kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.Kernel.OutboundGlobalEnabled") == "1" and scope == "output")
+        kernelBundleEnabled: bool = Registry.read("SOFTWARE.NanoPyOS.Events.Kernel.InboundPassiveEnabled") == "1" and scope == "passive"
+        kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.NanoPyOS.Events.Kernel.InboundInteractiveEnabled") == "1" and scope == "interaction")
+        kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.NanoPyOS.Events.Kernel.OutboundReplyEnabled") == "1" and scope == "reply")
+        kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.NanoPyOS.Events.Kernel.OutboundSendEnabled") == "1" and scope == "send")
+        kernelBundleEnabled = kernelBundleEnabled or (Registry.read("SOFTWARE.NanoPyOS.Events.Kernel.OutboundGlobalEnabled") == "1" and scope == "output")
         if kernelBundleEnabled:
             Journaling.record("INFO", f"Kernel event bundles enabled for {scope} scope.")
             if os.path.isdir(f"kernel/events/{scope}"):
@@ -33,14 +33,14 @@ def runModule(message: str, scope: str):
                     Journaling.record("INFO", f"Kernel event bundle {kernelBundles[idx]} found.")
 
         userBundles: list = []
-        userBundleEnabled: bool = Registry.read("SOFTWARE.CordOS.Events.User.InboundPassiveEnabled") == "1" and scope == "passive"
-        userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.User.InboundInteractiveEnabled") == "1" and scope == "interaction")
-        userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.User.OutboundReplyEnabled") == "1" and scope == "reply")
-        userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.User.OutboundSendEnabled") == "1" and scope == "send")
-        userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.CordOS.Events.User.OutboundGlobalEnabled") == "1" and scope == "output")
+        userBundleEnabled: bool = Registry.read("SOFTWARE.NanoPyOS.Events.User.InboundPassiveEnabled") == "1" and scope == "passive"
+        userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.NanoPyOS.Events.User.InboundInteractiveEnabled") == "1" and scope == "interaction")
+        userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.NanoPyOS.Events.User.OutboundReplyEnabled") == "1" and scope == "reply")
+        userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.NanoPyOS.Events.User.OutboundSendEnabled") == "1" and scope == "send")
+        userBundleEnabled = userBundleEnabled or (Registry.read("SOFTWARE.NanoPyOS.Events.User.OutboundGlobalEnabled") == "1" and scope == "output")
         if userBundleEnabled:
             Journaling.record("INFO", f"User event bundles enabled for {scope} scope.")
-            eventBundlesContainers: list = Registry.read("SOFTWARE.CordOS.Events.EventsBundleContainer", default="").replace(", ", ",").split(",")
+            eventBundlesContainers: list = Registry.read("SOFTWARE.NanoPyOS.Events.EventsBundleContainer", default="").replace(", ", ",").split(",")
             Journaling.record("INFO", f"Event bundle containers: {eventBundlesContainers}")
             for eventBundle in eventBundlesContainers:
                 if not os.path.isdir(eventBundle):
@@ -68,11 +68,11 @@ def runModule(message: str, scope: str):
         # Check if the event is in the eventBundles
         for idx, eventBundle in enumerate(eventBundles):
             if "kernel/" in eventBundle:
-                Journaling.record("INFO",  f"Checking if bundle is disabled: SOFTWARE.CordOS.Events.Kernel.{eventBundle.replace('/', '.').replace('\\', '.').split(".")[-1]}.Disabled={Registry.read(f'SOFTWARE.CordOS.Events.Kernel.{eventBundle.replace("/", ".").replace("\\", ".").split(".")[-1]}.Disabled', default="0")}")
+                Journaling.record("INFO",  f"Checking if bundle is disabled: SOFTWARE.NanoPyOS.Events.Kernel.{eventBundle.replace('/', '.').replace('\\', '.').split(".")[-1]}.Disabled={Registry.read(f'SOFTWARE.NanoPyOS.Events.Kernel.{eventBundle.replace("/", ".").replace("\\", ".").split(".")[-1]}.Disabled', default="0")}")
             else:
-                Journaling.record("INFO",  f"Checking if bundle is disabled: SOFTWARE.CordOS.Events.User.{eventBundle.replace('/', '.').replace('\\', '.').split(".")[-1]}.Disabled={Registry.read(f'SOFTWARE.CordOS.Events.User.{eventBundle.replace("/", ".").replace("\\", ".").split(".")[-1]}.Disabled', default="0")}")
+                Journaling.record("INFO",  f"Checking if bundle is disabled: SOFTWARE.NanoPyOS.Events.User.{eventBundle.replace('/', '.').replace('\\', '.').split(".")[-1]}.Disabled={Registry.read(f'SOFTWARE.NanoPyOS.Events.User.{eventBundle.replace("/", ".").replace("\\", ".").split(".")[-1]}.Disabled', default="0")}")
 
-            if ".disabled" in eventBundle or (Registry.read(f"SOFTWARE.CordOS.Events.User.{eventBundle.replace('/', '.').replace('\\', '.').split(".")[-1]}.Disabled", default="0") == "1" or Registry.read(f"SOFTWARE.CordOS.Events.Kernel.{eventBundle.replace('/', '.').replace('\\', '.').split(".")[-1]}.Disabled", default="0") == "1"):
+            if ".disabled" in eventBundle or (Registry.read(f"SOFTWARE.NanoPyOS.Events.User.{eventBundle.replace('/', '.').replace('\\', '.').split(".")[-1]}.Disabled", default="0") == "1" or Registry.read(f"SOFTWARE.NanoPyOS.Events.Kernel.{eventBundle.replace('/', '.').replace('\\', '.').split(".")[-1]}.Disabled", default="0") == "1"):
                 eventBundles.pop(idx)
                 Journaling.record("INFO", f"Event bundle {eventBundle} is disabled.")
             Journaling.record("INFO", f"Checking event bundle {eventBundle}...")

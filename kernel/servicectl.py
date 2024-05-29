@@ -54,11 +54,11 @@ def hasServiceAsRole(role: str) -> str:
 
 
 def start(stage: int, safeMode: bool):
-    if Registry.read("SOFTWARE.CordOS.Kernel.Services.Enabled") == "0":
+    if Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.Enabled") == "0":
         Journaling.record("INFO", "Service manager is disabled. Skipping service start.")
         return
 
-    safeMode = safeMode or Registry.read("SOFTWARE.CordOS.Kernel.SafeMode") == "1"
+    safeMode = safeMode or Registry.read("SOFTWARE.NanoPyOS.Kernel.SafeMode") == "1"
 
     if safeMode:
         Journaling.record("INFO", "System started with safe mode. Disabling all non-safemode services.")
@@ -71,14 +71,14 @@ def start(stage: int, safeMode: bool):
     for idx, line in enumerate(servicesList):
         servicesList[idx] = "kernel/services/" + line
 
-    thirdPartyServicesLoc: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices")
+    thirdPartyServicesLoc: str = Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.OtherServices")
     if os.path.isdir(thirdPartyServicesLoc):
         thirdPartyServicesList: list = os.listdir(thirdPartyServicesLoc)
         for idx, line in enumerate(thirdPartyServicesList):
             thirdPartyServicesList[idx] = thirdPartyServicesLoc + "/" + line
         servicesList.extend(thirdPartyServicesList)
 
-    thirdPartyServiceLoadStage: int = int(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServicesMinimumBootStage", default=3))
+    thirdPartyServiceLoadStage: int = int(Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.OtherServicesMinimumBootStage", default=3))
     Journaling.record("INFO", f"Third-party service load stage: {thirdPartyServiceLoadStage}")
 
     if not os.path.exists(PartitionMgr.cache() + "/krnlsrv"):
@@ -90,9 +90,9 @@ def start(stage: int, safeMode: bool):
 
 
 def launchsvc(service: str, safeMode: bool, stage: int) -> bool:
-    thirdPartyServicesLoc: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices")
-    thirdPartyServiceLoadStage: int = int(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServicesMinimumBootStage", default=3))
-    safeServiceList: list = Registry.read("SOFTWARE.CordOS.Kernel.Services.SafeModeServices").split(",")
+    thirdPartyServicesLoc: str = Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.OtherServices")
+    thirdPartyServiceLoadStage: int = int(Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.OtherServicesMinimumBootStage", default=3))
+    safeServiceList: list = Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.SafeModeServices").split(",")
 
     if service.endswith(".disabled"):
         Journaling.record("INFO", f"Service '{service}' is disabled. Skipping.")
@@ -149,20 +149,20 @@ def launchsvc(service: str, safeMode: bool, stage: int) -> bool:
                     return False
 
             # Check compatibility
-            if serviceData['sdk'] < int(Registry.read("SOFTWARE.CordOS.Kernel.Services.SDKMinimum")):
+            if serviceData['sdk'] < int(Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.SDKMinimum")):
                 Journaling.record("ERROR",
-                                  f"Service '{service}' is not compatible with this version of CordOS (Too old). Skipping.")
-                print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too old). Skipping.")
+                                  f"Service '{service}' is not compatible with this version of NanoPyOS (Too old). Skipping.")
+                print(f"Service Failed: Service '{service}' is not compatible with this version of NanoPyOS (Too old). Skipping.")
                 return False
 
-            if serviceData['sdk'] > int(Registry.read("SOFTWARE.CordOS.Kernel.Services.SDKMaximum")):
+            if serviceData['sdk'] > int(Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.SDKMaximum")):
                 Journaling.record("ERROR",
-                                  f"Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
-                print(f"Service Failed: Service '{service}' is not compatible with this version of CordOS (Too new). Skipping.")
+                                  f"Service '{service}' is not compatible with this version of NanoPyOS (Too new). Skipping.")
+                print(f"Service Failed: Service '{service}' is not compatible with this version of NanoPyOS (Too new). Skipping.")
                 return False
 
             if "critical.unique." in serviceData['role'] and hasServiceAsRole(serviceData['role']) is not None:
-                allowedUniqueUnuniques = Registry.read("SOFTWARE.CordOS.Kernel.Services.AllowedMultipleUniqueRoles",
+                allowedUniqueUnuniques = Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.AllowedMultipleUniqueRoles",
                                                        default="").split(",")
                 if serviceData['role'] not in allowedUniqueUnuniques and not serviceData[
                                                                                  'id'] in allowedUniqueUnuniques:
@@ -177,19 +177,19 @@ def launchsvc(service: str, safeMode: bool, stage: int) -> bool:
                 runSync = True
 
             if service.startswith("kernel/services"):
-                if Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled") == "0":
+                if Registry.read(f"SOFTWARE.NanoPyOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled") == "0":
                     Journaling.record("INFO", f"Service '{service}' is disabled. Skipping.")
                     return False
 
-                Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled", "1")
+                Registry.write(f"SOFTWARE.NanoPyOS.Kernel.Services.{service[len("kernel/services"):]}.Enabled", "1")
 
             else:
                 serviceName = service.replace(thirdPartyServicesLoc.replace("/", ".").replace("\\", "."), "")
-                if Registry.read(f"SOFTWARE.CordOS.Services.{serviceName}.Enabled") == "0":
+                if Registry.read(f"SOFTWARE.NanoPyOS.Services.{serviceName}.Enabled") == "0":
                     Journaling.record("INFO", f"Service '{service}' is disabled. Skipping.")
                     return False
 
-                Registry.write(f"SOFTWARE.CordOS.Services.{serviceName}.Enabled", "1")
+                Registry.write(f"SOFTWARE.NanoPyOS.Services.{serviceName}.Enabled", "1")
 
     except:
         pass
@@ -202,8 +202,8 @@ def launchsvc(service: str, safeMode: bool, stage: int) -> bool:
         print(f"Starting service (Stage {stage}) '{service}'.")
         module = importlib.import_module(moduleName)
 
-        if Registry.read("SOFTWARE.CordOS.Kernel.Services.ReloadOnCall") == "1":
-            if not Registry.read(f"SOFTWARE.CordOS.Kernel.Services.{service}.ReloadOnCall") == "0":
+        if Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.ReloadOnCall") == "1":
+            if not Registry.read(f"SOFTWARE.NanoPyOS.Kernel.Services.{service}.ReloadOnCall") == "0":
                 Journaling.record("INFO", f"Reloading service '{service}'...")
                 importlib.reload(module)
 

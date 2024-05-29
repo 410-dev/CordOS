@@ -56,5 +56,5 @@ def main(args: list):
             IO.println(f"Invalid number of arguments. Expected 1 or 2, got {len(args)}")
 
     except Exception as e:
-        if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
+        if Registry.read("SOFTWARE.NanoPyOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
         IO.println(f"Error in settings. e: {e}")

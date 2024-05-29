@@ -73,17 +73,17 @@ def record(state: str, text: str):
     specificJournal = f"{PartitionMgr.etc()}/journals/{Clock.getStartTime().split(".")[0]}/{callerName}.journal"
     globalJournal = f"{PartitionMgr.etc()}/journals/{Clock.getStartTime().split(".")[0]}/_.journal"
 
-    if Registry.read("SOFTWARE.CordOS.Kernel.DisableOnMemoryJournaling", default="0") == "0":
+    if Registry.read("SOFTWARE.NanoPyOS.Kernel.DisableOnMemoryJournaling", default="0") == "0":
         if callerName not in JournalingContainer.journals:
             JournalingContainer.addJournal(callerName, scriptPath)
         JournalingContainer.addEntry(callerName, f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
         JournalingContainer.addEntry("_global", f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}\n")
 
-        maxSize = int(Registry.read("SOFTWARE.CordOS.Kernel.OnMemoryJournalingMaxEntryPerProcess", default="16384"))
+        maxSize = int(Registry.read("SOFTWARE.NanoPyOS.Kernel.OnMemoryJournalingMaxEntryPerProcess", default="16384"))
         while len(JournalingContainer.journals[callerName]["entries"]) > maxSize:
             JournalingContainer.journals[callerName]["entries"].pop(0)
 
-    if Registry.read("SOFTWARE.CordOS.Kernel.EnableOnDiskJournaling", default="0") == "1":
+    if Registry.read("SOFTWARE.NanoPyOS.Kernel.EnableOnDiskJournaling", default="0") == "1":
         # Create directory
         directory = os.path.dirname(specificJournal)
         os.makedirs(directory, exist_ok=True)

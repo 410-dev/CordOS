@@ -1,5 +1,5 @@
 {
-    "spec": "CordOSInstallablePackage",
+    "spec": "NanoPyOSInstallablePackage",
     "specv": 1,
     "sdk": 1,
     "name": "Package Name Here",

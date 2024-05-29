@@ -10,7 +10,7 @@ import requests
 def main():
 
     # Build-specific signature check
-    url = Registry.read("SOFTWARE.CordOS.Security.SystemLifeSupport.StateFileServers", default="https://hysong.dev/keystore/api/cordos/{build}.lifesupport")
+    url = Registry.read("SOFTWARE.NanoPyOS.Security.SystemLifeSupport.StateFileServers", default="https://hysong.dev/keystore/api/nanopyos/{build}.lifesupport")
     url = url.replace("{build}", Profile.getKernelBuild())
     response = requests.get(url)
     message = ["", ""] # Yes, No
@@ -41,7 +41,7 @@ def main():
                 IPC.set("kernel.bootable.warning", line.split('=')[1])
 
     # Global bootlock check
-    url = Registry.read("SOFTWARE.CordOS.Security.SystemLifeSupport.Bootlock", default="https://hysong.dev/keystore/api/cordos/bootlocklist")
+    url = Registry.read("SOFTWARE.NanoPyOS.Security.SystemLifeSupport.Bootlock", default="https://hysong.dev/keystore/api/nanopyos/bootlocklist")
     response = requests.get(url)
     if response.status_code != 200 and response.status_code != 404:
         IO.println(f"Failed to check system bootability. The system may be unstable or severely vulnerable. Server returned {response.status_code}.")

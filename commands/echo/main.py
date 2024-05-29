@@ -8,6 +8,6 @@ def main(args: list) -> None:
         args.pop(0)
         IO.println(" ".join(args))
     except Exception as e:
-        if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
+        if Registry.read("SOFTWARE.NanoPyOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
         IO.println(f"Error while executing command: {e}")
 

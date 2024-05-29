@@ -50,7 +50,7 @@ def add(idxJsonURL: str):
         print("Invalid index file - Missing fields")
         return "Invalid index file - Missing fields"
 
-    if indexData['specv'] != 1 or indexData['spec'] != "CordOSInstallablePackageRepositoryIndex":
+    if indexData['specv'] != 1 or indexData['spec'] != "NanoPyOSInstallablePackageRepositoryIndex":
         print("Invalid index file - Index version/spec mismatch")
         return "Invalid index file - Index version/spec mismatch"
 
@@ -89,7 +89,7 @@ def sync():
         if not 'spec' in newIndex or not 'specv' in newIndex:
             print(f"Failed syncing {index['name']} ({index['id']}): {index['index']} - Missing fields")
             continue
-        if newIndex['specv'] != 1 or newIndex['spec'] != "CordOSInstallablePackageRepositoryIndex":
+        if newIndex['specv'] != 1 or newIndex['spec'] != "NanoPyOSInstallablePackageRepositoryIndex":
             print(f"Failed syncing {index['name']} ({index['id']}): {index['index']} - Index version/spec mismatch")
             continue
         if newIndex['updateTime'] != index['updateTime']:

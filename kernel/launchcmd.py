@@ -5,7 +5,7 @@ import kernel.registry as Registry
 import kernel.journaling as Journaling
 
 def getRunnableModule(args: list, targetExecutive: str = "main"):
-    commandsPaths: list = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
+    commandsPaths: list = Registry.read("SOFTWARE.NanoPyOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
     appropriateCommandPath: str = ""
     Journaling.record("INFO", f"Path: {commandsPaths}")
 
@@ -52,7 +52,7 @@ def launchRunnable(module: str, args: list):
     import importlib
     module = importlib.import_module(module)
 
-    if Registry.read("SOFTWARE.CordOS.Kernel.ReloadOnCall") == "1":
+    if Registry.read("SOFTWARE.NanoPyOS.Kernel.ReloadOnCall") == "1":
         importlib.reload(module)
 
     # Try with class structure

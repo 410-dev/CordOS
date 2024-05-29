@@ -7,15 +7,15 @@ def main(args: list):
         return
 
     if args[0] == "enabled":
-        Registry.write("SOFTWARE.CordOS.Kernel.IPC.EnableAutoCleaner", "1")
+        Registry.write("SOFTWARE.NanoPyOS.Kernel.IPC.EnableAutoCleaner", "1")
         IO.println("IPC auto cleaner enabled.")
     elif args[0] == "disabled":
-        Registry.write("SOFTWARE.CordOS.Kernel.IPC.EnableAutoCleaner", "0")
+        Registry.write("SOFTWARE.NanoPyOS.Kernel.IPC.EnableAutoCleaner", "0")
         IO.println("IPC auto cleaner disabled.")
     elif args[0].startswith("expire="):
         try:
             time = int(args[0].split("=")[1])
-            Registry.write("SOFTWARE.CordOS.Kernel.IPC.MemoryLiveTime", str(time))
+            Registry.write("SOFTWARE.NanoPyOS.Kernel.IPC.MemoryLiveTime", str(time))
             IO.println(f"IPC memory expire time set to {time} seconds.")
         except ValueError:
             IO.println("Invalid time. Expected integer.")

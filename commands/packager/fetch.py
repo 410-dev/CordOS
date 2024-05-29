@@ -7,13 +7,13 @@ import json
 def getSpecRawURLFromGitHubURL(repoURL: str, file: str) -> str:
     try:
         # Example input URL:
-        # https://github.com/410-dev/CordOS or https://github.com/410-dev/CordOS.git
+        # https://github.com/410-dev/NanoPyOS or https://github.com/410-dev/NanoPyOS.git
         if repoURL.endswith(".git"):
             repoURL = repoURL[:-4]
         author, repo = repoURL.split("/")[-2:]
 
         # Get branches from API
-        # https://api.github.com/repos/410-dev/CordOS/branches
+        # https://api.github.com/repos/410-dev/NanoPyOS/branches
         branches = requests.get(f"https://api.github.com/repos/{author}/{repo}/branches").json()
 
         # Get default branch
@@ -27,7 +27,7 @@ def getSpecRawURLFromGitHubURL(repoURL: str, file: str) -> str:
             defaultBranch = branches[0]["name"]
 
         # Example output URL:
-        # https://raw.githubusercontent.com/410-dev/CordOS/branch/spec.json
+        # https://raw.githubusercontent.com/410-dev/NanoPyOS/branch/spec.json
         return f"https://raw.githubusercontent.com/{author}/{repo}/{defaultBranch}/{file}"
     except Exception as e:
         return f"Error while getting spec from repository. e: {e}"

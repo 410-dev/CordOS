@@ -13,14 +13,14 @@ import kernel.profile as Profile
 
 def main(argsList: list) -> int:
     try:
-        IO.println(f"CordOS Kernel {Profile.getKernelVersion()} {Profile.getKernelBuild()}")
+        IO.println(f"NanoPyOS Kernel {Profile.getKernelVersion()} {Profile.getKernelBuild()}")
 
         # Check commandline arguments
         Clock.init()
         safeMode: bool = "--safe" in argsList
 
-        foundation = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Foundation")
-        version = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")
+        foundation = Registry.read("SOFTWARE.NanoPyOS.Kernel.Profiles.Foundation")
+        version = Registry.read("SOFTWARE.NanoPyOS.Kernel.Profiles.Version")
         IO.println(f"Starting up {foundation} {version}")
         Journaling.record("INFO", f"Starting up {foundation} {version}")
 

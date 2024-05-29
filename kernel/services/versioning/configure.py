@@ -22,25 +22,25 @@ def getValueOf(url: str, key: str):
             return line.split("=")[1]
 
 def getBuild(url: str):
-    return getValueOf(url, "SOFTWARE.CordOS.Kernel.Profiles.Build")
+    return getValueOf(url, "SOFTWARE.NanoPyOS.Kernel.Profiles.Build")
 
 def getVersion(url: str):
-    return getValueOf(url, "SOFTWARE.CordOS.Kernel.Profiles.Version")
+    return getValueOf(url, "SOFTWARE.NanoPyOS.Kernel.Profiles.Version")
 
 
 
 def main(args: list):
     try:
-        branch: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.Branch", default="stable")
-        imageurl: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.ImageURL", default="https://github.com/410-dev/CordOS/archive/<branch>.zip")
-        metaURL: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.MetaURL", default="https://raw.githubusercontent.com/410-dev/CordOS/<branch>/defaults/registry.cordreg")
-        forceReboot: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.versioning.ForceReboot", default="1")
+        branch: str = Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.versioning.Branch", default="stable")
+        imageurl: str = Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.versioning.ImageURL", default="https://github.com/410-dev/NanoPyOS/archive/<branch>.zip")
+        metaURL: str = Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.versioning.MetaURL", default="https://raw.githubusercontent.com/410-dev/NanoPyOS/<branch>/defaults/registry.cordreg")
+        forceReboot: str = Registry.read("SOFTWARE.NanoPyOS.Kernel.Services.versioning.ForceReboot", default="1")
 
         imageurl = imageurl.replace("<branch>", branch)
         metaURL = metaURL.replace("<branch>", branch)
 
         if args[0] == "upgrade":
-            if not (len(args) > 1 and args[1] == "--reinstall") and (getBuild(metaURL) == Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Build") and getVersion(metaURL) == Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")):
+            if not (len(args) > 1 and args[1] == "--reinstall") and (getBuild(metaURL) == Registry.read("SOFTWARE.NanoPyOS.Kernel.Profiles.Build") and getVersion(metaURL) == Registry.read("SOFTWARE.NanoPyOS.Kernel.Profiles.Version")):
                 IO.println("You are already on the latest version.")
                 return
 
@@ -91,8 +91,8 @@ def main(args: list):
             print(f"Update is ready to go, and will be rebooted {'once services are closed' if forceReboot != '1' else 'forcefully'}. Check the console for detailed logs.")
             IO.println(f"Update is ready to go, and will be rebooted {'once services are closed' if forceReboot != '1' else 'forcefully'}. Check the console for detailed logs.")
 
-            Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeMode", "etc/UPGRADE_IMAGE")
-            Registry.write("SOFTWARE.CordOS.Boot.VersioningIssue.UpgradeQueue", "1")
+            Registry.write("SOFTWARE.NanoPyOS.Boot.VersioningIssue.UpgradeMode", "etc/UPGRADE_IMAGE")
+            Registry.write("SOFTWARE.NanoPyOS.Boot.VersioningIssue.UpgradeQueue", "1")
             Power.reboot()
 
             if forceReboot == "1":
@@ -102,8 +102,8 @@ def main(args: list):
             try:
                 latestVersion = getVersion(metaURL)
                 latestBuild = getBuild(metaURL)
-                currentVersion = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")
-                currentBuild = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Build")
+                currentVersion = Registry.read("SOFTWARE.NanoPyOS.Kernel.Profiles.Version")
+                currentBuild = Registry.read("SOFTWARE.NanoPyOS.Kernel.Profiles.Build")
 
                 if latestVersion == "N/A" or latestBuild == "N/A":
                     IO.println("Failed to get latest version information.")
@@ -128,7 +128,7 @@ def main(args: list):
                 IO.println(f"Invalid branch. Valid branches: {', '.join(branches)}")
                 return
 
-            Registry.write("SOFTWARE.CordOS.Kernel.Services.versioning.Branch", args[1])
+            Registry.write("SOFTWARE.NanoPyOS.Kernel.Services.versioning.Branch", args[1])
             IO.println(f"Branch set to {args[1]}.")
 
         else:

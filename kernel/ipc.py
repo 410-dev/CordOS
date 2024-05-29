@@ -44,10 +44,10 @@ def exists(id: str) -> bool:
     return IPCMemory.exists(id)
 
 def removeExpired():
-    ipcGC: int = int(Registry.read("SOFTWARE.CordOS.Kernel.IPC.EnableAutoCleaner", default="1"))
+    ipcGC: int = int(Registry.read("SOFTWARE.NanoPyOS.Kernel.IPC.EnableAutoCleaner", default="1"))
     if ipcGC == 0:
         return
-    memoryLiveTime: int = int(Registry.read("SOFTWARE.CordOS.Kernel.IPC.MemoryLiveTime", default="1800"))
+    memoryLiveTime: int = int(Registry.read("SOFTWARE.NanoPyOS.Kernel.IPC.MemoryLiveTime", default="1800"))
     toDelete = []
     for key in IPCMemory.memory.keys():
         if IPCMemory.referenceTime[key] + memoryLiveTime < Clock.getEpoch():
