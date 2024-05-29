@@ -64,6 +64,10 @@ class Data:
     def list(path: str) -> list:
         return os.listdir(os.path.join(data(), path))
 
+    @staticmethod
+    def rm(path: str):
+        return RootFS.rm(os.path.join(data(), path))
+
 class Etc:
     @staticmethod
     def read(path: str) -> str:
@@ -100,6 +104,10 @@ class Etc:
     @staticmethod
     def list(path: str) -> list:
         return os.listdir(os.path.join(etc(), path))
+
+    @staticmethod
+    def rm(path: str):
+        return RootFS.rm(os.path.join(etc(), path))
 
 
 class RootFS:
@@ -153,6 +161,23 @@ class RootFS:
     def list(path: str) -> list:
         return os.listdir(os.path.join(root(), path))
 
+    @staticmethod
+    def rm(path: str) -> bool:
+        full_path = os.path.join(root(), path)
+        if not os.path.exists(full_path):
+            return False
+
+        def on_rm_error(func, p, exc_info):
+            # Change file to be writable and then remove
+            os.chmod(p, 0o777)
+            func(p)
+
+        if os.path.isfile(full_path):
+            os.remove(full_path)
+        elif os.path.isdir(full_path):
+            shutil.rmtree(full_path, onerror=on_rm_error)
+
+        return True
 
 class Cache:
     @staticmethod
@@ -190,3 +215,7 @@ class Cache:
     @staticmethod
     def list(path: str) -> list:
         return os.listdir(os.path.join(cache(), path))
+
+    @staticmethod
+    def rm(path: str):
+        return RootFS.rm(os.path.join(cache(), path))
