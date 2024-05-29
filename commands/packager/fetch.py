@@ -1,4 +1,4 @@
-from kernel.commands.packager.spec import Spec
+from commands.packager.spec import Spec
 
 import requests
 import json

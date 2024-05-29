@@ -1,12 +1,5 @@
-import os
-
-import kernel.host as Host
 import kernel.io as IO
-import kernel.partitionmgr as PartitionManager
 
-import kernel.commands.packtool.install as Install
-import kernel.commands.packtool.remove as Remove
-import kernel.commands.packtool.list as List
 
 # packtool install <url>...
 # packtool remove <name>...
@@ -31,7 +24,7 @@ def main(args: list):
             ignoreConflicts = True
         if len(args) > 3 and '--reinstall' in args:
             reinstall = True
-        Install.install(args[2:], args[1], ignoreDependencies, ignoreConflicts, reinstall)
+        install.install(args[2:], args[1], ignoreDependencies, ignoreConflicts, reinstall)
 
     elif args[1] == "remove":
         if len(args) < 3:
@@ -43,8 +36,8 @@ def main(args: list):
             ignoreDependencies = True
         if len(args) > 3 and '--chain' in args:
             removeAsChain = True
-        Remove.remove(args[2:], ignoreDependencies, removeAsChain)
+        remove.remove(args[2:], ignoreDependencies, removeAsChain)
 
     elif args[1] == "list":
-        output = List.listPackages()
+        output = list.listPackages()
         IO.println(output)

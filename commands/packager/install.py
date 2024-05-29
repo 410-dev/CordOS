@@ -1,20 +1,13 @@
-import json
 import shutil
 import string
 
-import kernel.commands.packager.database as Database
-import kernel.commands.packager.sources as Sources
 import kernel.partitionmgr
-import kernel.commands.packager.spec as Spec
-import kernel.commands.packager.fetch as Fetch
-import kernel.registry as Registry
 import kernel.io as IO
 import kernel.journaling as Journaling
 import kernel.partitionmgr as PartitionMgr
 import kernel.profile as Profile
 import os
 import random
-import json
 
 from typing import List
 
@@ -25,7 +18,7 @@ def install(keywords: list, case: str, url=False):
     try:
         # Get sources list
         Journaling.record("INFO", "Installing packages: " + ", ".join(keywords))
-        sourcesList = Sources.getSources()
+        sourcesList = sources.getSources()
         Journaling.record("INFO", "Sources list: " + str(sourcesList))
 
         # If urls, then download all specs
@@ -33,12 +26,12 @@ def install(keywords: list, case: str, url=False):
         if url:
             Journaling.record("INFO", "URL mode enabled.")
             for spec in keywords:
-                spec = Fetch.fetchSpec(spec)
+                spec = fetch.fetchSpec(spec)
                 Journaling.record("INFO", f"Spec: {spec}")
                 if spec["state"] == "SUCCESS":
                     # Register package
                     spec.pop("state")
-                    spec = Spec.Spec("none", data=spec)
+                    spec = spec.Spec("none", data=spec)
                     specQueue.append(spec)
                     Journaling.record("INFO", f"Spec added to SpecQueue.")
                 else:
@@ -54,7 +47,7 @@ def install(keywords: list, case: str, url=False):
         # Check if installed
         for dependency in dependencies:
             Journaling.record("INFO", f"Checking if {dependency['name']} is installed...")
-            installed: bool = Database.isInstalled(dependency['name'], condition=dependency['condition'], packageVersion=dependency['version'])
+            installed: bool = database.isInstalled(dependency['name'], condition=dependency['condition'], packageVersion=dependency['version'])
             if installed:
                 Journaling.record("INFO", f"{dependency['name']} is installed.")
                 dependencies.remove(dependency)
@@ -63,7 +56,7 @@ def install(keywords: list, case: str, url=False):
         conflicts: dict = {}
         for dependency in dependencies:
             Journaling.record("INFO", f"Checking conflicts for {dependency['name']}...")
-            conflictList: List[str] = Database.getConflicts(dependency['name'], condition=dependency['condition'], version=dependency['version'])
+            conflictList: List[str] = database.getConflicts(dependency['name'], condition=dependency['condition'], version=dependency['version'])
             if len(conflictList) > 0:
                 Journaling.record("INFO", f"Conflicts found for {dependency['name']}: {conflictList}")
                 if dependency['name'] in conflicts:
@@ -73,7 +66,7 @@ def install(keywords: list, case: str, url=False):
 
         for conflict in getConflicts(sourcesList, keywords):
             # conflict is dict with keys: name, target, condition, version
-            if Database.isInstalled(conflict['name'], condition=conflict['condition'], packageVersion=conflict['version']):
+            if database.isInstalled(conflict['name'], condition=conflict['condition'], packageVersion=conflict['version']):
                 if conflict['target'] in conflicts:
                     conflicts[conflict['target']].append(conflict['name'])
                 else:
@@ -95,11 +88,11 @@ def install(keywords: list, case: str, url=False):
 
             # Download specs
             for spec in specURLs:
-                spec = Fetch.fetchSpec(spec)
+                spec = fetch.fetchSpec(spec)
                 if spec["state"] == "SUCCESS":
                     # Register package
                     spec.pop("state")
-                    spec = Spec.Spec(spec)
+                    spec = spec.Spec(spec)
                     specQueue.append(spec)
                 else:
                     IO.println(f"Error while fetching package: {spec}")
@@ -216,7 +209,7 @@ def install(keywords: list, case: str, url=False):
                             installFailed.append(spec.getName())
                             break
                         IO.printf(f"Get {idx}: ")
-                        savedPath, extension = Fetch.fetchPackage(spec, packageLocation, label=package)
+                        savedPath, extension = fetch.fetchPackage(spec, packageLocation, label=package)
                         Journaling.record("INFO", "Package fetched.")
                         IO.printf(f"Install {idx}: ")
                         # Unpack package
@@ -269,7 +262,7 @@ def install(keywords: list, case: str, url=False):
                         }
 
                         # Read spec.json
-                        spec = Spec.Spec(os.path.join(extractTo, "spec.json"))
+                        spec = spec.Spec(os.path.join(extractTo, "spec.json"))
                         os.remove(os.path.join(extractTo, "spec.json"))
 
                         # Copy files to root
@@ -279,7 +272,7 @@ def install(keywords: list, case: str, url=False):
 
                         # Database register
                         Journaling.record("INFO", f"Registering package to database...")
-                        Database.register(spec, meta["files"], meta)
+                        database.register(spec, meta["files"], meta)
 
                         # Clean up
                         Journaling.record("INFO", f"Cleaning up...")

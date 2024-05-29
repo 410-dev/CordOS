@@ -5,7 +5,7 @@ import kernel.registry as Registry
 import kernel.partitionmgr as PartitionMgr
 import kernel.journaling as Journaling
 
-from kernel.commands.packager.spec import Spec
+from commands.packager.spec import Spec
 
 
 def getPackagesDBPath():

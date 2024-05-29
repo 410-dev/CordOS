@@ -19,8 +19,7 @@ class Services:
 
     async def chkPermission(self, permission):
         if self.user.hasPermission(permission) == False:
-            await self.message.reply(f"You do not have permission to use this command. (Requires {permission})",
-                                     mention_author=True)
+            await self.message.reply(f"You do not have permission to use this command. (Requires {permission})",mention_author=True)
             return False
         return True
 

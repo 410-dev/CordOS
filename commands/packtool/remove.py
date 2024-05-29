@@ -1,7 +1,5 @@
 import kernel.io as IO
 import kernel.partitionmgr as PartitionManager
-import kernel.commands.packtool.spec as Spec
-import kernel.commands.packtool.database as Database
 import json
 
 
@@ -20,13 +18,13 @@ def removeTask(uid: str, ignoreDependencies: bool, removeAsChain: bool, uninstal
     if uninstallingDueToDependency:
         IO.println(f"Removing {uid} due to dependency...")
 
-    specPaths = Database.listSpecs()
+    specPaths = database.listSpecs()
     targetSpec = None
     for specPath in specPaths:
         if specPath.endswith(f"{uid}.json"):
             with open(specPath, "r") as f:
                 spec = json.loads(f.read())
-                if not Spec.validateSpec(spec):
+                if not spec.validateSpec(spec):
                     return False, "VALIDATE_SPEC", f"Spec {uid} is not valid"
                 targetSpec = spec
 
@@ -52,7 +50,7 @@ def removeTask(uid: str, ignoreDependencies: bool, removeAsChain: bool, uninstal
 
     target = targetSpec['target']
     if PartitionManager.RootFS.rm(target):
-        Database.dropSpec(uid, targetSpec['scope'])
+        database.dropSpec(uid, targetSpec['scope'])
         return True, "REMOVE", f"Package {uid} removed successfully"
     else:
         return False, "REMOVE", f"Package {uid} could not be removed"

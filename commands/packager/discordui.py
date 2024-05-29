@@ -3,12 +3,6 @@ import kernel.registry as Registry
 import kernel.servers as Servers
 import kernel.journaling as Journaling
 
-import kernel.commands.packager.database as Database
-import kernel.commands.packager.install as Install
-import kernel.commands.packager.uninstall as Uninstall
-import kernel.commands.packager.sources as Sources
-
-
 from kernel.objects.discordmessage import DiscordMessageWrapper
 
 
@@ -51,48 +45,48 @@ async def mainAsync(args, message: DiscordMessageWrapper):
         unavailablePackages = []
         if args[0] == "install":
             for package in targetPackages:
-                if Database.isInstalled(package):
+                if database.isInstalled(package):
                     unavailablePackages.append(package)
             await message.reply(f"Installing packages: {', '.join(targetPackages)}, Installed packages: {', '.join(unavailablePackages)}", mention_author=True)
         elif args[0] == "installurl":
             await message.reply(f"Installing packages from URL: {', '.join(targetPackages)}", mention_author=True)
         elif args[0] == "remove":
             for package in targetPackages:
-                if not Database.isInstalled(package):
+                if not database.isInstalled(package):
                     unavailablePackages.append(package)
             await message.reply(f"Removing packages: {', '.join(targetPackages)}, Not installed packages: {', '.join(unavailablePackages)}", mention_author=True)
         elif args[0] == "update":
             if len(targetPackages) == 0:
-                targetPackages = Database.getPackagesInstalled()
+                targetPackages = database.getPackagesInstalled()
                 await message.reply(f"Checking for updates...",mention_author=True)
             else:
                 for package in targetPackages:
-                    if not Database.isInstalled(package):
+                    if not database.isInstalled(package):
                         unavailablePackages.append(package)
                 await message.reply(f"Updating packages: {', '.join(targetPackages)}, Not installed packages: {', '.join(unavailablePackages)}", mention_author=True)
         elif args[0] == "addsource":
-            Sources.add(args[1])
+            sources.add(args[1])
         elif args[0] == "removesource":
-            Sources.remove(args[1])
+            sources.remove(args[1])
         elif args[0] == "sync":
-            Sources.sync()
+            sources.sync()
         else:
             await message.reply(f"Invalid arguments (Unknown action: {args[0]}). Usage: packager <install/remove/update> <package-name> <package-name> ...", mention_author=True)
             return
 
         if args[0] == "install":
-            result = Install.install(targetPackages, "install")
+            result = install.install(targetPackages, "install")
             await message.reply(f"{result[1]}", mention_author=True)
 
         if args[0] == "installurl":
-            result = Install.install(targetPackages, "install", url=True)
+            result = install.install(targetPackages, "install", url=True)
             await message.reply(f"{result[1]}", mention_author=True)
 
         elif args[0] == "remove":
-            Uninstall.uninstall(targetPackages)
+            uninstall.uninstall(targetPackages)
 
         elif args[0] == "update":
-            result = Install.install(targetPackages, "update")
+            result = install.install(targetPackages, "update")
             await message.reply(f"{result[1]}", mention_author=True)
 
 

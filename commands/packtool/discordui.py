@@ -1,8 +1,5 @@
 import kernel.registry as Registry
 import kernel.servers as Servers
-import kernel.commands.packtool.install as Install
-import kernel.commands.packtool.remove as Remove
-import kernel.commands.packtool.list as List
 
 
 async def checkPermission(message):
@@ -37,7 +34,7 @@ async def mainAsync(args: list, message):
                 ignoreConflicts = True
             if len(args) > 3 and '--reinstall' in args:
                 reinstall = True
-            result = Install.install(args[2:], args[1], ignoreDependencies, ignoreConflicts, reinstall)
+            result = install.install(args[2:], args[1], ignoreDependencies, ignoreConflicts, reinstall)
             if not result:
                 await message.reply("Failed to install package(s). Check logs for more information.")
                 return
@@ -55,7 +52,7 @@ async def mainAsync(args: list, message):
                 ignoreDependencies = True
             if len(args) > 3 and '--chain' in args:
                 removeAsChain = True
-            result = Remove.remove(args[2:], ignoreDependencies, removeAsChain)
+            result = remove.remove(args[2:], ignoreDependencies, removeAsChain)
             if not result:
                 await message.reply("Failed to remove package(s). Check logs for more information.")
                 return
@@ -64,7 +61,7 @@ async def mainAsync(args: list, message):
                 return
 
         elif args[1] == "list":
-            output = List.listPackages()
+            output = list.listPackages()
             await message.reply(output)
 
     except Exception as e:

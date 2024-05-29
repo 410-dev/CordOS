@@ -1,8 +1,6 @@
 import kernel.io as IO
 import kernel.host as Host
 import kernel.partitionmgr as PartitionManager
-import kernel.commands.packtool.spec as Spec
-import kernel.commands.packtool.database as Database
 import requests
 import shutil
 import json
@@ -35,7 +33,7 @@ def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: 
 
     # Check if spec is valid
     IO.println("Validating spec...")
-    if not Spec.validateSpec(spec):
+    if not spec.validateSpec(spec):
         return False, "VALIDATE_SPEC", f"Spec {url} is not valid"
 
     # Check dependencies and conflicts
@@ -43,17 +41,17 @@ def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: 
     IO.println("Checking dependencies...")
     if 'dependencies' in spec and not ignoreDependencies:
         for dependency in spec['dependencies']:
-            if not Database.installed(dependency['id'], dependency['scope'], dependency['git'], dependency['version'], dependency['build']):
+            if not database.installed(dependency['id'], dependency['scope'], dependency['git'], dependency['version'], dependency['build']):
                 return False, "CHK_DEPENDENCY", f"Dependency {dependency['name']} is not installed"
 
     if 'conflicts' in spec and not ignoreConflicts:
         for conflict in spec['conflicts']:
-            if Database.installed(conflict['id'], conflict['scope'], conflict['git'], conflict['version'], conflict['build']):
+            if database.installed(conflict['id'], conflict['scope'], conflict['git'], conflict['version'], conflict['build']):
                 return False, "CHK_CONFLICT", f"Conflicting package {conflict['name']} is installed"
 
     # Check if spec is already installed
     IO.println("Checking spec...")
-    originalSpec = Database.getSpecOf(spec['id'], spec['scope'])
+    originalSpec = database.getSpecOf(spec['id'], spec['scope'])
     update = False
     if originalSpec is not None:
         if originalSpec['version'] == spec['version'] and originalSpec['build'] == spec['build'] and originalSpec['git'] == spec['git'] and not reinstall:
@@ -63,7 +61,7 @@ def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: 
                 IO.println(f"Spec {spec['name']} is already installed with version {originalSpec['version']} and build {originalSpec['build']}. Updating...")
             else:
                 IO.println(f"Spec {spec['name']} is already installed with version {originalSpec['version']} and build {originalSpec['build']}. Reinstalling...")
-            Database.dropSpec(spec['name'], spec['scope'])
+            database.dropSpec(spec['name'], spec['scope'])
             update = True
 
     # Run git clone
@@ -131,7 +129,7 @@ def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: 
     IO.println("Installing spec...")
     spec['id'] = spec['id'].replace(" ", "-")
     spec['target'] = clonePath
-    Database.setSpecOf(spec['id'], spec['scope'], spec)
+    database.setSpecOf(spec['id'], spec['scope'], spec)
 
     IO.println(f"Installation complete for {spec['name']} {spec['version']}")
 
