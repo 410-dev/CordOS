@@ -5,13 +5,14 @@ import kernel.commands.packtool.database as Database
 import json
 
 
-def remove(ids: list, ignoreDependencies: bool, removeAsChain: bool):
+def remove(ids: list, ignoreDependencies: bool, removeAsChain: bool) -> bool:
     for uid in ids:
         IO.println(f"Removing {uid}...")
         success, stage, message = removeTask(uid, ignoreDependencies, removeAsChain)
         IO.println(message)
         if not success:
-            return
+            return False
+    return True
 
 
 def removeTask(uid: str, ignoreDependencies: bool, removeAsChain: bool, uninstallingDueToDependency: bool = False) -> tuple:

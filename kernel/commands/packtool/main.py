@@ -18,29 +18,20 @@ def main(args: list):
         IO.println("Usage: packtool <install|remove|list> <url|name>...")
         return
 
-    if args[1] == "install":
+    if args[1] == "install" or args[1] == "patch":
         if len(args) < 3:
-            IO.println("Usage: packtool install <url>...")
+            IO.println("Usage: packtool install|patch <url>...")
             return
         ignoreDependencies = False
         ignoreConflicts = False
+        reinstall = False
         if len(args) > 3 and '--ignore-dependencies' in args:
             ignoreDependencies = True
         if len(args) > 3 and '--ignore-conflicts' in args:
             ignoreConflicts = True
-        Install.install(args[2:], "install", ignoreDependencies, ignoreConflicts)
-
-    elif args[1] == "patch":
-        if len(args) < 3:
-            IO.println("Usage: packtool patch <url>...")
-            return
-        ignoreDependencies = False
-        ignoreConflicts = False
-        if len(args) > 3 and '--ignore-dependencies' in args:
-            ignoreDependencies = True
-        if len(args) > 3 and '--ignore-conflicts' in args:
-            ignoreConflicts = True
-        Install.install(args[2:], "patch", ignoreDependencies, ignoreConflicts)
+        if len(args) > 3 and '--reinstall' in args:
+            reinstall = True
+        Install.install(args[2:], args[1], ignoreDependencies, ignoreConflicts, reinstall)
 
     elif args[1] == "remove":
         if len(args) < 3:

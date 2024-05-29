@@ -24,29 +24,26 @@ async def mainAsync(args: list, message):
             await message.reply("Usage: packtool <install|remove|list> <url|name>...")
             return
 
-        if args[1] == "install":
+        if args[1] == "install" or args[1] == "patch":
             if len(args) < 3:
-                await message.reply("Usage: packtool install <url>...")
+                await message.reply("Usage: packtool install|patch <url>...")
                 return
             ignoreDependencies = False
             ignoreConflicts = False
+            reinstall = False
             if len(args) > 3 and '--ignore-dependencies' in args:
                 ignoreDependencies = True
             if len(args) > 3 and '--ignore-conflicts' in args:
                 ignoreConflicts = True
-            Install.install(args[2:], "install", ignoreDependencies, ignoreConflicts)
-
-        elif args[1] == "patch":
-            if len(args) < 3:
-                await message.reply("Usage: packtool patch <url>...")
+            if len(args) > 3 and '--reinstall' in args:
+                reinstall = True
+            result = Install.install(args[2:], args[1], ignoreDependencies, ignoreConflicts, reinstall)
+            if not result:
+                await message.reply("Failed to install package(s). Check logs for more information.")
                 return
-            ignoreDependencies = False
-            ignoreConflicts = False
-            if len(args) > 3 and '--ignore-dependencies' in args:
-                ignoreDependencies = True
-            if len(args) > 3 and '--ignore-conflicts' in args:
-                ignoreConflicts = True
-            Install.install(args[2:], "patch", ignoreDependencies, ignoreConflicts)
+            else:
+                await message.reply("Package(s) installed successfully.")
+                return
 
         elif args[1] == "remove":
             if len(args) < 3:
@@ -58,7 +55,13 @@ async def mainAsync(args: list, message):
                 ignoreDependencies = True
             if len(args) > 3 and '--chain' in args:
                 removeAsChain = True
-            Remove.remove(args[2:], ignoreDependencies, removeAsChain)
+            result = Remove.remove(args[2:], ignoreDependencies, removeAsChain)
+            if not result:
+                await message.reply("Failed to remove package(s). Check logs for more information.")
+                return
+            else:
+                await message.reply("Package(s) removed successfully.")
+                return
 
         elif args[1] == "list":
             output = List.listPackages()

@@ -8,16 +8,18 @@ import shutil
 import json
 
 
-def install(urls: list, mode: str, ignoreDependencies: bool, ignoreConflicts: bool):
+def install(urls: list, mode: str, ignoreDependencies: bool, ignoreConflicts: bool, reinstall: bool) -> bool:
     for url in urls:
         IO.println(f"Installing {url}...")
-        success, stage, message = installTask(url, mode, ignoreDependencies, ignoreConflicts)
+        success, stage, message = installTask(url, mode, ignoreDependencies, ignoreConflicts, reinstall)
         if not success:
             IO.println(f"Failed to install {url} - {stage}: {message}")
-            return
+            return False
+        IO.println(message)
+    return True
 
 
-def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: bool) -> tuple:
+def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: bool, reinstall: bool) -> tuple:
     # Download url as plain text - this is specification
     IO.println("Downloading spec...")
     response = requests.get(url)
@@ -54,10 +56,13 @@ def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: 
     originalSpec = Database.getSpecOf(spec['id'], spec['scope'])
     update = False
     if originalSpec is not None:
-        if originalSpec['version'] == spec['version'] and originalSpec['build'] == spec['build'] and originalSpec['git'] == spec['git']:
+        if originalSpec['version'] == spec['version'] and originalSpec['build'] == spec['build'] and originalSpec['git'] == spec['git'] and not reinstall:
             return False, "CHK_DUPLICATION", f"Spec {spec['name']} is already installed with version {spec['version']}"
         else:
-            IO.println(f"Spec {spec['name']} is already installed with version {originalSpec['version']} and build {originalSpec['build']}. Updating...")
+            if not reinstall:
+                IO.println(f"Spec {spec['name']} is already installed with version {originalSpec['version']} and build {originalSpec['build']}. Updating...")
+            else:
+                IO.println(f"Spec {spec['name']} is already installed with version {originalSpec['version']} and build {originalSpec['build']}. Reinstalling...")
             Database.dropSpec(spec['name'], spec['scope'])
             update = True
 
