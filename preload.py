@@ -105,7 +105,7 @@ for key in config:
                 exit(2)
 
 print("Checking required keys for configurations...")
-requiredKeys = ["token", "registry", "config_parser"]
+requiredKeys = ["registry", "config_parser"]
 requiredKeysMissing: bool = False
 for key in requiredKeys:
     print(f"Checking config key: {key}")
@@ -117,10 +117,10 @@ if requiredKeysMissing:
 
 import kernel.registry as Registry
 
-if not os.path.exists('etc/registry') or not os.path.isdir('etc/registry'):
-    print("etc/registry does not exist or is not a directory. Creating etc/registry")
-    os.mkdir('etc/registry')
-    Registry.build('defaults/registry.cordreg', 'etc/registry')
+if not os.path.exists(config['registry']) or not os.path.isdir(config['registry']):
+    print(f"{config['registry']} does not exist or is not a directory. Creating {config['registry']}")
+    os.mkdir(config['registry'])
+    Registry.build('defaults/registry.cordreg', config['registry'])
 
 print("Checking required registries...")
 
