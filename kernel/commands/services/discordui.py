@@ -46,7 +46,7 @@ class Services:
                 userServiceLocation = Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices").replace("/",
                                                                                                              ".").replace(
                     "\\", ".")
-                moduleName = f"{userServiceLocation}.{self.args[2]}.configure"
+                moduleName = f"{userServiceLocation}.{self.args[2]}.configure_discordui"
                 if os.path.isfile(moduleName.replace(".", "/") + ".py"):
                     with open(moduleName.replace(".", "/") + ".py", 'r') as f:
                         if "async def mainAsync(" not in f.read():
@@ -64,7 +64,7 @@ class Services:
             except ModuleNotFoundError:
                 try:
                     import importlib
-                    moduleName = f"kernel.services.{self.args[2]}.configure"
+                    moduleName = f"kernel.services.{self.args[2]}.configure_discordui"
                     if os.path.isfile(moduleName.replace(".", "/") + ".py"):
                         with open(moduleName.replace(".", "/") + ".py", 'r') as f:
                             if "async def mainAsync(" not in f.read():
