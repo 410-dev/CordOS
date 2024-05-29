@@ -15,7 +15,7 @@ def getSpecOf(uid: str, scope: str) -> dict:
 
 
 def setSpecOf(name: str, scope: str, spec: dict):
-    PartitionManager.Etc.write(f"packtool/specs/{scope}/{name}.json", json.dumps(spec))
+    PartitionManager.Etc.write(f"packtool/specs/{scope}/{name}.json", json.dumps(spec, indent=4))
 
 
 def checkSpec(name: str, scope: str) -> bool:
@@ -27,16 +27,19 @@ def dropSpec(name: str, scope: str):
 
 
 def listSpecs() -> list:
-    specs = []
-    def recursion(p: str, s: list):
-        for element in PartitionManager.Etc.list(p):
-            if PartitionManager.Etc.isDir(element):
-                recursion(element, specs)
-            else:
-                s.append(element)
 
-    recursion(path("specs"), specs)
-    return specs
+    def recursion(p: str, s: list) -> list:
+        for element in PartitionManager.Etc.list(p):
+            if PartitionManager.Etc.isDir(f"{p}/{element}"):
+                s = recursion(f"{p}/{element}", s)
+            else:
+                s.append(f"{p}/{element}")
+        return s
+
+    returned = recursion("packtool/specs", [])
+    for i in range(len(returned)):
+        returned[i] = os.path.join(PartitionManager.Etc.path(), returned[i])
+    return returned
 
 
 def installed(uid: str, scope: str, git: str, version: str, build: str) -> bool:
