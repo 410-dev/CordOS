@@ -52,6 +52,7 @@ def removeTask(uid: str, ignoreDependencies: bool, removeAsChain: bool, uninstal
 
     target = targetSpec['target']
     if PartitionManager.RootFS.rm(target):
+        Database.dropSpec(uid, targetSpec['scope'])
         return True, "REMOVE", f"Package {uid} removed successfully"
     else:
         return False, "REMOVE", f"Package {uid} could not be removed"
