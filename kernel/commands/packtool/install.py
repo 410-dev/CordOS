@@ -4,19 +4,20 @@ import kernel.partitionmgr as PartitionManager
 import kernel.commands.packtool.spec as Spec
 import kernel.commands.packtool.database as Database
 import requests
+import shutil
 import json
 
 
-def install(urls: list):
+def install(urls: list, mode: str, ignoreDependencies: bool, ignoreConflicts: bool):
     for url in urls:
         IO.println(f"Installing {url}...")
-        success, stage, message = installTask(url)
+        success, stage, message = installTask(url, mode, ignoreDependencies, ignoreConflicts)
         if not success:
             IO.println(f"Failed to install {url} - {stage}: {message}")
             return
 
 
-def installTask(url: str) -> tuple:
+def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: bool) -> tuple:
     # Download url as plain text - this is specification
     IO.println("Downloading spec...")
     response = requests.get(url)
@@ -38,12 +39,12 @@ def installTask(url: str) -> tuple:
     # Check dependencies and conflicts
     IO.println("Currently installing: " + spec['name'] + " " + spec['version'])
     IO.println("Checking dependencies...")
-    if 'dependencies' in spec:
+    if 'dependencies' in spec and not ignoreDependencies:
         for dependency in spec['dependencies']:
             if not Database.installed(dependency['id'], dependency['scope'], dependency['git'], dependency['version'], dependency['build']):
                 return False, "CHK_DEPENDENCY", f"Dependency {dependency['name']} is not installed"
 
-    if 'conflicts' in spec:
+    if 'conflicts' in spec and not ignoreConflicts:
         for conflict in spec['conflicts']:
             if Database.installed(conflict['id'], conflict['scope'], conflict['git'], conflict['version'], conflict['build']):
                 return False, "CHK_CONFLICT", f"Conflicting package {conflict['name']} is installed"
@@ -78,31 +79,53 @@ def installTask(url: str) -> tuple:
     if spec['scope'] != "$root" and ('autowrap' not in spec or spec['autowrap']):
         clonePath += f"/{spec['name'].replace(' ', '-')}"
 
-    if not update:
-        IO.println(f"Installing {spec['name']} {spec['version']} to {clonePath}...")
-        command = [
-            "git",
-            "clone",
-            spec['git'],
-            clonePath
-        ]
+    allowPatchInstall = spec['allowPatchInstall'] if 'allowPatchInstall' in spec else False
+
+    if mode == "patch" and allowPatchInstall:
+        if 'zip' not in spec:
+            return False, "PATCH_ZIP", f"Spec {spec['name']} does not have 'zip' field for patch install"
+        IO.println(f"Downloading patch archive for {spec['name']} {spec['version']} to {clonePath}...")
+        response = requests.get(spec['zip'])
+        if response.status_code != 200:
+            return False, "DOWNLOAD_PATCH", f"Failed to download patch archive for {spec['name']} {spec['version']} - status code {response.status_code}"
+        IO.println("Saving patch archive...")
+        with open(f"{clonePath}.zip", "wb") as file:
+            file.write(response.content)
+        IO.println("Extracting patch archive...")
+        shutil.unpack_archive(f"{clonePath}.zip", clonePath)
+        IO.println("Removing patch archive...")
+        shutil.rmtree(f"{clonePath}.zip")
+        spec['installed'] = "patch"
+
     else:
-        IO.println(f"Updating {spec['name']} {spec['version']} at {clonePath}...")
-        command = [
-            "git",
-            "-C",
-            clonePath,
-            "pull"
-        ]
-    subprocessRun: dict = Host.executeCommand2(command)
-    if subprocessRun['returncode'] != 0:
-        return False, "GIT_CLONE", f"Failed to clone repository {spec['git']} to {clonePath} - return code {subprocessRun['returncode']} with output {subprocessRun['stdout']}"
-    IO.println("Successfully installed files.")
+        if not allowPatchInstall and mode == "patch":
+            IO.println(f"Patch install is not allowed for {spec['name']} {spec['version']}")
+
+        if not update:
+            IO.println(f"Installing {spec['name']} {spec['version']} to {clonePath}...")
+            command = [
+                "git",
+                "clone",
+                spec['git'],
+                clonePath
+            ]
+        else:
+            IO.println(f"Updating {spec['name']} {spec['version']} at {clonePath}...")
+            command = [
+                "git",
+                "-C",
+                clonePath,
+                "pull"
+            ]
+        subprocessRun: dict = Host.executeCommand2(command)
+        if subprocessRun['returncode'] != 0:
+            return False, "GIT_CLONE", f"Failed to clone repository {spec['git']} to {clonePath} - return code {subprocessRun['returncode']} with output {subprocessRun['stdout']}"
+        IO.println("Successfully installed files.")
 
     # Install spec
     IO.println("Installing spec...")
     spec['id'] = spec['id'].replace(" ", "-")
-    spec['installedTarget'] = clonePath
+    spec['target'] = clonePath
     Database.setSpecOf(spec['id'], spec['scope'], spec)
 
     IO.println(f"Installation complete for {spec['name']} {spec['version']}")
