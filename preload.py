@@ -102,7 +102,7 @@ for key in config:
             print("Checking environment variable", envVar)
             if envVar not in os.environ:
                 print('Environment variable', envVar, 'not found.')
-                exit(2)
+
 
 print("Checking required keys for configurations...")
 requiredKeys = ["registry", "config_parser"]

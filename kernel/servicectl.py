@@ -100,7 +100,7 @@ def launchsvc(service: str, safeMode: bool, stage: int) -> bool:
         return False
 
     if safeMode:
-        if service not in safeServiceList:
+        if service.replace("/", os.path.sep).split(os.path.sep)[-1] not in safeServiceList:
             Journaling.record("INFO", f"Service '{service}' is not in safe mode list. Skipping.")
             print(f"Service '{service}' is not in safe mode list. Skipping.")
             return False

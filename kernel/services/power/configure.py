@@ -69,6 +69,21 @@ def main(args: list):
             pid = os.getpid()
             Host.executeCommand("taskkill /F /PID " + str(pid))
 
+    elif args[0] == "reset-safe":
+        terminationSteps()
+        IO.println(f"System will now be reset in safemode.")
+        IPC.set("power.off", True)
+        IPC.set("power.off.state", "REBOOT-SAFE")
+        with open("restart", "w") as f:
+            f.write("reboot")
+        with open("safe_restart", "w") as f:
+            f.write("true")
+        if Host.isPOSIX():
+            os.kill(os.getpid(), signal.SIGTERM)
+        else:
+            pid = os.getpid()
+            Host.executeCommand("taskkill /F /PID " + str(pid))
+
     else:
         IO.println("Usage: power <off|reboot|halt|reset>")
         return
@@ -92,3 +107,7 @@ def halt():
 
 def reset():
     main(["reset"])
+
+
+def reset_safe():
+    main(["reset-safe"])

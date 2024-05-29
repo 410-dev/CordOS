@@ -13,8 +13,11 @@ def load() -> dict:
             value = config[key]
             if isinstance(value, str):
                 if value.startswith(envVarKeyword):
-                    envVar = value.replace(envVarKeyword, '')
-                    config[key] = os.environ[envVar]
+                    try:
+                        envVar = value.replace(envVarKeyword, '')
+                        config[key] = os.environ[envVar]
+                    except KeyError:
+                        pass
         
         return config
 

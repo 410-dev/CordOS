@@ -28,6 +28,11 @@ def main():
         botname = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.BotName")
         botver = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.BotVersion")
 
+        if 'token' not in config:
+            IO.println("ERROR: Unable to start DiscordUIService. Token not found in config file.")
+            Journaling.record("ERROR", "Token not found in config file.")
+            Power.halt()
+
         IO.println(f"Token: {config['token']}")
         IO.println(f"Prefix: {prefix}")
         IO.println(f"Paths: {paths}")
@@ -251,7 +256,7 @@ def main():
         IO.println(f"System will stop now immediately.")
         IO.println(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         Journaling.record("ERROR", f"DiscordUIService has crashed due to Discord login failure: {e}")
-        Power.halt()
+        Power.reset_safe()
 
     except Exception as e:
         IO.println(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -267,4 +272,4 @@ def main():
         IO.println(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         Journaling.record("ERROR", f"DiscordUIService has crashed with unhandled exception: {e}")
         time.sleep(3)
-        Power.halt()
+        Power.reset_safe()
