@@ -2,7 +2,6 @@ print("Undiscord Tool for CordOS")
 print("This tool will remove all discord related code from the CordOS source code.")
 
 import os
-import re
 import fnmatch
 
 # Remove all discord related code
@@ -63,9 +62,9 @@ def recursiveDirectoryDelete(path: str):
             recursiveDirectoryDelete(os.path.join(path, element))
         else:
             os.remove(os.path.join(path, element))
-            print(f"Removed {os.path.join(path, element)}")
+            print(f"[SUCCESS] Remove: {os.path.join(path, element)}")
     os.rmdir(path)
-    print(f"Removed {path}")
+    print(f"[SUCCESS] Remove: {path}")
 
 
 def expandAsterisk(expandableList: list, fullFileList: list) -> list:  # Return fully expanded list
@@ -82,28 +81,28 @@ def expandAsterisk(expandableList: list, fullFileList: list) -> list:  # Return 
     return expandedList
 
 
-print("Building file list...")
+print("[WORKING] Building file list...")
 fileList = expandAsterisk(knownDiscordFiles, recursiveFileBuild(".", []))
 
-print("Removable files: ")
+print("[WORKING] Removable files: ")
 for file in fileList:
-    print(file)
+    print(f"[ +INFO ] {file}")
 
-print("Removing files...")
+print("[WORKING] Removing files...")
 for file in fileList:
     if os.path.isdir(file):
         recursiveDirectoryDelete(file)
     elif os.path.isfile(file):
         os.remove(file)
-        print(f"Removed {file}")
+        print(f"[SUCCESS] Remove: {file}")
     else:
-        print(f"Warning: {file} is not a file or directory.")
+        print(f"[WARNING] No such file or directory: {file}")
 
-print("Rebuilding file list for refactoring...")
+print("[WORKING] Rebuilding file list for refactoring...")
 fileList = recursiveFileBuild(".", [])
 
 
-print("Refactoring files...")
+print("[WORKING] Refactoring files...")
 substitutionList = [
     ("CordOS", "NanoPyOS"),
     ("cordos", "nanopyos"),
@@ -118,11 +117,11 @@ for file in fileList:
                     content = content.replace(substitution[0], substitution[1])
                 with open(file, "w") as f2:
                     f2.write(content)
-                    print(f"Refactored {file} successfully.")
+                    print(f"[SUCCESS] Refactoring: {file}")
         except Exception as e:
-            print(f"Error in refactoring {file}. e: {e}")
+            print(f"[ERROR]: {file}. e: {e}")
 
-print("Updating requirements.txt...")
+print("[WORKING] Updating requirements.txt...")
 try:
     with open("requirements.txt", "r") as f:
         content = f.read()
@@ -133,8 +132,8 @@ try:
                 newContent += line + "\n"
         with open("requirements.txt", "w") as f2:
             f2.write(newContent)
-            print("Updated requirements.txt successfully.")
+            print("[SUCCESS] Refactor: Updated requirements.txt")
 except Exception as e:
-    print(f"Error in updating requirements.txt. e: {e}")
+    print(f"[ERROR] Updating requirements.txt. e: {e}")
 
-print("Done.")
+print("[SUCCESS] Done.")
