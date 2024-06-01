@@ -10,8 +10,8 @@ IPCAutoClean 서비스는 커널 내 IPC 메모리가 과도하게 사용되는 
 `ipcautoclean expire=n`: IPC 메모리가 만료되기까지 시간을 설정합니다. (단위: 초)
 
 ## 레지스트리
-| 키 이름 | 기본 값 | 설명                      |
-| ---- | ---- |-------------------------|
-| `SOFTWARE.CordOS.Kernel.IPC.EnableAutoCleaner` | 1 | IPCAutoClean 서비스 활성화 여부 |
-| `SOFTWARE.CordOS.Kernel.IPC.MemoryLiveTime` | 1800 | IPC 메모리가 만료되기까지 시간 (초)  |
+| 키 이름 | 기본 값 | 설명                                     |
+| ---- | ---- |----------------------------------------|
+| `SOFTWARE.CordOS.Kernel.IPC.EnableAutoCleaner` | 1 | IPCAutoClean 서비스 활성화 여부                |
+| `SOFTWARE.CordOS.Kernel.IPC.MemoryLiveTime` | 1800 | IPC 메모리가 만료되기까지 시간 (초) (-1 이면 만료되지 않음) |
 
