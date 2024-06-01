@@ -31,6 +31,7 @@ neglectQueryPatterns = [
     "*/docs/*",
     "*.pyc",
     "*/venv/*",
+    "*/.venv/*",
     "*/__pycache__/*",
     "*/etc/*",
     "*/storage/*",
@@ -38,6 +39,7 @@ neglectQueryPatterns = [
     "*.idea/*",
     "*.gitignore",
     "*.gitattributes",
+    "*.DS_Store",
     "*undiscord.py"
 ]
 
@@ -100,6 +102,7 @@ for file in fileList:
 print("Rebuilding file list for refactoring...")
 fileList = recursiveFileBuild(".", [])
 
+
 print("Refactoring files...")
 substitutionList = [
     ("CordOS", "NanoPyOS"),
@@ -120,11 +123,18 @@ for file in fileList:
             print(f"Error in refactoring {file}. e: {e}")
 
 print("Updating requirements.txt...")
-with open("requirements.txt", "r") as f:
-    content = f.read()
-    content = re.sub(r"discord*\n", "", content)
-    with open("requirements.txt", "w") as f2:
-        f2.write(content)
-        print("Updated requirements.txt successfully.")
+try:
+    with open("requirements.txt", "r") as f:
+        content = f.read()
+        contentData = content.split("\n")
+        newContent = ""
+        for line in contentData:
+            if "discord" not in line:
+                newContent += line + "\n"
+        with open("requirements.txt", "w") as f2:
+            f2.write(newContent)
+            print("Updated requirements.txt successfully.")
+except Exception as e:
+    print(f"Error in updating requirements.txt. e: {e}")
 
 print("Done.")
