@@ -113,11 +113,13 @@ for file in fileList:
         try:
             with open(file, "r") as f:
                 content = f.read()
+                contentOrig = content
                 for substitution in substitutionList:
                     content = content.replace(substitution[0], substitution[1])
-                with open(file, "w") as f2:
-                    f2.write(content)
-                    print(f"[SUCCESS] Refactoring: {file}")
+                if content != contentOrig:
+                    with open(file, "w") as f2:
+                        f2.write(content)
+                        print(f"[SUCCESS] Refactoring: {file}")
         except Exception as e:
             print(f"[ERROR]: {file}. e: {e}")
 
