@@ -2,10 +2,8 @@ print("Undiscord Tool for CordOS")
 print("This tool will remove all discord related code from the CordOS source code.")
 
 import os
-import shutil
 import re
 import fnmatch
-import glob
 
 # Remove all discord related code
 knownDiscordFiles = [
@@ -120,5 +118,13 @@ for file in fileList:
                     print(f"Refactored {file} successfully.")
         except Exception as e:
             print(f"Error in refactoring {file}. e: {e}")
+
+print("Updating requirements.txt...")
+with open("requirements.txt", "r") as f:
+    content = f.read()
+    content = re.sub(r"discord*\n", "", content)
+    with open("requirements.txt", "w") as f2:
+        f2.write(content)
+        print("Updated requirements.txt successfully.")
 
 print("Done.")
