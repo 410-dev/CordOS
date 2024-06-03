@@ -21,3 +21,18 @@ CordOS 는 다음과 같은 브랜치를 가지고 있습니다.
 - `stable`: 안정적인 버전이 배포되는 브랜치입니다. ***현재 CordOS 는 개발 단계이므로 이 브랜치 또한 안정적이지 않을 수 있습니다.***
 - `beta`: 안정적인 버전이 배포되기 전에 테스트되는 브랜치입니다. 이 브랜치는 안정적이지 않을 수 있습니다.
 - `dev`: 개발에 사용되는 브랜치입니다. 이 브랜치는 실행되지 않을 수 있습니다.
+
+## Discord 관련 서비스 제거
+Discord 서비스를 안전하게 제거하고 NanoPyOS 로 변환하려면 undiscord.py 파일을 호스트에서 실행하십시오.
+Discord 서비스를 제거하면 DiscordUIService 대신 SystemUI 서비스로 기본 부트되며 이는 되돌릴 수 없습니다.
+
+macOS 및 Linux:
+```bash
+python3 ./undiscord.py
+```
+
+Windows:
+```batch
+python .\undiscord.py
+```
+

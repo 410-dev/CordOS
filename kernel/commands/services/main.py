@@ -3,7 +3,9 @@ import os
 
 import kernel.registry as Registry
 import kernel.partitionmgr as PartitionMgr
+import kernel.servicectl as Services
 import kernel.io as IO
+import kernel.ipc as IPC
 
 def main(args: list):
 
@@ -112,7 +114,18 @@ def main(args: list):
             response += f"Stage {stage} Third Party Services: {', '.join(loadedThirdPartyService[stage])}\n"
 
         IO.println(f"{response}")
-
+    elif args[1] == "start-ksrv":
+        safeMode = IPC.read("kernel.safemode", False) or Registry.read("SOFTWARE.CordOS.Kernel.SafeMode") == "1"
+        if Services.launchsvc("kernel/services/" + args[2], safeMode, -1):
+            IO.println(f"Service '{args[2]}' started.")
+        else:
+            IO.println(f"Service '{args[2]}' failed to start.")
+    elif args[1] == "start-usrv":
+        safeMode = IPC.read("kernel.safemode", False) or Registry.read("SOFTWARE.CordOS.Kernel.SafeMode") == "1"
+        if Services.launchsvc(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices") + "/" + args[2], safeMode, -1):
+            IO.println(f"Service '{args[2]}' started.")
+        else:
+            IO.println(f"Service '{args[2]}' failed to start.")
     elif args[1] == "enable-ksrv":
         Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{args[2]}.Enabled", "1")
         IO.println("Registry updated.")

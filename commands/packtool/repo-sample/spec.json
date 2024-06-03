@@ -1,0 +1,40 @@
+{
+    "spec": "NanoPyOS.Standards.PackageSpec",
+    "specv": 1,
+    "sdk": 1,
+    "name": "Package Name Here",
+    "id": "package-name",
+    "version": "1.0.0",
+    "author": "Author Name Here",
+    "description": "Description Here",
+    "build": 1,
+    "arch": "any",
+    "platform": "posix",
+    "scope": "/$storage/commands",
+    "git": "",
+    "autowrap": true,
+    "allow-patch-install": false,
+    "dependencies": [
+        {
+            "id": "system",
+            "scope": "/",
+            "git": "",
+            "version": ">=1.0",
+            "build": 1
+        }
+    ],
+    "conflicts": [
+        {
+            "id": "package-name",
+            "scope": "/$storage/commands",
+            "git": "",
+            "version": "==1.0.0",
+            "build": 1
+        }
+    ],
+    "triggers": {
+        "post-install": "",
+        "pre-remove": "",
+        "post-remove": ""
+    }
+}

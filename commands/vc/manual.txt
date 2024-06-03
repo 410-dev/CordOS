@@ -5,5 +5,12 @@ Required permissions:
     
 ```
 Usage:
-    vc <@user mention> <@user mention> ...  : Open private temporary voice channel for specific people. Make sure to include all user (even command issuer, if involved)!
+    vc title <@user mention> <@user mention> ...  : Open private temporary voice channel for specific people. Make sure to include all user (even command issuer, if involved).
+    vc <@user mention> <@user mention> ...        : Open private temporary voice channel for specific people. Make sure to include all user (even command issuer, if involved). Title will be set to all members names.
 ```
+
+Channel will be deleted automatically when both conditions are met:
+1. All members leave the channel.
+2. 5 minutes after first open. (This could be changed by updating `SOFTWARE.CordOS.Kernel.Services.PrivateVoiceChannels.Timeout` value)
+
+Warning: If there service is down or bot is restarted, all temporary voice channels will not be deleted automatically. Make sure to delete them manually.

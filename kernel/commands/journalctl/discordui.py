@@ -1,7 +1,11 @@
+import discord
+
 import kernel.registry as Registry
 import kernel.journaling as Journaling
 
 import traceback
+
+from kernel.objects.discordmessage import DiscordMessageWrapper
 
 def journalIndex() -> str:
     labels: list = Journaling.JournalingContainer.journals.keys()
@@ -18,15 +22,19 @@ def getLastNLines(target: str, n: int) -> str:
     return "".join(entries[-n:])
 
 
-async def mainAsync(args: list, message) -> None:
+async def mainAsync(args: list, message: DiscordMessageWrapper) -> None:
     try:
         # Available: dump, list, get
         if len(args) < 2:
             await message.reply("Not enough arguments.\nUsage: journalctl <dump|list|read> (target)", mention_author=True)
             return
         if args[1] == "dump":
-            Journaling.JournalingContainer.dump()
-            await message.reply("Journal dumped. The dump file is only accessible locally.", mention_author=True)
+            dumpPath = Journaling.JournalingContainer.dump()
+
+            if Registry.read("SOFTWARE.CordOS.Kernel.DiscordUIService.AllowExposeJournalDumpToEveryone", default="0") == "1":
+                await message.getMessageObject().reply(f"Journal dumped. The dump file is attached below.", mention_author=True, file=discord.File(dumpPath))
+            else:
+                await message.reply("Journal dumped. The dump file is only accessible locally.", mention_author=True)
 
         elif args[1] == "list":
             await message.reply(journalIndex(), mention_author=True)

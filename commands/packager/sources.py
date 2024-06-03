@@ -2,9 +2,6 @@ import requests
 import json
 import os
 
-import kernel.commands.packager.database as Database
-import kernel.commands.packager.spec as Spec
-
 import kernel.profile as Profile
 
 
@@ -23,7 +20,7 @@ def download(url: str) -> dict:
 
 
 def getSources():
-    databaseLocation = Database.getSourcesDBPath()
+    databaseLocation = database.getSourcesDBPath()
 
     if not os.path.exists(databaseLocation):
         os.mkdir(databaseLocation)
@@ -57,7 +54,7 @@ def add(idxJsonURL: str):
         print("Invalid index file - Index version/spec mismatch")
         return "Invalid index file - Index version/spec mismatch"
 
-    databaseLocation = Database.getSourcesDBPath()
+    databaseLocation = database.getSourcesDBPath()
     id = indexData["id"]
     with open(f"{databaseLocation}/{id}.index.json", "w") as f:
         f.write(json.dumps(indexData, indent=4))
@@ -67,7 +64,7 @@ def add(idxJsonURL: str):
 
 def remove(idxJsonURL: str):
     # Remove source
-    databaseLocation = Database.getSourcesDBPath()
+    databaseLocation = database.getSourcesDBPath()
     id = idxJsonURL.split("/")[-1].split(".")[0]
     if os.path.exists(f"{databaseLocation}/{id}.index.json"):
         os.remove(f"{databaseLocation}/{id}.index.json")
@@ -97,7 +94,7 @@ def sync():
             continue
         if newIndex['updateTime'] != index['updateTime']:
             changedSources.append(index['name'])
-            with open(f"{Database.getSourcesDBPath()}/{index['id']}.index.json", "w") as f:
+            with open(f"{database.getSourcesDBPath()}/{index['id']}.index.json", "w") as f:
                 f.write(json.dumps(newIndex, indent=4))
             print(f"Synced (Updated) {index['name']} ({index['id']}): {index['index']}")
         else:
@@ -116,10 +113,10 @@ def listUpdatablePackages(indexList: list = None) -> list:
     for index in indexList:
         packagesInIndex = index['packages']
         for package in packagesInIndex:
-            if not Database.isInstalled(package['name']):
+            if not database.isInstalled(package['name']):
                 continue
 
-            installedVersion: Spec = Database.getInfo(package['name'])
+            installedVersion: spec = database.getInfo(package['name'])
             if installedVersion.getVersion() == package['version'] and installedVersion.getBuild() == package['build']:
                 continue
 

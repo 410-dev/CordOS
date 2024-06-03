@@ -1,4 +1,4 @@
-from kernel.commands.packager.spec import Spec
+from commands.packager.spec import Spec
 
 import requests
 import json
@@ -75,6 +75,8 @@ def fetchPackage(spec: Spec, output: str, label: str = "core"):
     packageFileURL: str = spec.getObject("payloads")[label]
     print(f"Downloading package from: {packageFileURL}", end=" ")
     result = requests.get(packageFileURL)
-    with open(f"{output}/{label}.cpkg", "wb") as f:
+    extension = packageFileURL.split(".")[-1]
+    with open(f"{output}/{label}.{extension}", "wb") as f:
         f.write(result.content)
-        print(f"Success. ({output}/{label}.cpkg)")
+        print(f"Success. ({output}/{label}.{extension})")
+    return f"{output}/{label}.{extension}", extension

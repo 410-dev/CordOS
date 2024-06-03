@@ -53,13 +53,20 @@ class Data:
         RootFS.mkdir(os.path.join(data(), path))
 
     @staticmethod
-    def path() -> str:
-        return data()
+    def path(subPath: str = "") -> str:
+        return data() + ("/" + subPath if subPath != "" else "")
 
     @staticmethod
     def copyDefault(path: str, existOK: bool = True):
         RootFS.copy(os.path.join(default(), data(), path), os.path.join(data(), path), existOK)
 
+    @staticmethod
+    def list(path: str) -> list:
+        return os.listdir(os.path.join(data(), path))
+
+    @staticmethod
+    def rm(path: str):
+        return RootFS.rm(os.path.join(data(), path))
 
 class Etc:
     @staticmethod
@@ -87,12 +94,20 @@ class Etc:
         RootFS.mkdir(os.path.join(etc(), path))
 
     @staticmethod
-    def path() -> str:
-        return etc()
+    def path(subPath: str = "") -> str:
+        return etc() + ("/" + subPath if subPath != "" else "")
 
     @staticmethod
     def copyDefault(path: str, existOK: bool = True):
         RootFS.copy(os.path.join(default(), etc(), path), os.path.join(etc(), path), existOK)
+
+    @staticmethod
+    def list(path: str) -> list:
+        return os.listdir(os.path.join(etc(), path))
+
+    @staticmethod
+    def rm(path: str):
+        return RootFS.rm(os.path.join(etc(), path))
 
 
 class RootFS:
@@ -106,6 +121,8 @@ class RootFS:
 
     @staticmethod
     def write(path: str, content: str):
+        if not os.path.exists(os.path.join(root(), os.path.dirname(path))):
+            os.makedirs(os.path.join(root(), os.path.dirname(path)), exist_ok=True)
         with open(os.path.join(root(), path), "w") as f:
             f.write(content)
 
@@ -139,3 +156,66 @@ class RootFS:
         if not os.path.exists(os.path.join(root(), src)):
             return
         shutil.move(os.path.join(root(), src), os.path.join(root(), dst))
+
+    @staticmethod
+    def list(path: str) -> list:
+        return os.listdir(os.path.join(root(), path))
+
+    @staticmethod
+    def rm(path: str) -> bool:
+        full_path = os.path.join(root(), path)
+        if not os.path.exists(full_path):
+            return False
+
+        def on_rm_error(func, p, exc_info):
+            # Change file to be writable and then remove
+            os.chmod(p, 0o777)
+            func(p)
+
+        if os.path.isfile(full_path):
+            os.remove(full_path)
+        elif os.path.isdir(full_path):
+            shutil.rmtree(full_path, onerror=on_rm_error)
+
+        return True
+
+class Cache:
+    @staticmethod
+    def read(path: str) -> str:
+        return RootFS.read(os.path.join(cache(), path))
+
+    @staticmethod
+    def write(path: str, content: str):
+        RootFS.write(os.path.join(cache(), path), content)
+
+    @staticmethod
+    def isFile(path: str) -> bool:
+        return RootFS.isFile(os.path.join(cache(), path))
+
+    @staticmethod
+    def isDir(path: str) -> bool:
+        return RootFS.isDir(os.path.join(cache(), path))
+
+    @staticmethod
+    def exists(path: str) -> bool:
+        return RootFS.exists(os.path.join(cache(), path))
+
+    @staticmethod
+    def mkdir(path: str):
+        RootFS.mkdir(os.path.join(cache(), path))
+
+    @staticmethod
+    def path(subPath: str = "") -> str:
+        return cache() + ("/" + subPath if subPath != "" else "")
+
+    @staticmethod
+    def copyDefault(path: str, existOK: bool = True):
+        RootFS.copy(os.path.join(default(), cache(), path), os.path.join(cache(), path), existOK)
+
+    @staticmethod
+    def list(path: str) -> list:
+        return os.listdir(os.path.join(cache(), path))
+
+    @staticmethod
+    def rm(path: str):
+        return RootFS.rm(os.path.join(cache(), path))

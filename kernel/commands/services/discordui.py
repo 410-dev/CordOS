@@ -5,6 +5,8 @@ import kernel.config as Config
 import kernel.registry as Registry
 import kernel.servers as Servers
 import kernel.partitionmgr as PartitionMgr
+import kernel.ipc as IPC
+import kernel.servicectl as Servicectl
 
 class Services:
 
@@ -17,8 +19,7 @@ class Services:
 
     async def chkPermission(self, permission):
         if self.user.hasPermission(permission) == False:
-            await self.message.reply(f"You do not have permission to use this command. (Requires {permission})",
-                                     mention_author=True)
+            await self.message.reply(f"You do not have permission to use this command. (Requires {permission})",mention_author=True)
             return False
         return True
 
@@ -45,7 +46,7 @@ class Services:
                 userServiceLocation = Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices").replace("/",
                                                                                                              ".").replace(
                     "\\", ".")
-                moduleName = f"{userServiceLocation}.{self.args[2]}.configure"
+                moduleName = f"{userServiceLocation}.{self.args[2]}.configure_discordui"
                 if os.path.isfile(moduleName.replace(".", "/") + ".py"):
                     with open(moduleName.replace(".", "/") + ".py", 'r') as f:
                         if "async def mainAsync(" not in f.read():
@@ -63,7 +64,7 @@ class Services:
             except ModuleNotFoundError:
                 try:
                     import importlib
-                    moduleName = f"kernel.services.{self.args[2]}.configure"
+                    moduleName = f"kernel.services.{self.args[2]}.configure_discordui"
                     if os.path.isfile(moduleName.replace(".", "/") + ".py"):
                         with open(moduleName.replace(".", "/") + ".py", 'r') as f:
                             if "async def mainAsync(" not in f.read():
@@ -141,7 +142,19 @@ class Services:
                 response += f"Stage {stage} Third Party Services: {', '.join(loadedThirdPartyService[stage])}\n"
 
             await self.message.reply(f"```{response}```", mention_author=True)
-
+            
+        elif self.args[1] == "start-ksrv":
+            safeMode = IPC.read("kernel.safemode", False) or Registry.read("SOFTWARE.CordOS.Kernel.SafeMode") == "1"
+            if Servicectl.launchsvc("kernel/services/" + self.args[2], safeMode, -1):
+                await self.message.reply(f"Service '{self.args[2]}' started.")
+            else:
+                await self.message.reply(f"Service '{self.args[2]}' failed to start.")
+        elif self.args[1] == "start-usrv":
+            safeMode = IPC.read("kernel.safemode", False) or Registry.read("SOFTWARE.CordOS.Kernel.SafeMode") == "1"
+            if Servicectl.launchsvc(Registry.read("SOFTWARE.CordOS.Kernel.Services.OtherServices") + "/" + self.args[2], safeMode, -1):
+                await self.message.reply(f"Service '{self.args[2]}' started.")
+            else:
+                await self.message.reply(f"Service '{self.args[2]}' failed to start.")
         elif self.args[1] == "enable-ksrv":
             Registry.write(f"SOFTWARE.CordOS.Kernel.Services.{self.args[2]}.Enabled", "1")
             await self.message.reply("Registry updated.")
