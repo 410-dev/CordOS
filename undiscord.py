@@ -20,6 +20,7 @@ knownDiscordFiles = [
     "./kernel/objects/server.py",
     "./kernel/objects/user.py",
     "./kernel/services/DiscordUIService",
+    "./kernel/services/PrivateVoiceChannels",
     "./kernel/services/webhook",
     "./kernel/servers.py",
     "./kernel/webhook.py",
