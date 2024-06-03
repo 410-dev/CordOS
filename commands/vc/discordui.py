@@ -20,9 +20,12 @@ async def mainAsync(args: list, message: DiscordMessageWrapper):
     # if len(args) == 0:
     #     await message.reply("Please provide at least one member.")
     #     return
+
     title = args[0]
     if args[0].startswith("<@"):
         title = "<auto>"
+    else:
+        args.pop(0)
 
     members = []
     for member in args:
