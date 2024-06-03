@@ -12,7 +12,7 @@ class IPCMemory:
         IPCMemory.memory[id] = value
         IPCMemory.referenceTime[id] = Clock.getEpoch()
 
-    def get(id: str, default=None) -> object:
+    def get(id: str, default=None):
         if IPCMemory.exists(id):
             IPCMemory.referenceTime[id] = Clock.getEpoch()
             return IPCMemory.memory[id]
@@ -35,7 +35,7 @@ def delete(id: str):
     # Use static memory
     IPCMemory.delete(id)
 
-def read(id: str, default=None) -> object:
+def read(id: str, default=None):
     # Use static memory
     return IPCMemory.get(id, default=default)
 
