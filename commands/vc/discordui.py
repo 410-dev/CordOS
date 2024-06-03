@@ -70,6 +70,9 @@ async def create(title: str, memberIDs: list, message: DiscordMessageWrapper) ->
             title = title[:-2]
             Journaling.record("INFO", f"Title updated: {title}")
 
+        if len(title) > 100:
+            title = title[:97] + "..."
+
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(connect=False),
             guild.me: discord.PermissionOverwrite(connect=True)
