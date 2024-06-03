@@ -4,6 +4,8 @@ import time
 import discord
 import threading
 import asyncio
+import random
+import string
 
 import kernel.servers as Servers
 import kernel.registry as Registry
@@ -16,6 +18,23 @@ import kernel.services.power.configure as Power
 import kernel.webhook as Webhook
 
 from kernel.objects.discordmessage import DiscordMessageWrapper
+
+
+class DiscordUIServiceIPCMemory:
+    client = None
+    eventLoop = None
+
+
+
+def coroutineResolve(asyncFunction: callable, args: dict, identifier: str = "".join(random.choices(string.ascii_letters + string.digits, k=8))):
+    if DiscordUIServiceIPCMemory.eventLoop is None:
+        Journaling.record("ERROR", f"[{identifier}] Event loop is not available at this time.")
+        return None
+
+    Journaling.record("INFO", f"[{identifier}] Running async function with parameters of {args}")
+    futureResult = asyncio.run_coroutine_threadsafe(asyncFunction(**args), DiscordUIServiceIPCMemory.eventLoop)
+    Journaling.record("INFO", f"[{identifier}] Future result obtained: {futureResult}")
+    return futureResult.result()
 
 def main():
     try:
@@ -44,7 +63,17 @@ def main():
 
         # Instantiate a Discord client object
         intents = discord.Intents.default()
-        intents.message_content = True
+        intents.message_content = Registry.read("SOFTWARE.CordOS.Kernel.Services.DiscordUIService.Intents.message_content", default="1", writeDefault=True) == "1"
+        intents.guilds = Registry.read("SOFTWARE.CordOS.Kernel.Services.DiscordUIService.Intents.guilds", default="1", writeDefault=True) == "1"
+        intents.members = Registry.read("SOFTWARE.CordOS.Kernel.Services.DiscordUIService.Intents.members", default="1", writeDefault=True) == "1"
+
+        intentsRegistryList = Registry.listSubKeys("SOFTWARE.CordOS.Kernel.Services.DiscordUIService.Intents")
+        for intent in intentsRegistryList:
+            try:
+                setattr(intents, intent, Registry.read(f"SOFTWARE.CordOS.Kernel.Services.DiscordUIService.Intents.{intent}", default="0") == "1")
+            except Exception as e:
+                Journaling.record("ERROR", f"Failed to set intent {intent} to {Registry.read(f"SOFTWARE.CordOS.Kernel.Services.DiscordUIService.Intents.{intent}", default="0") == "1"}.")
+
         client = discord.Client(intents=intents)
         Journaling.record("INFO", "Client instantiated.")
 
@@ -58,16 +87,19 @@ def main():
         # Define an event handler for when the bot is ready to start receiving events
         async def on_ready():
             IO.println(f"Logged in as {client.user}")
+            DiscordUIServiceIPCMemory.eventLoop = asyncio.get_running_loop()
             try:
-                enabled = Registry.read("SOFTWARE.CordOS.Kernel.Services.DiscordUIService.OnReadyMessage", default="0")
-                if enabled == "1":
-                    webhooks = Registry.read("SOFTWARE.CordOS.Kernel.Services.DiscordUIService.OnReadyWebhooks", default="").replace(", ", ",").split(",")
+                enabled = Registry.read("SOFTWARE.CordOS.Kernel.Services.DiscordUIService.OnReadyMessage", default="0", writeDefault=True) == "1"
+                if enabled:
+                    webhooks = Registry.read("SOFTWARE.CordOS.Kernel.Services.DiscordUIService.OnReadyWebhooks", default="", writeDefault=True).replace(", ", ",").split(",")
                     for webhook in webhooks:
                         try:
                             IO.println(f"Sending on_ready webhook to {webhook}")
                             Webhook.send(webhook, f"DiscordUIService for {client.user} is now online.")
                         except Exception as ex:
                             IO.println("Failed to send on_ready webhook: " + str(ex))
+                else:
+                    IO.println("OnReadyMessage is disabled.")
 
             except Exception as ex:
                 IO.println("Failed to prepare on_ready webhook: " + str(ex))
@@ -217,6 +249,7 @@ def main():
         # Push client to IPC
         Journaling.record("INFO", "Pushing client to IPC.")
         IPC.set("discord.client", client)
+        DiscordUIServiceIPCMemory.client = client
 
         # Start the shutdown listener
         def start_async_loop():
