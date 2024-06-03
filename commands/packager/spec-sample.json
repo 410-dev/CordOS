@@ -1,0 +1,129 @@
+{
+    "spec": "CordOSInstallablePackage",
+    "specv": 1,
+    "sdk": 1,
+    "name": "Package Name Here",
+    "version": "1.0.0",
+    "author": "Author Name Here",
+    "build": 1,
+    "arch": "any",
+    "description": "Description Here",
+    "payloads": {
+        "core": "https://github.com/dev/<repo>/archive/<branch>.zip",
+        "additional1": "https://github.com/dev/<repo>/archive/<branch>.zip",
+        "additional2": "https://github.com/dev/<repo>/archive/<branch>.zip"
+    },
+    "dependencies": {
+        "system": {
+            "version": ">=1.0",
+            "build": 1
+        }
+    },
+    "conflicts": {
+        "system": {
+            "version": "any",
+            "build": 1
+        }
+    },
+    "pip": [
+        "package1==1.0.0",
+        "package2"
+    ],
+    "procedure": [
+        {
+            "task": "delete",
+            "target": [
+                "storage/thispackagecache"
+            ],
+            "ignoreFail": true
+        },
+        {
+            "task": "install",
+            "package": "core"
+        },
+        {
+            "task": "filecheck",
+            "conditions": [
+                {
+                    "file": "",
+                    "exists": true,
+                    "value": "Hello 123"
+                },
+                {
+                    "file": "",
+                    "exists": true
+                }
+            ],
+            "true": {
+
+            },
+            "false": {
+
+            }
+        },
+        {
+            "task": "prompt",
+            "message": "Which Additional Package would you like to install? (all, 0, 1, 2)",
+            "cases": [
+                {
+                    "input": "all",
+                    "message": "Installing Additional1",
+                    "set": {
+                        "additional1": "yes",
+                        "additional2": "yes"
+                    }
+                },
+                {
+                    "input": "0",
+                    "message": "Installing nothing.",
+                    "set": {
+                        "additional1": "no",
+                        "additional2": "no"
+                    }
+                },
+                {
+                    "input": "1",
+                    "message": "Installing Additional1",
+                    "set": {
+                        "additional1": "yes",
+                        "additional2": "no"
+                    }
+                },
+                {
+                    "input": "2",
+                    "message": "Installing Additional2",
+                    "set": {
+                        "additional1": "no",
+                        "additional2": "yes"
+                    }
+                }
+            ]
+        },
+        {
+            "task": "install",
+            "if": {
+                "packageQueue": {
+                    "exists": true,
+                    "compare": "==",
+                    "value": "additional1"
+                }
+            },
+            "package": "additional1"
+        },
+        {
+            "task": "print",
+            "label": "testlabel",
+            "message": "This is a test for label-conditional statement"
+        },
+        {
+            "label": "end",
+            "task": "copy",
+            "source": [
+                "storage/thispackage"
+            ],
+            "destination": [
+                "storage/thispackage"
+            ]
+        }
+    ]
+}

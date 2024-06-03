@@ -1,0 +1,8 @@
+{
+    "id": "me.410-dev.NanoPyOS.DefaultBuilder",
+    "name": "DefaultBuilder",
+    "role": "critical",
+    "sdk": 1,
+    "stage": 1,
+    "sync": true
+}

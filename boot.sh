@@ -9,14 +9,22 @@ while true; do
         source ./venv/bin/activate
     fi
 
-    python3 ./bootloader.py "$@"
-    exit_code=$?
+    if [ -f "./safe_restart" ]; then
+        rm -f ./safe_restart
+        python3 ./bootloader.py --safe "$@"
+        exit_code=$?
+    else
+        python3 ./bootloader.py "$@"
+        exit_code=$?
+    fi
 
     if [ $exit_code -eq 1 ]; then
         touch ./restart
+    elif [ $exit_code -eq 3 ]; then
+        touch ./safe_restart
     fi
 
-    rm -rf ./data/cache
+    rm -rf ./tmp
 
     if [ ! -f "./restart" ]; then
         break

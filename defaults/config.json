@@ -6,5 +6,5 @@
         "file_trigger": "FILE:"
     },
     "token": "ENV:TOKEN",
-    "registry": "data/registry"
+    "registry": "etc/registry"
 }

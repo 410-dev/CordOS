@@ -12,7 +12,7 @@ class IPCMemory:
         IPCMemory.memory[id] = value
         IPCMemory.referenceTime[id] = Clock.getEpoch()
 
-    def get(id: str, default=None) -> object:
+    def get(id: str, default=None):
         if IPCMemory.exists(id):
             IPCMemory.referenceTime[id] = Clock.getEpoch()
             return IPCMemory.memory[id]
@@ -35,7 +35,7 @@ def delete(id: str):
     # Use static memory
     IPCMemory.delete(id)
 
-def read(id: str, default=None) -> object:
+def read(id: str, default=None):
     # Use static memory
     return IPCMemory.get(id, default=default)
 
@@ -48,7 +48,45 @@ def removeExpired():
     if ipcGC == 0:
         return
     memoryLiveTime: int = int(Registry.read("SOFTWARE.CordOS.Kernel.IPC.MemoryLiveTime", default="1800"))
+    if memoryLiveTime <= 0:
+        return
+    toDelete = []
     for key in IPCMemory.memory.keys():
         if IPCMemory.referenceTime[key] + memoryLiveTime < Clock.getEpoch():
-            IPCMemory.delete(key)
+            toDelete.append(key)
 
+    for key in toDelete:
+        IPCMemory.delete(key)
+
+
+def canRepeatUntilShutdown():
+    return not read("power.off", False)
+
+
+def repeatUntilShutdown(delay: float, function, delayFirst=False, terminateIfAnyOf=[("power.off", True)], terminateIfAllOf=[("power.off", True)]):
+    def wait():
+        milliseconds = delay % 1
+        seconds = delay - milliseconds
+        for i in range(int(seconds)):
+            if not read("power.off", False):
+                time.sleep(1)
+            else:
+                break
+        if not read("power.off", False):
+            time.sleep(milliseconds)
+
+    def checkConditions():
+        for condition in terminateIfAnyOf:
+            if read(condition[0], False) == condition[1]:
+                return True
+        for condition in terminateIfAllOf:
+            if read(condition[0], False) != condition[1]:
+                return False
+        return True
+
+    while not read("power.off", False) and not checkConditions():
+        if delayFirst:
+            wait()
+        function()
+        if not delayFirst:
+            wait()

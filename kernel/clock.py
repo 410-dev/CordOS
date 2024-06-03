@@ -11,7 +11,16 @@ def init():
         with open(os.path.join(cacheLoc, "start"), "w") as f:
             f.write(str(datetime.datetime.now().timestamp()))
             print("Clock initialized.")
-    
+
+def getStartTime():
+    cacheLoc: str = PartitionMgr.cache()
+    cacheLoc = os.path.join(cacheLoc, "krnlsrv", "clock")
+    try:
+        with open(os.path.join(cacheLoc, "start"), "r") as f:
+            return f.read()
+    except:
+        print("Error in reading start file.")
+        return "0"
 
 def getUptime():
     cacheLoc: str = PartitionMgr.cache()

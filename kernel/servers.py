@@ -1,10 +1,10 @@
 import json
 import kernel.registry as Registry
 
-from objects.server import Server
-from objects.user import User
+from kernel.objects.server import Server
+from kernel.objects.user import User
 
-import kernel.objects as Objects
+import kernel.object as Objects
 
 from typing import List
 
@@ -16,7 +16,7 @@ def load() -> List[Server]:
     Returns:
         List[Server]: A dictionary object representing the servers file.
     """
-    with open('data/servers.json') as f:
+    with open('etc/servers.json') as f:
         servers = json.load(f)['servers']
         
         if servers is None:
@@ -39,7 +39,7 @@ def save(servers: List[Server]):
     Parameters:
         servers (list): A dictionary object representing the servers file.
     """
-    with open('data/servers.json', 'w') as f:
+    with open('etc/servers.json', 'w') as f:
         jsonObject: dict = {}
         jsonObject['servers'] = []
         for sv in servers:

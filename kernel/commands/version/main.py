@@ -1,21 +1,16 @@
 import kernel.registry as Registry
 import kernel.ipc as IPC
+import kernel.io as IO
 
-class Version:
-    
-    def __init__(self, lineArgs, message) -> None:
-        self.args: list = lineArgs
-        self.message = message
 
-    async def exec(self):
-        
-        try: 
-            foundation = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Foundation")
-            version = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")
-            build = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Build")
-            botName = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.BotName")
-            botVer = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.BotVersion")
-            isSafe = "" if not IPC.read("kernel.safemode") else " (Safe Mode)"
-            await self.message.reply(f"Version Profiling:\n\nBaseSystem: {foundation} {version} (build {build}) {isSafe}\nBot: {botName} {botVer}", mention_author=True)
-        except Exception as e:
-            await self.message.reply(f"Error loading profile: {e}", mention_author=True)
+def main(args: list):
+    try:
+        foundation = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Foundation")
+        version = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Version")
+        build = Registry.read("SOFTWARE.CordOS.Kernel.Profiles.Build")
+        isSafe = "Normal Mode" if not IPC.read("kernel.safemode") else "Safe Mode"
+
+        IO.println(f"Version Profiling:\n\nSystem: {foundation} {version} (build {build}) {'(TEST VERSION) ' if '.alpha.' in build or '.beta.' in build or '.test.' in build else '' } {isSafe}\nCurrently using Sync Mode.")
+
+    except Exception as e:
+        IO.println(f"Error loading profile: {e}")

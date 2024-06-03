@@ -1,5 +1,5 @@
-# Open data/config.json and check if the config is valid
-# If data/config.json does not exist, copy defaults/config.json to data/config.json
+# Open etc/config.json and check if the config is valid
+# If etc/config.json does not exist, copy defaults/config.json to etc/config.json
 
 import json
 import shutil
@@ -14,11 +14,11 @@ if len(sys.argv) > 1:
             fixCorruption = True
             break
 
-# Open data/servers.json
+# Open etc/servers.json
 fileFound: bool = False
 servers = None
 try:
-    with open('data/servers.json') as f:
+    with open('etc/servers.json') as f:
         servers = json.load(f)
         fileFound = True
         
@@ -28,36 +28,36 @@ except FileNotFoundError:
 
 except:
     if fixCorruption:
-        # Delete data/servers.json
-        print("Deleting data/servers.json")
+        # Delete etc/servers.json
+        print("Deleting etc/servers.json")
         try:
-            os.remove('data/servers.json')
+            os.remove('etc/servers.json')
         except:
-            print("Error deleting data/servers.json")
+            print("Error deleting etc/servers.json")
         fileFound = False
     else:
-        print("Error opening data/servers.json")
+        print("Error opening etc/servers.json")
         exit(3)
 
 if not fileFound:
-    print('data/servers.json does not exist. Copying defaults/servers.json to data/servers.json')
-    shutil.copy('defaults/servers.json', 'data/servers.json')
+    print('etc/servers.json does not exist. Copying defaults/servers.json to etc/servers.json')
+    shutil.copy('defaults/servers.json', 'etc/servers.json')
     
-    # Remove default=True from data/servers.json
-    with open('data/servers.json') as f:
+    # Remove default=True from etc/servers.json
+    with open('etc/servers.json') as f:
         servers = json.load(f)
         servers.pop('default')
         servers['servers'] = []
         
-        with open('data/servers.json', 'w') as f:
+        with open('etc/servers.json', 'w') as f:
             json.dump(servers, f, indent=4)
 
 
-# Open data/config.json
+# Open etc/config.json
 fileFound: bool = False
 config = None
 try:
-    with open('data/config.json') as f:
+    with open('etc/config.json') as f:
         config = json.load(f)
         config_parser = config['config_parser']
         envVarKeyword = config_parser['env_trigger']
@@ -68,27 +68,27 @@ except FileNotFoundError:
     
 except:
     if fixCorruption:
-        # Delete data/config.json
-        print("Deleting data/config.json")
+        # Delete etc/config.json
+        print("Deleting etc/config.json")
         try:
-            os.remove('data/config.json')
+            os.remove('etc/config.json')
         except:
-            print("Error deleting data/config.json")
+            print("Error deleting etc/config.json")
         fileFound = False
     else:
-        print("Error opening data/config.json")
+        print("Error opening etc/config.json")
         exit(4)
     
 if not fileFound:
-    print('data/config.json does not exist. Copying defaults/config.json to data/config.json')
-    shutil.copy('defaults/config.json', 'data/config.json')
+    print('etc/config.json does not exist. Copying defaults/config.json to etc/config.json')
+    shutil.copy('defaults/config.json', 'etc/config.json')
     
-    # Remove default=True from data/config.json
-    with open('data/config.json') as f:
+    # Remove default=True from etc/config.json
+    with open('etc/config.json') as f:
         config = json.load(f)
         config.pop('default')
         
-        with open('data/config.json', 'w') as f:
+        with open('etc/config.json', 'w') as f:
             json.dump(config, f, indent=4)
             
     exit(1)
@@ -102,10 +102,10 @@ for key in config:
             print("Checking environment variable", envVar)
             if envVar not in os.environ:
                 print('Environment variable', envVar, 'not found.')
-                exit(2)
+
 
 print("Checking required keys for configurations...")
-requiredKeys = ["token", "registry", "config_parser"]
+requiredKeys = ["registry", "config_parser"]
 requiredKeysMissing: bool = False
 for key in requiredKeys:
     print(f"Checking config key: {key}")
@@ -117,10 +117,10 @@ if requiredKeysMissing:
 
 import kernel.registry as Registry
 
-if not os.path.exists('data/registry') or not os.path.isdir('data/registry'):
-    print("data/registry does not exist or is not a directory. Creating data/registry")
-    os.mkdir('data/registry')
-    Registry.build('defaults/registry.cordreg', 'data/registry')
+if not os.path.exists(config['registry']) or not os.path.isdir(config['registry']):
+    print(f"{config['registry']} does not exist or is not a directory. Creating {config['registry']}")
+    os.mkdir(config['registry'])
+    Registry.build('defaults/registry.cordreg', config['registry'])
 
 print("Checking required registries...")
 

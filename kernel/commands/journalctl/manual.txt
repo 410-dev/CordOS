@@ -1,0 +1,21 @@
+Journal management command
+
+This command will allow you to read the journal entries of the system.
+
+```
+Usage:
+    journalctl [OPTIONS] [Parameters]
+
+Options:
+    list - List all journal entries.
+    read - Read a specific journal entry. This requires a parameter of entry id and optional parameter of lines to read. Optional parameter is unsupported on DiscordUIService.
+    dump - Dump the on-memory journal entries to a file. The file is only accessible locally and will not be streamed to the output.
+    dump-ipc - Dump the IPC memory variables to a file. The file is only accessible locally and will not be streamed to the output. This is only available on SystemUI.
+
+Example:
+    journalctl list
+    journalctl read kernel.system
+    journalctl read kernel.system 10
+    journalctl dump
+
+```

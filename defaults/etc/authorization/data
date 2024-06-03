@@ -1,0 +1,21 @@
+{
+    "logins": [
+        {
+            "username": "Administrator",
+            "privilege": 32767,
+            "authentications": [
+                {
+                    "type": "password",
+                    "data": "54c5b3dd459d5ef778bb2fa1e23a5fb0e1b62ae66970bcb436e8f81a1a1a8e41"
+                }
+            ],
+            "capability": {
+                "enabled": true,
+                "login.local": true,
+                "login.remote": true,
+                "privilege.escalation": true
+            },
+            "extra": {}
+        }
+    ]
+}

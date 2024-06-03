@@ -1,5 +1,8 @@
 {
-    "api": 1,
+    "id": "me.410-dev.NanoPyOS.Power",
+    "name": "Power",
+    "role": "critical",
+    "sdk": 2,
     "stage": 1, 
-    "name": "Power"
+    "sync": false
 }

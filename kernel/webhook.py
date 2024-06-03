@@ -1,7 +1,10 @@
 import kernel.registry as Registry
+import kernel.journaling as Journaling
+from kernel.objects.embedmsg import EmbeddedMessage
 
 import os
-from discord_webhook import DiscordWebhook
+from discord_webhook import DiscordWebhook, DiscordEmbed
+
 
 def list() -> list:
     path: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.RegistrationPath")
@@ -16,7 +19,20 @@ def list() -> list:
 def send(webhookURL: str, message: str) -> None:
     webhook = DiscordWebhook(url=webhookURL, content=message)
     response = webhook.execute()
-    print(response)
+    Journaling.record("INFO", f"Webhook response: {response} for url {webhookURL}")
+
+
+def sendEmbed(webhookURL: str, embedContent: EmbeddedMessage) -> None:
+    webhook = DiscordWebhook(url=webhookURL)
+    embed = DiscordEmbed(
+        title=embedContent.get("title"),
+        description=embedContent.get("description"),
+        color=embedContent.get("color")
+    )
+    webhook.add_embed(embed)
+    response = webhook.execute()
+    Journaling.record("INFO", f"Webhook response: {response} for url {webhookURL}")
+
 
 def getLibrary(webhookID: str) -> str:
     libraryPath: str = Registry.read("SOFTWARE.CordOS.Kernel.Services.Webhook.LibraryPath")
