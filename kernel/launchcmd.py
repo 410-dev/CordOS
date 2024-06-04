@@ -4,8 +4,11 @@ import traceback
 import kernel.registry as Registry
 import kernel.journaling as Journaling
 
-def getRunnableModule(args: list, targetExecutive: str = "main"):
-    commandsPaths: list = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
+def getRunnableModule(args: list, targetExecutive: str = "main", pathList: list = None) -> str:
+    if pathList is not None:
+        commandsPaths = pathList
+    else:
+        commandsPaths: list = Registry.read("SOFTWARE.CordOS.Kernel.Programs.Paths").replace(", ", ",").split(",")
     appropriateCommandPath: str = ""
     Journaling.record("INFO", f"Path: {commandsPaths}")
 
