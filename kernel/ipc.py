@@ -63,7 +63,11 @@ def canRepeatUntilShutdown():
     return not read("power.off", False)
 
 
-def repeatUntilShutdown(delay: float, function, delayFirst=False, terminateIfAnyOf=[("power.off", True)], terminateIfAllOf=[("power.off", True)]):
+def repeatUntilShutdown(delay: float, function, delayFirst=False, terminateIfAnyOf=None, terminateIfAllOf=None):
+    if terminateIfAnyOf is None:
+        terminateIfAnyOf = [("power.off", True)]
+    if terminateIfAllOf is None:
+        terminateIfAllOf = [("power.off", True)]
     def wait():
         milliseconds = delay % 1
         seconds = delay - milliseconds
