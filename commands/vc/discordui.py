@@ -3,10 +3,10 @@ import time
 import discord
 
 from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessageWrapper
+from kernel.services.DiscordUIService.main import DiscordUIServiceIPCMemory
 
 import kernel.services.PrivateVoiceChannels.main as PrivateVoiceChannels
 import kernel.journaling as Journaling
-import kernel.ipc as IPC
 import kernel.registry as Registry
 
 async def mainAsync(args: list, message: DiscordMessageWrapper):
@@ -43,7 +43,7 @@ async def mainAsync(args: list, message: DiscordMessageWrapper):
 async def create(title: str, memberIDs: list, message: DiscordMessageWrapper) -> (bool, str): # Success
     try:
         guildID = message.guild.id
-        client: discord.Client = IPC.read("discord.client", None)
+        client: discord.Client = DiscordUIServiceIPCMemory.client
         if client is None:
             Journaling.record("ERROR", "The Discord client is not available: IPC read \"discord.client\" returned None.")
             return False, "The Discord client is not available."
