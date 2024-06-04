@@ -16,10 +16,6 @@ def cache() -> str:
     return "tmp"
 
 
-def appdata() -> str:
-    return f"{data()}/ApplicationData"
-
-
 def default() -> str:
     return f"defaults"
 
@@ -27,143 +23,159 @@ def default() -> str:
 def root() -> str:
     return f"./"
 
+
 class Data:
+
+    @staticmethod
+    def appdata():
+        return Data.path("ApplicationData")
+
     @staticmethod
     def read(path: str) -> str:
-        return RootFS.read(os.path.join(data(), path))
+        return RootFS.read(os.path.join(Data.path(), path))
 
     @staticmethod
     def write(path: str, content: str):
-        RootFS.write(os.path.join(data(), path), content)
+        RootFS.write(os.path.join(Data.path(), path), content)
 
     @staticmethod
     def isFile(path: str) -> bool:
-        return RootFS.isFile(os.path.join(data(), path))
+        return RootFS.isFile(os.path.join(Data.path(), path))
 
     @staticmethod
     def isDir(path: str) -> bool:
-        return RootFS.isDir(os.path.join(data(), path))
+        return RootFS.isDir(os.path.join(Data.path(), path))
 
     @staticmethod
     def exists(path: str) -> bool:
-        return RootFS.exists(os.path.join(data(), path))
+        return RootFS.exists(os.path.join(Data.path(), path))
 
     @staticmethod
     def mkdir(path: str):
-        RootFS.mkdir(os.path.join(data(), path))
+        RootFS.mkdir(os.path.join(Data.path(), path))
 
     @staticmethod
     def path(subPath: str = "") -> str:
-        return data() + ("/" + subPath if subPath != "" else "")
+        return "storage" + ("/" + subPath if subPath != "" else "")
 
     @staticmethod
     def copyDefault(path: str, existOK: bool = True):
-        RootFS.copy(os.path.join(default(), data(), path), os.path.join(data(), path), existOK)
+        RootFS.copy(os.path.join(RootFS.defaults(), Data.path(), path), os.path.join(Data.path(), path), existOK)
 
     @staticmethod
     def list(path: str) -> list:
-        return os.listdir(os.path.join(data(), path))
+        return os.listdir(os.path.join(Data.path(), path))
 
     @staticmethod
     def rm(path: str):
-        return RootFS.rm(os.path.join(data(), path))
+        return RootFS.rm(os.path.join(Data.path(), path))
+
 
 class Etc:
     @staticmethod
     def read(path: str) -> str:
-        return RootFS.read(os.path.join(etc(), path))
+        return RootFS.read(os.path.join(Etc.path(), path))
 
     @staticmethod
     def write(path: str, content: str):
-        RootFS.write(os.path.join(etc(), path), content)
+        RootFS.write(os.path.join(Etc.path(), path), content)
 
     @staticmethod
     def isFile(path: str) -> bool:
-        return RootFS.isFile(os.path.join(etc(), path))
+        return RootFS.isFile(os.path.join(Etc.path(), path))
 
     @staticmethod
     def isDir(path: str) -> bool:
-        return RootFS.isDir(os.path.join(etc(), path))
+        return RootFS.isDir(os.path.join(Etc.path(), path))
 
     @staticmethod
     def exists(path: str) -> bool:
-        return RootFS.exists(os.path.join(etc(), path))
+        return RootFS.exists(os.path.join(Etc.path(), path))
 
     @staticmethod
     def mkdir(path: str):
-        RootFS.mkdir(os.path.join(etc(), path))
+        RootFS.mkdir(os.path.join(Etc.path(), path))
 
     @staticmethod
     def path(subPath: str = "") -> str:
-        return etc() + ("/" + subPath if subPath != "" else "")
+        return "etc" + ("/" + subPath if subPath != "" else "")
 
     @staticmethod
     def copyDefault(path: str, existOK: bool = True):
-        RootFS.copy(os.path.join(default(), etc(), path), os.path.join(etc(), path), existOK)
+        RootFS.copy(os.path.join(RootFS.defaults(), Etc.path(), path), os.path.join(Etc.path(), path), existOK)
 
     @staticmethod
     def list(path: str) -> list:
-        return os.listdir(os.path.join(etc(), path))
+        return os.listdir(os.path.join(Etc.path(), path))
 
     @staticmethod
     def rm(path: str):
-        return RootFS.rm(os.path.join(etc(), path))
+        return RootFS.rm(os.path.join(Etc.path(), path))
 
 
 class RootFS:
+
+    @staticmethod
+    def defaults():
+        return "defaults"
+
+    @staticmethod
+    def path() -> str:
+        return "./"
+
     @staticmethod
     def read(path: str) -> str:
         try:
-            with open(os.path.join(root(), path), "r") as f:
+            with open(os.path.join(RootFS.path(), path), "r") as f:
                 return f.read()
         except:
             return None
 
     @staticmethod
     def write(path: str, content: str):
-        if not os.path.exists(os.path.join(root(), os.path.dirname(path))):
-            os.makedirs(os.path.join(root(), os.path.dirname(path)), exist_ok=True)
-        with open(os.path.join(root(), path), "w") as f:
+        if not os.path.exists(os.path.join(RootFS.path(), os.path.dirname(path))):
+            os.makedirs(os.path.join(RootFS.path(), os.path.dirname(path)), exist_ok=True)
+        with open(os.path.join(RootFS.path(), path), "w") as f:
             f.write(content)
 
     @staticmethod
     def isFile(path: str) -> bool:
-        return os.path.isfile(os.path.join(root(), path))
+        return os.path.isfile(os.path.join(RootFS.path(), path))
 
     @staticmethod
     def isDir(path: str) -> bool:
-        return os.path.isdir(os.path.join(root(), path))
+        return os.path.isdir(os.path.join(RootFS.path(), path))
 
     @staticmethod
     def exists(path: str) -> bool:
-        return os.path.exists(os.path.join(root(), path))
+        return os.path.exists(os.path.join(RootFS.path(), path))
 
     @staticmethod
     def mkdir(path: str):
-        os.makedirs(os.path.join(root(), path), exist_ok=True)
+        os.makedirs(os.path.join(RootFS.path(), path), exist_ok=True)
 
     @staticmethod
     def copy(src: str, dst: str, exist_ok: bool = True):
-        if not os.path.exists(os.path.join(root(), src)):
+        if not os.path.exists(os.path.join(RootFS.path(), src)):
             return
-        if os.path.isfile(os.path.join(root(), src)):
-            shutil.copyfile(os.path.join(root(), src), os.path.join(root(), dst))
-        elif os.path.isdir(os.path.join(root(), src)):
-            shutil.copytree(os.path.join(root(), src), os.path.join(root(), dst), dirs_exist_ok=exist_ok)
+        if os.path.isfile(os.path.join(RootFS.path(), src)):
+            shutil.copyfile(os.path.join(RootFS.path(), src), os.path.join(RootFS.path(), dst))
+        elif os.path.isdir(os.path.join(RootFS.path(), src)):
+            shutil.copytree(os.path.join(RootFS.path(), src), os.path.join(RootFS.path(), dst), dirs_exist_ok=exist_ok)
 
     @staticmethod
     def move(src: str, dst: str):
-        if not os.path.exists(os.path.join(root(), src)):
+        if not os.path.exists(os.path.join(RootFS.path(), src)):
             return
-        shutil.move(os.path.join(root(), src), os.path.join(root(), dst))
+        shutil.move(os.path.join(RootFS.path(), src), os.path.join(RootFS.path(), dst))
 
     @staticmethod
     def list(path: str) -> list:
-        return os.listdir(os.path.join(root(), path))
+        return os.listdir(os.path.join(RootFS.path(), path))
 
     @staticmethod
     def rm(path: str) -> bool:
-        full_path = os.path.join(root(), path)
+        full_path = os.path.join(RootFS.path(), path)
         if not os.path.exists(full_path):
             return False
 
@@ -179,43 +191,44 @@ class RootFS:
 
         return True
 
+
 class Cache:
     @staticmethod
     def read(path: str) -> str:
-        return RootFS.read(os.path.join(cache(), path))
+        return RootFS.read(os.path.join(Cache.path(), path))
 
     @staticmethod
     def write(path: str, content: str):
-        RootFS.write(os.path.join(cache(), path), content)
+        RootFS.write(os.path.join(Cache.path(), path), content)
 
     @staticmethod
     def isFile(path: str) -> bool:
-        return RootFS.isFile(os.path.join(cache(), path))
+        return RootFS.isFile(os.path.join(Cache.path(), path))
 
     @staticmethod
     def isDir(path: str) -> bool:
-        return RootFS.isDir(os.path.join(cache(), path))
+        return RootFS.isDir(os.path.join(Cache.path(), path))
 
     @staticmethod
     def exists(path: str) -> bool:
-        return RootFS.exists(os.path.join(cache(), path))
+        return RootFS.exists(os.path.join(Cache.path(), path))
 
     @staticmethod
     def mkdir(path: str):
-        RootFS.mkdir(os.path.join(cache(), path))
+        RootFS.mkdir(os.path.join(Cache.path(), path))
 
     @staticmethod
     def path(subPath: str = "") -> str:
-        return cache() + ("/" + subPath if subPath != "" else "")
+        return "tmp" + ("/" + subPath if subPath != "" else "")
 
     @staticmethod
     def copyDefault(path: str, existOK: bool = True):
-        RootFS.copy(os.path.join(default(), cache(), path), os.path.join(cache(), path), existOK)
+        RootFS.copy(os.path.join(RootFS.defaults(), Cache.path(), path), os.path.join(Cache.path(), path), existOK)
 
     @staticmethod
     def list(path: str) -> list:
-        return os.listdir(os.path.join(cache(), path))
+        return os.listdir(os.path.join(Cache.path(), path))
 
     @staticmethod
     def rm(path: str):
-        return RootFS.rm(os.path.join(cache(), path))
+        return RootFS.rm(os.path.join(Cache.path(), path))
