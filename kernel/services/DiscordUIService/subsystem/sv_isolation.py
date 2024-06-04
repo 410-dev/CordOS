@@ -9,7 +9,7 @@ import traceback
 
 
 def getRoot(subDir: str = "")-> str:
-    return PartitionMgr.Data.path(f"CordOS/sessions/{subDir}")
+    return PartitionMgr.Data.path(f"CordOS/sessions/s{subDir}")
 
 
 def getIsolationAvailable(message: DiscordMessageWrapper) -> bool:
@@ -101,7 +101,7 @@ def mkIsolation(message: DiscordMessageWrapper) -> bool:
             ("kernel.registry", "kernel.services.DiscordUIService.subsystem.registry"),
             ("kernel.ipc", "kernel.services.DiscordUIService.subsystem.ipc"),
             ("kernel.partitionmgr", "kernel.services.DiscordUIService.subsystem.partitionmgr"),
-            ("commands.packtool", f"{PartitionMgr.RootFS.path(getRoot(message.guild.id)).replace('\\', '/').replace('//', '/').replace('/', '.')}.commands.packtool"),
+            ("import commands.", f"import {getRoot(message.guild.id).replace('\\', '/').replace('//', '/').replace('/', '.')}.commands."),
         ]
         patchNeglectPattern = "#@GLOBAL"
 
