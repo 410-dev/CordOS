@@ -19,9 +19,15 @@ async def mainAsync(message):
             Journaling.record("INFO", f"Isolation not available for guild {message.guild.id}.")
             runnablePath: str = Launcher.getRunnableModule(args, "discordui")
         else:
-            paths = [
-                Isolation.getContainerPath(message, "commands"),
-            ]
+            paths = []
+            if Isolation.getIsolationPermission(message, "local.commands.execute"):
+                paths.append(Isolation.getContainerPath(message, "commands"))
+            if Isolation.getIsolationPermission(message, "global.commands.execute"):
+                paths.append("commands")
+            if Isolation.getIsolationPermission(message, "kernel.commands.execute"):
+                paths.append("kernel/commands")
+            registryData = ','.join(paths)
+            Isolation.setRegistry(message, "SOFTWARE.CordOS.Kernel.Programs.Paths", registryData)
             Journaling.record("INFO", f"Command will be searched under path: {paths}")
             runnablePath: str = Launcher.getRunnableModule(args, "discordui", pathList=paths)
         Journaling.record("INFO", f"Command '{cmd}' found at '{runnablePath}'.")

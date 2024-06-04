@@ -78,6 +78,14 @@ def mkIsolation(message: DiscordMessageWrapper) -> bool:
                 "global.events.modify": {
                     "enabled": False,
                     "key": ""
+                },
+                "kernel.commands.modify": {
+                    "enabled": False,
+                    "key": ""
+                },
+                "kernel.commands.execute": {
+                    "enabled": False,
+                    "key": ""
                 }
             }
         }
@@ -148,10 +156,10 @@ def mkIsolation(message: DiscordMessageWrapper) -> bool:
         return False
 
 
-def getIsolationPermission(message: DiscordMessageWrapper, key: str) -> str:
+def getIsolationPermission(message: DiscordMessageWrapper, key: str, authorization: str = "") -> str:
     try:
         declaration = json.loads(PartitionMgr.RootFS.read(f"{getRoot(message.guild.id)}/isolation.json"))
-        return declaration["permissions"][key]["key"]
+        return declaration["permissions"][key]["enabled"] and declaration["permissions"][key]["key"] == authorization
     except Exception as e:
         Journaling.record("ERROR", f"Error getting isolation config key for guild {message.guild.id}. e: {e}")
         return ""
@@ -165,9 +173,9 @@ def getCallerContainerPath(mustContain: str = getRoot()) -> str:
         if mustContain in filename:
             try:
                 session_id = filename.split(mustContain)[1].split("/")[0]
-                if mustContain.endswith("/"):
-                    return f"{mustContain}{session_id}"
-                return f"{mustContain}/{session_id}"
+                # if mustContain.endswith("/"):
+                return f"{mustContain}{session_id}"
+                # return f"{mustContain}/{session_id}"
             except IndexError:
                 pass  # Handle cases where the path doesn't have the expected structure
     return None  # Indicate that the session ID wasn't found
@@ -175,3 +183,16 @@ def getCallerContainerPath(mustContain: str = getRoot()) -> str:
 
 def getContainerPath(message: DiscordMessageWrapper, subDir: str) -> str:
     return getRoot(message.guild.id) + f"/{subDir}"
+
+
+def getRegistry(message: DiscordMessageWrapper, key: str) -> str:
+    return getRoot(message.guild.id) + f"/etc/registry/{key.replace('.', '/')}"
+
+
+def setRegistry(message: DiscordMessageWrapper, key: str, value: str) -> bool:
+    try:
+        PartitionMgr.RootFS.write(getRegistry(message, key), value)
+        return True
+    except Exception as e:
+        Journaling.record("ERROR", f"Error setting registry key for guild {message.guild.id}. e: {e}")
+        return False

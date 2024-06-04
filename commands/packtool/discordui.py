@@ -1,6 +1,8 @@
 import kernel.registry as Registry
 import kernel.services.DiscordUIService.servers as Servers
 
+import commands.packtool.install as install
+import commands.packtool.remove as remove
 
 async def checkPermission(message):
     permission = Registry.read("SOFTWARE.CordOS.Security.Services")
