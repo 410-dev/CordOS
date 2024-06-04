@@ -50,7 +50,7 @@ def read(key: str, regloc: str = Config.get("registry"), default=None, writeDefa
 
     with open(os.path.join(regloc, key), 'r') as f:
         if os.path.isfile(os.path.join(regloc, key)):
-            val = f.read()
+            val = f.read().strip()
             journal("read", True, default, key, val)
             return val
 
