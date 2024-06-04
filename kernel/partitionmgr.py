@@ -120,8 +120,8 @@ class RootFS:
         return "defaults"
 
     @staticmethod
-    def path() -> str:
-        return "./"
+    def path(subPath: str) -> str:
+        return "./" + subPath
 
     @staticmethod
     def read(path: str) -> str:
