@@ -7,7 +7,7 @@ import asyncio
 import random
 import string
 
-import kernel.servers as Servers
+import kernel.services.DiscordUIService.servers as Servers
 import kernel.registry as Registry
 import kernel.config as Config
 import kernel.ipc as IPC

@@ -1,6 +1,6 @@
 import traceback
 import kernel.registry as Registry
-import kernel.servers as Servers
+import kernel.services.DiscordUIService.servers as Servers
 
 from kernel.objects.user import User
 from kernel.objects.server import Server

@@ -1,6 +1,6 @@
 import traceback
 import kernel.registry as Registry
-import kernel.servers as Servers
+import kernel.services.DiscordUIService.servers as Servers
 import kernel.journaling as Journaling
 
 from kernel.objects.discordmessage import DiscordMessageWrapper

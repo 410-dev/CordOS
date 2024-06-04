@@ -1,7 +1,7 @@
 import traceback
 import kernel.config as Config
 import kernel.registry as Registry
-import kernel.servers as Servers
+import kernel.services.DiscordUIService.servers as Servers
 
 class Regedit:
 

@@ -1,5 +1,5 @@
 import kernel.registry as Registry
-import kernel.servers as Servers
+import kernel.services.DiscordUIService.servers as Servers
 
 
 async def checkPermission(message):
