@@ -1,6 +1,7 @@
 import kernel.io as IO
 import kernel.host as Host
 import kernel.partitionmgr as PartitionManager
+import commands.packtool.database as database
 import requests
 import shutil
 import json
@@ -68,9 +69,9 @@ def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: 
     IO.println("Updating scope keys...")
     clonePath = spec['scope']
     specialKeys = [
-        ("$storage", PartitionManager.data()),
-        ("$etc", PartitionManager.etc()),
-        ("$root", PartitionManager.root())
+        ("$storage", PartitionManager.Data.path()),
+        ("$etc", PartitionManager.Etc.path()),
+        ("$root", PartitionManager.RootFS.path())
     ]
     for key, value in specialKeys:
         clonePath = clonePath.replace(key, value)

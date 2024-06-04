@@ -1,4 +1,5 @@
 import json
+import commands.packtool.database as database
 
 
 def listPackages() -> str:

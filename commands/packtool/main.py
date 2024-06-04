@@ -1,4 +1,6 @@
 import kernel.io as IO
+import commands.packtool.install as install
+import commands.packtool.remove as remove
 
 
 # packtool install <url>...
