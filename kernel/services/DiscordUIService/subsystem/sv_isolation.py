@@ -7,21 +7,26 @@ import json
 import os
 import traceback
 
+
+def getRoot(subDir: str)-> str:
+    return PartitionMgr.Data.path(f"CordOS/sessions/{subDir}")
+
+
 def getIsolationAvailable(message: DiscordMessageWrapper) -> bool:
 
-    if not PartitionMgr.Data.isDir(f"CordOS/sessions/{message.guild.id}"):
+    if not PartitionMgr.RootFS.isDir(getRoot(message.guild.id)):
         Journaling.record("INFO", f"Isolation not setup for guild {message.guild.id}.")
         return False
 
     Journaling.record("INFO", f"Isolation setup for guild {message.guild.id}.")
-    declaration = json.loads(PartitionMgr.Data.read(f"CordOS/sessions/{message.guild.id}/isolation.json"))
+    declaration = json.loads(PartitionMgr.RootFS.read(f"{getRoot(message.guild.id)}/isolation.json"))
     return declaration["isolation"]
 
 
 def mkIsolation(message: DiscordMessageWrapper):
     try:
         # Setup isolation environment
-        PartitionMgr.Data.mkdir(f"CordOS/sessions/{message.guild.id}")
+        PartitionMgr.RootFS.mkdir(getRoot(message.guild.id))
         isolationDeclare = {
             "isolation": True,
             "guild": message.guild.id,
@@ -74,8 +79,7 @@ def mkIsolation(message: DiscordMessageWrapper):
             }
         }
         Journaling.record("INFO", f"Isolation container created for guild {message.guild.id}.")
-        PartitionMgr.Data.write(f"CordOS/sessions/{message.guild.id}/isolation.json",
-                                json.dumps(isolationDeclare, indent=4))
+        PartitionMgr.RootFS.write(f"{getRoot(message.guild.id)}/isolation.json", json.dumps(isolationDeclare, indent=4))
         Journaling.record("INFO", f"Isolation declaration created for guild {message.guild.id}.")
 
         # Copy files
@@ -84,7 +88,7 @@ def mkIsolation(message: DiscordMessageWrapper):
         ]
         for file in filesToCopy:
             Journaling.record("INFO", f"Copying {file} to isolation container for guild {message.guild.id}.")
-            PartitionMgr.RootFS.copy(file, PartitionMgr.Data.path(f"CordOS/sessions/{message.guild.id}"))
+            PartitionMgr.RootFS.copy(file, getRoot(message.guild.id))
             Journaling.record("INFO", f"Copy of {file} to isolation container for guild {message.guild.id} complete.")
 
         # File patches
@@ -93,7 +97,7 @@ def mkIsolation(message: DiscordMessageWrapper):
             ("import kernel.registry as", "import kernel.services.DiscordUIService.subsystem.registry as"),
             ("import kernel.ipc as", "import kernel.services.DiscordUIService.subsystem.ipc as"),
             ("import kernel.partitionmgr as", "import kernel.services.DiscordUIService.subsystem.partitionmgr as"),
-            ("import commands.packtool", f"import {PartitionMgr.Data.path('CordOS/sessions').replace('\\', '/').replace('//', '/').replace('/', '.')}.commands.packtool"),
+            ("import commands.packtool", f"import {PartitionMgr.RootFS.path(getRoot(message.guild.id)).replace('\\', '/').replace('//', '/').replace('/', '.')}.commands.packtool"),
         ]
         patchNeglectPattern = "#@GLOBAL"
 
@@ -109,7 +113,7 @@ def mkIsolation(message: DiscordMessageWrapper):
                     l.append(full_path)
             return l
 
-        filesToPatch = recursiveFileBuild(PartitionMgr.Data.path(f"CordOS/sessions/{message.guild.id}"), [])
+        filesToPatch = recursiveFileBuild(PartitionMgr.RootFS.path(getRoot(message.guild.id)), [])
         for file in filesToPatch:
             with open(file, "r") as f:
                 content = f.read()
@@ -132,7 +136,7 @@ def mkIsolation(message: DiscordMessageWrapper):
 
         for d in dirsToCreate:
             Journaling.record("INFO", f"Creating directory {d} in isolation container for guild {message.guild.id}.")
-            PartitionMgr.Data.mkdir(f"CordOS/sessions/{message.guild.id}/{d}")
+            PartitionMgr.RootFS.mkdir(f"{getRoot(message.guild.id)}/{d}")
             Journaling.record("INFO", f"Directory {d} created in isolation container for guild {message.guild.id}.")
 
         Journaling.record("INFO", f"Isolation setup complete for guild {message.guild.id}.")
@@ -144,14 +148,14 @@ def mkIsolation(message: DiscordMessageWrapper):
 
 def getIsolationPermission(message: DiscordMessageWrapper, key: str) -> str:
     try:
-        declaration = json.loads(PartitionMgr.Data.read(f"CordOS/sessions/{message.guild.id}/isolation.json"))
+        declaration = json.loads(PartitionMgr.RootFS.read(f"{getRoot(message.guild.id)}/isolation.json"))
         return declaration["permissions"][key]["key"]
     except Exception as e:
         Journaling.record("ERROR", f"Error getting isolation config key for guild {message.guild.id}. e: {e}")
         return ""
 
 
-def getCallerContainerPath(mustContain: str = "CordOS/sessions/") -> str:
+def getCallerContainerPath(mustContain: str = getRoot()) -> str:
     mustContain = mustContain.replace("\\", "/").replace("//", "/")
     for frame in traceback.extract_stack():
         filename = frame.filename
@@ -165,3 +169,7 @@ def getCallerContainerPath(mustContain: str = "CordOS/sessions/") -> str:
             except IndexError:
                 pass  # Handle cases where the path doesn't have the expected structure
     return None  # Indicate that the session ID wasn't found
+
+
+def getContainerPath(message: DiscordMessageWrapper, subDir: str) -> str:
+    return getRoot(message.guild.id) + f"/{subDir}"
