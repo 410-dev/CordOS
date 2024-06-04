@@ -10,7 +10,7 @@ CordOS 에서 Webhook 을 활용하는 백그라운드 작업을 관리하는 �
 Webhook 백그라운드 작업 파일은 간단한 python 스크립트입니다.<br>
 아래는 Webhook 백그라운드 작업 파일의 예시입니다.
 ```python
-import kernel.webhook as Webhook # 웹훅 모듈을 불러옵니다.
+import kernel.services.DiscordUIService.webhook as Webhook # 웹훅 모듈을 불러옵니다.
 
 # 라이브러리 위치를 인자로 받는 main 함수를 정의합니다. 이 함수는 매초마다 비동기적으로 실행됩니다.
 def main(library: str):

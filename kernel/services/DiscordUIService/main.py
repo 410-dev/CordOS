@@ -15,7 +15,7 @@ import kernel.journaling as Journaling
 import kernel.io as IO
 import kernel.services.DiscordUIService.asyncioevents as IOEventsMgr
 import kernel.services.power.configure as Power
-import kernel.webhook as Webhook
+import kernel.services.DiscordUIService.webhook as Webhook
 
 from kernel.objects.discordmessage import DiscordMessageWrapper
 

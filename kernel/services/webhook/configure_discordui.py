@@ -1,5 +1,5 @@
 import kernel.registry as Registry
-import kernel.webhook as Webhook
+import kernel.services.DiscordUIService.webhook as Webhook
 
 import os
 
