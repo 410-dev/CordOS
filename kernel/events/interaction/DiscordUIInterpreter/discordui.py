@@ -3,6 +3,7 @@ import kernel.registry as Registry
 import kernel.journaling as Journaling
 
 import kernel.services.DiscordUIService.asynclauncher as AsyncLauncher
+import kernel.services.DiscordUIService.subsystem.sv_isolation as Isolation
 
 import traceback
 
@@ -12,8 +13,17 @@ async def mainAsync(message):
         msgContent: str = message.content[len(prefix):]
         args: list = Launcher.splitArguments(msgContent)
         cmd: str = Launcher.getCommand(args)
+        # paths: list = Registry.read("SOFTWARE.CordOS.Kernel.Programs.DiscordPaths", default="kernel/services/DiscordUIService/subsystem/commands", writeDefault=True).replace(", ", ",").split(",")
         Journaling.record("INFO", f"Command '{cmd}' executed by {message.author.name}#{message.author.discriminator}.")
-        runnablePath: str = Launcher.getRunnableModule(args, "discordui")
+        if not Isolation.getIsolationAvailable(message):
+            Journaling.record("INFO", f"Isolation not available for guild {message.guild.id}.")
+            runnablePath: str = Launcher.getRunnableModule(args, "discordui")
+        else:
+            paths = [
+                Isolation.getContainerPath(message, "commands"),
+            ]
+            Journaling.record("INFO", f"Command will be searched under path: {paths}")
+            runnablePath: str = Launcher.getRunnableModule(args, "discordui", pathList=paths)
         Journaling.record("INFO", f"Command '{cmd}' found at '{runnablePath}'.")
     except Exception as e:
         Journaling.record("ERROR", f"Failed looking up for command. The issue is highly likely from Launcher.getRunnableModule. e: {e}")
