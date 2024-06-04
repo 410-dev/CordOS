@@ -73,6 +73,9 @@ def record(state: str, text: str):
     specificJournal = f"{PartitionMgr.etc()}/journals/{Clock.getStartTime().split(".")[0]}/{callerName}.journal"
     globalJournal = f"{PartitionMgr.etc()}/journals/{Clock.getStartTime().split(".")[0]}/_.journal"
 
+    if Registry.read("SOFTWARE.CordOS.Kernel.EnableStdoutJournaling", default="0") == "1":
+        print(f"[{timestamp}] [{state}] [{caller.name}@{callerName}] {text}")
+
     if Registry.read("SOFTWARE.CordOS.Kernel.DisableOnMemoryJournaling", default="0") == "0":
         if callerName not in JournalingContainer.journals:
             JournalingContainer.addJournal(callerName, scriptPath)
