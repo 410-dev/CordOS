@@ -1,0 +1,1 @@
+Updates the isolated command bundles to the latest version in system global
