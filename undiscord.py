@@ -12,6 +12,7 @@ knownDiscordFiles = [
     "./commands/note",
     "./commands/tags",
     "./commands/vc",
+    "./commands/multiline-execute",
     "./kernel/events/interaction/DiscordUIInterpreter",
     "./kernel/events/passive/GeminiInterpreter.disabled",
     "./kernel/events/passive/MessageLogger",
