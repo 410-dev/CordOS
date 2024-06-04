@@ -120,7 +120,7 @@ class RootFS:
         return "defaults"
 
     @staticmethod
-    def path(subPath: str) -> str:
+    def path(subPath: str = "") -> str:
         return "./" + subPath
 
     @staticmethod

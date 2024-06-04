@@ -94,7 +94,7 @@ class RootFS:
         return "defaults"
 
     @staticmethod
-    def path(subDir: str) -> str:
+    def path(subDir: str = "") -> str:
         return "./" + subDir
 
     @staticmethod
