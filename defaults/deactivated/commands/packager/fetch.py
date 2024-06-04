@@ -1,4 +1,4 @@
-from commands.packager.spec import Spec
+from defaults.deactivated.commands.packager.spec import Spec
 
 import requests
 import json
