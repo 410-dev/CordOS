@@ -4,7 +4,7 @@ import kernel.registry as Registry
 from kernel.objects.server import Server
 from kernel.objects.user import User
 
-import kernel.object as Objects
+import kernel.services.DiscordUIService.object as Objects
 
 from typing import List
 
