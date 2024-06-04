@@ -2,7 +2,7 @@ import time
 
 import discord
 
-from kernel.objects.discordmessage import DiscordMessageWrapper
+from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessageWrapper
 
 import kernel.services.PrivateVoiceChannels.main as PrivateVoiceChannels
 import kernel.journaling as Journaling

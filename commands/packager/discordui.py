@@ -3,7 +3,7 @@ import kernel.registry as Registry
 import kernel.services.DiscordUIService.servers as Servers
 import kernel.journaling as Journaling
 
-from kernel.objects.discordmessage import DiscordMessageWrapper
+from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessageWrapper
 
 
 async def chkPermission(message: DiscordMessageWrapper):

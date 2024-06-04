@@ -1,10 +1,7 @@
 import discord
 import datetime
 
-import kernel.ipc as IPC
-import kernel.io as IO
-
-from kernel.objects.discordmessage import DiscordMessageWrapper
+from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessageWrapper
 
 
 class EmbeddedMessage:

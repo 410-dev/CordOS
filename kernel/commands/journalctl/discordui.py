@@ -5,7 +5,7 @@ import kernel.journaling as Journaling
 
 import traceback
 
-from kernel.objects.discordmessage import DiscordMessageWrapper
+from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessageWrapper
 
 def journalIndex() -> str:
     labels: list = Journaling.JournalingContainer.journals.keys()

@@ -1,8 +1,8 @@
 import json
 import kernel.registry as Registry
 
-from kernel.objects.server import Server
-from kernel.objects.user import User
+from kernel.services.DiscordUIService.objects.server import Server
+from kernel.services.DiscordUIService.objects.user import User
 
 import kernel.services.DiscordUIService.object as Objects
 

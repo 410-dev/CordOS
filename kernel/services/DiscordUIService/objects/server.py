@@ -1,4 +1,4 @@
-from kernel.objects.user import User
+from kernel.services.DiscordUIService.objects.user import User
 
 import kernel.registry as Registry
 

@@ -1,6 +1,6 @@
 import kernel.registry as Registry
 import kernel.journaling as Journaling
-from kernel.objects.embedmsg import EmbeddedMessage
+from kernel.services.DiscordUIService.objects.embedmsg import EmbeddedMessage
 
 import os
 from discord_webhook import DiscordWebhook, DiscordEmbed

@@ -31,39 +31,41 @@ configure_discordui.py
 
 ```python
 import kernel.registry as Registry
-from kernel.objects.discordmessage import DiscordMessageWrapper
+from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessageWrapper
 
 
 # 이 함수는 사용자 명령어 `services configure <service> args...` 가 실행되었을 때 호출됩니다.
 async def mainAsync(args: list, message: DiscordMessageWrapper):
-    # 명령어가 올바르게 입력되었는지 확인합니다.
-    if len(args) < 2:
-        await message.reply("Usage: servicename <configurename> <value>")
-        return
+   # 명령어가 올바르게 입력되었는지 확인합니다.
+   if len(args) < 2:
+      await message.reply("Usage: servicename <configurename> <value>")
+      return
 
-    # 첫번째 인자가 keyname 일 경우, 레지스트리에 값을 쓰고 응답합니다.
-    if args[0] == "keyname":
-        Registry.write("REGKEY", args[1])
-        await message.reply("Key set to " + args[1])
-    else:
-        await message.reply("Invalid configure key")
+   # 첫번째 인자가 keyname 일 경우, 레지스트리에 값을 쓰고 응답합니다.
+   if args[0] == "keyname":
+      Registry.write("REGKEY", args[1])
+      await message.reply("Key set to " + args[1])
+   else:
+      await message.reply("Invalid configure key")
 ```
 
 configure.py
+
 ```python
 import kernel.registry as Registry
-from kernel.objects.discordmessage import DiscordMessageWrapper
+from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessageWrapper
+
 
 def main(args: list, message: DiscordMessageWrapper):
-    if len(args) < 2:
-        message.reply("Usage: servicename <configurename> <value>")
-        return
+   if len(args) < 2:
+      message.reply("Usage: servicename <configurename> <value>")
+      return
 
-    if args[0] == "keyname":
-        Registry.write("REGKEY", args[1])
-        message.reply("Key set to " + args[1])
-    else:
-        message.reply("Invalid configure key")
+   if args[0] == "keyname":
+      Registry.write("REGKEY", args[1])
+      message.reply("Key set to " + args[1])
+   else:
+      message.reply("Invalid configure key")
 ```
 
 main.py

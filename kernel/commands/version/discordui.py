@@ -1,6 +1,6 @@
 import kernel.registry as Registry
 import kernel.ipc as IPC
-from kernel.objects.embedmsg import EmbeddedMessage
+from kernel.services.DiscordUIService.objects.embedmsg import EmbeddedMessage
 
 
 async def mainAsync(args: list, message):

@@ -21,11 +21,11 @@ CordOS의 입출력 번들 표준은 다음과 같은 규칙을 가집니다:
 discordui.py (Function 구조)
 
 ```python
-from kernel.objects.discordmessage import DiscordMessageWrapper
+from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessageWrapper
 
 
 async def mainAsync(message: DiscordMessageWrapper):
-    await message.reply("Hello, world!")
+   await message.reply("Hello, world!")
 ```
  
 main.py (Function 구조)

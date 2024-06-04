@@ -17,7 +17,7 @@ import kernel.services.DiscordUIService.asyncioevents as IOEventsMgr
 import kernel.services.power.configure as Power
 import kernel.services.DiscordUIService.webhook as Webhook
 
-from kernel.objects.discordmessage import DiscordMessageWrapper
+from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessageWrapper
 
 
 class DiscordUIServiceIPCMemory:
