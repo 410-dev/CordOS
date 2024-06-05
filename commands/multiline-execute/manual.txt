@@ -1,0 +1,8 @@
+Execute multiple lines at once
+
+Usage example:
+```
+.multiline-execute
+echo hello
+regedit test 1
+```

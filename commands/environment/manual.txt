@@ -1,1 +1,6 @@
-Shows the current environment is either isolation or global
+Shows the current environment is either isolation or global.
+
+Usage:
+```
+environment
+```
