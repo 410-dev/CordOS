@@ -8,12 +8,15 @@ import kernel.services.DiscordUIService.subsystem.sv_isolation as Isolation
 import traceback
 
 async def mainAsync(message):
+    prefix = Registry.read("SOFTWARE.CordOS.Config.Core.Prefix")
+    msgContent: str = message.content[len(prefix):]
+    await execute(msgContent, message)
+
+
+async def execute(lineToExecute: str, message):
     try:
-        prefix = Registry.read("SOFTWARE.CordOS.Config.Core.Prefix")
-        msgContent: str = message.content[len(prefix):]
-        args: list = Launcher.splitArguments(msgContent)
+        args: list = Launcher.splitArguments(lineToExecute)
         cmd: str = Launcher.getCommand(args)
-        # paths: list = Registry.read("SOFTWARE.CordOS.Kernel.Programs.DiscordPaths", default="kernel/services/DiscordUIService/subsystem/commands", writeDefault=True).replace(", ", ",").split(",")
         Journaling.record("INFO", f"Command '{cmd}' executed by {message.author.name}#{message.author.discriminator}.")
         if not Isolation.getIsolationAvailable(message):
             Journaling.record("INFO", f"Isolation not available for guild {message.guild.id}.")
