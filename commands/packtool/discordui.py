@@ -1,23 +1,17 @@
 import kernel.registry as Registry
 import kernel.services.DiscordUIService.subsystem.server as Server
+import kernel.services.DiscordUIService.fastpermission as FastPermission
 
 import commands.packtool.install as install
 import commands.packtool.remove as remove
 import commands.packtool.database as Database
 
-async def checkPermission(message):
-    permission = Registry.read("SOFTWARE.CordOS.Security.Services")
-    user = Server.getUserAtServer(message.getMessageObject())
-
-    if user.hasPermission(permission) == False:
-        await message.reply(f"You do not have permission to use this command. (Requires {permission})", mention_author=True)
-        return False
-    return True
-
 
 async def mainAsync(args: list, message):
     try:
-        if not await checkPermission(message):
+        permission = Registry.read("SOFTWARE.CordOS.Security.Install")
+        if not FastPermission.hasPermission(message, permission):
+            await message.reply(f"You do not have permission to use this command. (Requires {permission})", mention_author=True)
             return
 
         if len(args) < 2:
