@@ -2,6 +2,8 @@ from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessa
 
 import kernel.partitionmgr as PartitionMgr
 import kernel.journaling as Journaling
+import kernel.io as IO
+import kernel.registry as Registry
 
 import json
 import os
@@ -149,6 +151,9 @@ def mkIsolation(message: DiscordMessageWrapper) -> bool:
             PartitionMgr.RootFS.mkdir(f"{getRoot(message.guild.id)}/{d}")
             Journaling.record("INFO", f"Directory {d} created in isolation container for guild {message.guild.id}.")
 
+        Journaling.record("INFO", f"Preparing registry for isolation container for guild {message.guild.id}.")
+        prepareRegistry(message)
+
         Journaling.record("INFO", f"Isolation setup complete for guild {message.guild.id}.")
         return True
     except Exception as e:
@@ -179,6 +184,32 @@ def getCallerContainerPath(mustContain: str = getRoot()) -> str:
             except IndexError:
                 pass  # Handle cases where the path doesn't have the expected structure
     return None  # Indicate that the session ID wasn't found
+
+def prepareRegistry(message: DiscordMessageWrapper):
+    regPath = getContainerPath(message, "etc/registry")
+    blueprintList: list = []
+    with open("defaults/registry.cordreg", 'r') as f:
+        conf: list = f.readlines()
+        for line in conf:
+            if line.startswith("#"):
+                continue
+            if line.strip() == "":
+                continue
+            blueprintList.append(line.strip())
+
+    for reg in blueprintList:
+        try:
+            regn = reg.split("=")[0]
+            optional = regn.startswith("?")
+            if optional: regn = regn[1:]
+            regVal = Registry.read(regn, regloc=regPath)
+            if regVal is None or not optional:
+                value = reg.split("=")[1] if len(reg.split("=")) > 1 else None
+                Registry.write(regn, value, regloc=regPath)
+                Journaling.record("INFO", f"Prepared: {regn}")
+
+        except Exception as e:
+            IO.println("Error while preparing registry: " + str(e))
 
 
 def getContainerPath(message: DiscordMessageWrapper, subDir: str) -> str:
