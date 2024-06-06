@@ -3,6 +3,7 @@ import kernel.services.DiscordUIService.servers as Servers
 
 import commands.packtool.install as install
 import commands.packtool.remove as remove
+import commands.packtool.database as Database
 
 async def checkPermission(message):
     permission = Registry.read("SOFTWARE.CordOS.Security.Services")
@@ -62,10 +63,17 @@ async def mainAsync(args: list, message):
                 await message.reply("Package(s) removed successfully.")
                 return
 
+        elif args[1] == "db":
+            await message.reply(f"Database: {Database.path()}")
+
         elif args[1] == "list":
             output = list.listPackages()
             await message.reply(output)
 
     except Exception as e:
-        await message.reply(f"Error while running executive. e: {e}", mention_author=True)
+        await message.reply(f"Packtool: Error while running executive. e: {e}", mention_author=True)
+        import traceback
+        tracebackstr = traceback.format_exc()
+        print(f"Error while running executive. e: {e}")
+        print(f"Traceback: {tracebackstr}")
         return
