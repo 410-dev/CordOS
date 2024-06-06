@@ -1,6 +1,8 @@
 import os
 import shutil
 
+import kernel.services.DiscordUIService.subsystem.sv_isolation as Isolation
+
 
 class Data:
 
@@ -95,7 +97,8 @@ class RootFS:
 
     @staticmethod
     def path(subDir: str = "") -> str:
-        return "./" + subDir
+        rootPath = Isolation.getCallerContainerPath()
+        return os.path.join(rootPath, subDir)
 
     @staticmethod
     def read(path: str) -> str:
