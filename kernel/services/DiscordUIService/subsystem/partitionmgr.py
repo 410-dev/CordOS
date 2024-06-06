@@ -32,7 +32,7 @@ class Data:
 
     @staticmethod
     def path(subPath: str = "") -> str:
-        return "storage" + ("/" + subPath if subPath != "" else "")
+        return RootFS.path("storage" + ("/" + subPath if subPath != "" else ""))
 
     @staticmethod
     def copyDefault(path: str, existOK: bool = True):
@@ -74,7 +74,7 @@ class Etc:
 
     @staticmethod
     def path(subPath: str = "") -> str:
-        return "etc" + ("/" + subPath if subPath != "" else "")
+        return RootFS.path("etc" + ("/" + subPath if subPath != "" else ""))
 
     @staticmethod
     def copyDefault(path: str, existOK: bool = True):
@@ -195,7 +195,7 @@ class Cache:
 
     @staticmethod
     def path(subPath: str = "") -> str:
-        return "tmp" + ("/" + subPath if subPath != "" else "")
+        return RootFS.path("tmp" + ("/" + subPath if subPath != "" else ""))
 
     @staticmethod
     def copyDefault(path: str, existOK: bool = True):
