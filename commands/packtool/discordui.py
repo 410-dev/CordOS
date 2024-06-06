@@ -5,6 +5,7 @@ import kernel.services.DiscordUIService.fastpermission as FastPermission
 import commands.packtool.install as install
 import commands.packtool.remove as remove
 import commands.packtool.database as Database
+import commands.packtool.list as lists
 
 
 async def mainAsync(args: list, message):
@@ -31,9 +32,9 @@ async def mainAsync(args: list, message):
                 ignoreConflicts = True
             if len(args) > 3 and '--reinstall' in args:
                 reinstall = True
-            result = install.install(args[2:], args[1], ignoreDependencies, ignoreConflicts, reinstall)
+            result, outmsg = install.install(args[2:], args[1], ignoreDependencies, ignoreConflicts, reinstall)
             if not result:
-                await message.reply("Failed to install package(s). Check logs for more information.")
+                await message.reply(f"Failed to install package(s): {outmsg}")
                 return
             else:
                 await message.reply("Package(s) installed successfully.")
@@ -49,9 +50,9 @@ async def mainAsync(args: list, message):
                 ignoreDependencies = True
             if len(args) > 3 and '--chain' in args:
                 removeAsChain = True
-            result = remove.remove(args[2:], ignoreDependencies, removeAsChain)
+            result, outmsg = remove.remove(args[2:], ignoreDependencies, removeAsChain)
             if not result:
-                await message.reply("Failed to remove package(s). Check logs for more information.")
+                await message.reply(f"Failed to remove package(s): {outmsg}")
                 return
             else:
                 await message.reply("Package(s) removed successfully.")
@@ -61,7 +62,9 @@ async def mainAsync(args: list, message):
             await message.reply(f"Database: {Database.path()}")
 
         elif args[1] == "list":
-            output = list.listPackages()
+            output = lists.listPackages()
+            if len(output) == 0:
+                output = "No packages installed."
             await message.reply(output)
 
     except Exception as e:

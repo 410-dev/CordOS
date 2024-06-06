@@ -1,6 +1,7 @@
 import kernel.registry as Registry
 import kernel.journaling as Journaling
 import kernel.profile as Profile
+import kernel.host as Host
 
 
 def getPreference(key: str, equals=None, default=None):
@@ -19,32 +20,32 @@ def validateSpec(data: dict):
 
     if not getPreference("BypassSpecVersion", equals="1"):
         if data["spec"] is None:
-            return False, "Spec version not found"
+            return False, "Spec standard not found"
         elif data["spec"] != "NanoPyOS.Standards.PackageSpec":
-            return False, "Spec version mismatch"
+            return False, f"Spec standard mismatch: Expected NanoPyOS.Standards.PackageSpec, got {data['spec']}"
 
         if data["specv"] is None:
             return False, "Spec version not found"
-        elif Profile.isPackageSDKCompatible(int(data["specv"])):
-            return False, "Spec version mismatch"
+        elif not Profile.isPackageSDKCompatible(int(data["specv"])):
+            return False, f"Spec version mismatch: Expected {Profile.getPackageSDKRange()}, got {data['specv']}"
 
     if not getPreference("BypassSpecArch", equals="1"):
         if data["arch"] is None:
             return False, "Arch not found"
         elif not Profile.isArchCompatible(data["arch"]):
-            return False, "Arch mismatch"
+            return False, f"Arch mismatch: Expected {Profile.getArch()} or any, got {data['arch']}"
 
     if not getPreference("BypassSpecPlatform", equals="1"):
         if data["platform"] is None:
             return False, "Platform not found"
         elif not Profile.isPlatformCompatible(data["platform"]):
-            return False, "Platform mismatch"
+            return False, f"Platform mismatch: Expected {Host.getHostOSType()} or any, got {data['platform']}"
 
     if not getPreference("BypassSpecServiceSDK", equals="1"):
         if data["sdk"] is None:
             return False, "SDK version not found"
         elif not Profile.isServiceSDKCompatible(int(data["sdk"])):
-            return False, "SDK version mismatch"
+            return False, f"SDK version mismatch: Expected {Profile.getServiceSDKRange()}, got {data['sdk']}"
 
     requiredFields = [
         ("name", str),

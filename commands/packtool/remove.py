@@ -5,8 +5,9 @@ import commands.packtool.database as database
 import json
 
 
-def remove(ids: list, ignoreDependencies: bool, removeAsChain: bool) -> bool:
+def remove(ids: list, ignoreDependencies: bool, removeAsChain: bool) -> tuple:
     data = {}
+    message = ""
     for uid in ids:
         IO.println(f"Removing {uid}...")
         Journaling.record("INFO", f"Removing {uid}...")
@@ -14,8 +15,8 @@ def remove(ids: list, ignoreDependencies: bool, removeAsChain: bool) -> bool:
         IO.println(message)
         Journaling.record("INFO", message)
         if not success:
-            return False
-    return True
+            return False, message
+    return True, message
 
 
 def removeTask(uid: str, ignoreDependencies: bool, removeAsChain: bool, data: dict, uninstallingDueToDependency: bool = False) -> tuple:

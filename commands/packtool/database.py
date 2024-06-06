@@ -27,14 +27,16 @@ def dropSpec(name: str, scope: str):
 
 
 def listSpecs() -> list:
-
     def recursion(p: str, s: list) -> list:
+        print(f"recursion({PartitionManager.Etc.path(p)}, {s})")
         for element in PartitionManager.Etc.list(p):
             if PartitionManager.Etc.isDir(f"{p}/{element}"):
                 s = recursion(f"{p}/{element}", s)
             else:
                 s.append(f"{p}/{element}")
         return s
+
+    PartitionManager.Etc.mkdir("packtool/specs")
 
     returned = recursion("packtool/specs", [])
     for i in range(len(returned)):

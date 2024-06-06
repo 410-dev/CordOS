@@ -1,6 +1,7 @@
 import kernel.io as IO
 import commands.packtool.install as install
 import commands.packtool.remove as remove
+import commands.packtool.list as lists
 
 
 # packtool install <url>...
@@ -41,5 +42,5 @@ def main(args: list):
         remove.remove(args[2:], ignoreDependencies, removeAsChain)
 
     elif args[1] == "list":
-        output = list.listPackages()
+        output = lists.listPackages()
         IO.println(output)

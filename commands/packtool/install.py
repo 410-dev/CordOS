@@ -3,12 +3,13 @@ import kernel.host as Host
 import kernel.partitionmgr as PartitionManager
 import kernel.journaling as Journaling
 import commands.packtool.database as database
+import commands.packtool.spec as Spec
 import requests
 import shutil
 import json
 
 
-def install(urls: list, mode: str, ignoreDependencies: bool, ignoreConflicts: bool, reinstall: bool) -> bool:
+def install(urls: list, mode: str, ignoreDependencies: bool, ignoreConflicts: bool, reinstall: bool) -> tuple:
     data = {}
     for url in urls:
         IO.println(f"Installing {url}...")
@@ -17,9 +18,9 @@ def install(urls: list, mode: str, ignoreDependencies: bool, ignoreConflicts: bo
         if not success:
             Journaling.record("ERROR", f"Failed to install {url} - {stage}: {message}")
             IO.println(f"Failed to install {url} - {stage}: {message}")
-            return False
+            return False, f"Failed to install {url} - {stage}: {message}"
         IO.println(message)
-    return True
+    return True, "Successfully installed packages"
 
 
 def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: bool, reinstall: bool, data: dict) -> tuple:
@@ -47,8 +48,9 @@ def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: 
     # Check if spec is valid
     IO.println("Validating spec...")
     Journaling.record("INFO", "Validating spec...")
-    if not spec.validateSpec(spec):
-        return False, "VALIDATE_SPEC", f"Spec {url} is not valid", data
+    validationResult = Spec.validateSpec(spec)
+    if not validationResult[0]:
+        return False, "VALIDATE_SPEC", f"Spec {url} is not valid: {validationResult[1]}", data
 
     # Check dependencies and conflicts
     IO.println("Currently installing: " + spec['name'] + " " + spec['version'])
@@ -148,7 +150,8 @@ def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: 
             ]
         subprocessRun: dict = Host.executeCommand2(command)
         if subprocessRun['returncode'] != 0:
-            output = subprocessRun['stdout'] + subprocessRun['stderr']
+            output = subprocessRun['stdout'] + "\n\n" + subprocessRun['stderr']
+            Journaling.record("ERROR", f"Failed to clone repository {spec['git']} to {clonePath} - return code {subprocessRun['returncode']} with output {output}")
             if "commit your changes" in output:
                 if data['--force']:
                     IO.println("Hard reseting repository...")
@@ -157,7 +160,7 @@ def installTask(url: str, mode: str, ignoreDependencies: bool, ignoreConflicts: 
                     Journaling.record("INFO", "Pulling repository...")
                     subprocessRun: dict = Host.executeCommand2(command)
                     if subprocessRun['returncode'] != 0:
-                        return False, "GIT_CLONE", f"Failed to clone repository {spec['git']} to {clonePath} - return code {subprocessRun['returncode']} with output {subprocessRun['stdout']}", data
+                        return False, "GIT_CLONE", f"Failed to clone repository after hard reset {spec['git']} to {clonePath} - return code {subprocessRun['returncode']} with output {subprocessRun['stdout']}", data
 
             return False, "GIT_CLONE", f"Failed to clone repository {spec['git']} to {clonePath} - return code {subprocessRun['returncode']} with output {subprocessRun['stdout']}", data
         IO.println("Successfully installed files.")
