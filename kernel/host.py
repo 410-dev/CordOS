@@ -32,14 +32,14 @@ def executeCommandWithStdOut(command: str) -> str:
     return os.popen(command).read()
 
 
-def executeCommand2(command: list) -> dict:
+def executeCommand2(command: list, cwd = "./") -> dict:
     # The returning dictionary contains the following keys
     # "cmd": the command executed
     # "returncode": the return code of the command
     # "stdout": the standard output of the command
     # "stderr": the standard error of the command
     try:
-        returned = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        returned = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, cwd=cwd)
         return {
             "cmd": command,
             "returncode": returned.returncode,
