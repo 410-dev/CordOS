@@ -67,9 +67,11 @@ class Server:
 
     def updateUser(self, userID: int, userName: str, userTags: list, userRoles: list, overwrite: bool = False):
         Journaling.record("INFO", f"Updating user {userName}({userID}) in server {self.getName()}({self.getId()})")
+        userFound = False
         for user in self._users:
             if str(user.getId()) == str(userID):
                 Journaling.record("INFO", "User found and is updating...")
+                userFound = True
                 user.setName(userName)
                 if overwrite:
                     Journaling.record("INFO", "Overwriting user tags and roles")
@@ -87,7 +89,7 @@ class Server:
                     "id": "permission",
                     "value": "root"
                 })
-        else:
+        elif not userFound:
             Journaling.record("INFO", "Any users found in server, checking permission tag")
             if not any(tag["id"] == "permission" for tag in userTags):
                 if Registry.read("SOFTWARE.CordOS.Kernel.PrintLogs") == "1": print("User does not have permission tag, adding root permission")
@@ -96,8 +98,11 @@ class Server:
                     "value": "unavailable"
                 })
 
-        self._users.append(User(userID, userName, userTags, userRoles))
-        Journaling.record("INFO", "User added to server.")
+        if not userFound:
+            self._users.append(User(userID, userName, userTags, userRoles))
+            Journaling.record("INFO", "User added to server.")
+        else:
+            Journaling.record("INFO", "User exists in server and did not added.")
     
     def updateUserObject(self, user: User, overwrite: bool = False):
         self.updateUser(user.getId(), user.getName(), user.getTags(), user.getRoles(), overwrite)
