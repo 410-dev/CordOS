@@ -1,5 +1,5 @@
 import kernel.registry as Registry
-
+import kernel.journaling as Journaling
 
 class User:
     
@@ -54,43 +54,44 @@ class User:
     def hasPermission(self, permissionTag: str):
         # Get tag of current user
         permissionValue = self.getTagValue("permission")
+        Journaling.record("INFO", f"User {self.getName()} has permission tag value of {permissionValue}.")
         if permissionValue is None:
-            print(f"User {self.getName()} does not have permission tag.")
+            Journaling.record("INFO", f"User {self.getName()} does not have a permission tag.")
             return False
 
         # Convert value to integer
-        permissionValue = Registry.read(f"SOFTWARE.CordOS.Security.Users.{permissionValue}", default=None, writeDefault=False)
+        permissionValue = Registry.read(f"SOFTWARE.CordOS.Security.Definitions.{permissionValue}", default=None, writeDefault=False)
         try:
             permissionValue = int(permissionValue)
         except:
-            print(f"User {self.getName()} does not have a valid permission tag (not an integer).")
+            Journaling.record("ERROR", f"User {self.getName()} does not have a valid permission tag.")
             return False
 
         # Check if permission is valid
         if permissionValue < 0 or permissionValue > 32767:
-            print(f"User {self.getName()} does not have a valid permission tag (out of range).")
+            Journaling.record("ERROR", f"User {self.getName()} does not have a valid permission tag (out of range).")
             return False
 
         # Get tag of permission value from registry
         permissionDefinition = Registry.read(f"SOFTWARE.CordOS.Security.Definitions.{permissionTag}", default=None, writeDefault=False)
         if permissionDefinition is None:
-            print(f"Permission definition {permissionTag} does not exist.")
+            Journaling.record("ERROR", f"Permission definition {permissionTag} does not exist.")
             return False
 
         # Convert value to integer
         try:
             permissionDefinition = int(permissionDefinition)
         except:
-            print(f"Permission definition {permissionTag} is not a valid integer.")
+            Journaling.record("ERROR", f"Permission definition {permissionTag} is not a valid integer.")
             return False
 
         # Check if permission is valid
         if permissionDefinition < 0 or permissionDefinition > 32767:
-            print(f"Permission definition {permissionTag} is not a valid integer (out of range).")
+            Journaling.record("ERROR", f"Permission definition {permissionTag} is not a valid integer (out of range).")
             return False
 
         # Check if user has permission
-        print(f"User {self.getName()} has permission of {permissionValue} and action requires permission of {permissionDefinition}.")
+        Journaling.record("INFO", f"User {self.getName()} has permission of {permissionValue} and action requires permission of {permissionDefinition}.")
         return permissionValue >= permissionDefinition
 
 
