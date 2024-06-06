@@ -19,7 +19,6 @@ def getRoot(subDir: str = "")-> str:
 
 
 def getIsolationAvailable(message: DiscordMessageWrapper) -> bool:
-
     if not PartitionMgr.RootFS.isDir(getRoot(message.guild.id)):
         Journaling.record("INFO", f"Isolation not setup for guild {message.guild.id}.")
         if mkIsolation(message):
@@ -46,11 +45,14 @@ def mkIsolation_sync(message: DiscordMessageWrapper, fileMap: list) -> bool:
 
 def mkIsolation_patchImports(message: DiscordMessageWrapper, patchPath: str, patchPattern: list = None, patchNeglectPattern: str = "#GLOBAL") -> bool:
     if patchPattern is None:
+        patchPathPattern = patchPath.replace("\\", "/").replace("//", "/").replace("/", ".")
+        if patchPathPattern.endswith("."):
+            patchPathPattern = patchPathPattern[:-1]
         patchPattern = [
             ("kernel.registry", "kernel.services.DiscordUIService.subsystem.registry"),
             ("kernel.ipc", "kernel.services.DiscordUIService.subsystem.ipc"),
             ("kernel.partitionmgr", "kernel.services.DiscordUIService.subsystem.partitionmgr"),
-            ("import commands.", f"import {patchPath.replace('\\', '/').replace('//', '/').replace('/', '.')}.commands."),
+            ("import commands.", f"import {patchPathPattern}.commands."),
         ]
 
     def recursiveFileBuild(path: str, l: list) -> list:
@@ -64,19 +66,23 @@ def mkIsolation_patchImports(message: DiscordMessageWrapper, patchPath: str, pat
 
     filesToPatch = recursiveFileBuild(patchPath, [])
     for file in filesToPatch:
-        if ".py" not in file:
+        if ".py" not in file or "__pycache__" in file or ".pyc" in file:
             continue
         Journaling.record("INFO", f"Patching: {file}")
-        with open(file, "r") as f:
-            content = f.read()
-        for line in content.split("\n"):
-            if patchNeglectPattern in line:
-                continue
-            for pattern in patchPattern:
-                content = content.replace(pattern[0], pattern[1])
-        with open(file, "w") as f:
-            f.write(content)
-        Journaling.record("INFO", f"Patched: {file}")
+        try:
+            with open(file, "r") as f:
+                content = f.read()
+            for line in content.split("\n"):
+                if patchNeglectPattern in line:
+                    continue
+                for pattern in patchPattern:
+                    content = content.replace(pattern[0], pattern[1])
+                    content = content.replace("..", ".")
+            with open(file, "w") as f:
+                f.write(content)
+            Journaling.record("INFO", f"Patched: {file}")
+        except Exception as e:
+            Journaling.record("ERROR", f"Error patching file {file}. e: {e}")
     Journaling.record("INFO", f"File patching complete for guild {message.guild.id}.")
 
 
