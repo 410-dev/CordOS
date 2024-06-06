@@ -11,19 +11,37 @@ def isWindows():
     return os.name == "nt"
 
 def getHostOSName():
-    return os.uname().sysname
+    if isPOSIX():
+        return os.uname().sysname
+    elif isWindows():
+        return os.name
+    return "Unknown"
 
 def getHostOSRelease():
-    return os.uname().release
+    if isPOSIX():
+        return os.uname().release
+    elif isWindows():
+        return os.name
+    return "Unknown"
 
 def getHostOSVersion():
-    return os.uname().version
+    if isPOSIX():
+        return os.uname().version
+    elif isWindows():
+        return os.name
+    return "Unknown"
 
 def getHostOSArchitecture():
-    return os.uname().machine
+    if isPOSIX():
+        return os.uname().machine
+    elif isWindows():
+        return os.name
 
 def getHostOSInfo():
-    return os.uname()
+    if isPOSIX():
+        return os.uname()
+    elif isWindows():
+        return os.name
 
 def executeCommand(command: str):
     return os.system(command)
