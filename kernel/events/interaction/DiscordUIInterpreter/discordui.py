@@ -1,9 +1,12 @@
 import kernel.launchcmd as Launcher
 import kernel.registry as Registry
 import kernel.journaling as Journaling
+from kernel.services.DiscordUIService.objects.user import User
+from kernel.services.DiscordUIService.objects.server import Server as ServerO
 
 import kernel.services.DiscordUIService.asynclauncher as AsyncLauncher
 import kernel.services.DiscordUIService.subsystem.sv_isolation as Isolation
+import kernel.services.DiscordUIService.subsystem.server as Server
 
 import traceback
 
@@ -30,6 +33,15 @@ async def execute(lineToExecute: str, message):
             if Isolation.getIsolationPermission(message, "kernel.commands.execute"):
                 paths.append("kernel/commands")
             registryData = ','.join(paths)
+            Journaling.record("INFO", "Updating user information in server cache.")
+            user: User = Server.getUserAtServer(message)
+            if user is None:
+                Journaling.record("INFO", "User not found in server cache. Creating new user.")
+                user = User(message.author.id, message.author.name, [], [])
+            else:
+                Journaling.record("INFO", "User found in server cache. Updating user.")
+                user.setName(message.author.name)
+            Server.updateUserAtServer(user, message)
             Isolation.setRegistry(message, "SOFTWARE.CordOS.Kernel.Programs.Paths", registryData)
             Journaling.record("INFO", f"Command will be searched under path: {paths}")
             runnablePath: str = Launcher.getRunnableModule(args, "discordui", pathList=paths)

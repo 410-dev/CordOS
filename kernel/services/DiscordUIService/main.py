@@ -7,7 +7,7 @@ import asyncio
 import random
 import string
 
-import kernel.services.DiscordUIService.servers as Servers
+import kernel.services.DiscordUIService.subsystem.server as Server
 import kernel.registry as Registry
 import kernel.config as Config
 import kernel.ipc as IPC
@@ -150,8 +150,8 @@ def main():
                     return
 
                 # Update the user's server etc
-                Journaling.record("INFO", "Updating server etc.")
-                Servers.updateServer(message.getMessageObject())
+                # Journaling.record("INFO", "Updating server etc.")
+                # Server.save(None, message)
 
                 Journaling.record("INFO", "InboundInteractive events hooker is enabled.")
                 await IOEventsMgr.onInteractiveInputEvent(message)

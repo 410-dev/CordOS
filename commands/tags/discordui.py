@@ -1,6 +1,6 @@
 import traceback
 import kernel.registry as Registry
-import kernel.services.DiscordUIService.servers as Servers
+import kernel.services.DiscordUIService.subsystem.server as Server
 
 from kernel.services.DiscordUIService.objects.user import User
 from kernel.services.DiscordUIService.objects.server import Server
@@ -10,7 +10,7 @@ class Tags:
     def __init__(self, lineArgs, message) -> None:
         self.args: list = lineArgs
         self.message = message
-        self.user: User = Servers.getUserAtServer(self.message.guild.id, self.message.author.id)
+        self.user: User = Server.getUserAtServer(self.message.getMessageObject())
 
     async def mainAsync(self):
         
@@ -37,7 +37,7 @@ class Tags:
                 await self.message.reply(f"Invalid target user ID: {target}", mention_author=True)
                 return
             
-            targetUserObject: User = Servers.getUserAtServer(self.message.guild.id, int(target))
+            targetUserObject: User = Server.getUserAtServer(self.message.getMessageObject())
             
             messageStr = ""
 
@@ -57,9 +57,7 @@ class Tags:
                 messageStr += "```"
                 
             # Update server json
-            serverObject: Server = Servers.getServer(self.message.guild.id)
-            serverObject.updateUserObject(targetUserObject, overwrite=True)
-            Servers.updateServerObject(serverObject)
+            Server.updateUserAtServer(targetUserObject, self.message)
             
             await self.message.reply(messageStr, mention_author=True)
             

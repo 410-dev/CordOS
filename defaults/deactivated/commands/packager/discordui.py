@@ -1,13 +1,13 @@
 import traceback
 import kernel.registry as Registry
-import kernel.services.DiscordUIService.servers as Servers
+import kernel.services.DiscordUIService.subsystem.server as Server
 import kernel.journaling as Journaling
 
 from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessageWrapper
 
 
 async def chkPermission(message: DiscordMessageWrapper):
-    if not Servers.getUserAtServer(message.getMessageObject().guild.id, message.getMessageObject().author.id).hasPermission(Registry.read("SOFTWARE.CordOS.Security.Install")):
+    if not Server.getUserAtServer(message.getMessageObject()).hasPermission(Registry.read("SOFTWARE.CordOS.Security.Install")):
         await message.reply(f"You do not have permission to use this command. (Requires {Registry.read("SOFTWARE.CordOS.Security.Install")})", mention_author=True)
         return False
     return True

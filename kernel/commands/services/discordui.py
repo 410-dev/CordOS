@@ -3,19 +3,21 @@ import os
 
 import kernel.config as Config
 import kernel.registry as Registry
-import kernel.services.DiscordUIService.servers as Servers
+import kernel.services.DiscordUIService.subsystem.server as Server
 import kernel.partitionmgr as PartitionMgr
 import kernel.ipc as IPC
 import kernel.servicectl as Servicectl
 
+from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessageWrapper
+
 class Services:
 
-    def __init__(self, lineArgs, message) -> None:
+    def __init__(self, lineArgs, message: DiscordMessageWrapper) -> None:
         self.args: list = lineArgs
         self.message = message
         self.config = Config.load()
         self.permission = Registry.read("SOFTWARE.CordOS.Security.Services")
-        self.user = Servers.getUserAtServer(self.message.guild.id, self.message.author.id)
+        self.user = Server.getUserAtServer(self.message.getMessageObject())
 
     async def chkPermission(self, permission):
         if self.user.hasPermission(permission) == False:

@@ -1,6 +1,7 @@
 from kernel.services.DiscordUIService.objects.user import User
 
 import kernel.registry as Registry
+import kernel.journaling as Journaling
 
 class Server:
     def __init__(self, name: str, id: int, tags: list, roles: list, users: list):
@@ -63,26 +64,31 @@ class Server:
             if str(user.getId()) == str(userID):
                 return user
         return None
-    
+
     def updateUser(self, userID: int, userName: str, userTags: list, userRoles: list, overwrite: bool = False):
+        Journaling.record("INFO", f"Updating user {userName}({userID}) in server {self.getName()}({self.getId()})")
         for user in self._users:
             if str(user.getId()) == str(userID):
+                Journaling.record("INFO", "User found and is updating...")
                 user.setName(userName)
                 if overwrite:
+                    Journaling.record("INFO", "Overwriting user tags and roles")
                     if Registry.read("SOFTWARE.CordOS.Kernel.PrintLogs") == "1": print("Overwriting user tags and roles")
                     user.setTags(userTags)
                     user.setRoles(userRoles)
-                return
+                Journaling.record("INFO", "User updated.")
 
         # If server has no user at all, create new user with root permission
         # If userTags does not contain a tag with id "permission", add it
         if len(self._users) == 0:
+            Journaling.record("INFO", "No user found in server, creating new user with root permission")
             if not any(tag["id"] == "permission" for tag in userTags):
                 userTags.append({
                     "id": "permission",
                     "value": "root"
                 })
         else:
+            Journaling.record("INFO", "Any users found in server, checking permission tag")
             if not any(tag["id"] == "permission" for tag in userTags):
                 if Registry.read("SOFTWARE.CordOS.Kernel.PrintLogs") == "1": print("User does not have permission tag, adding root permission")
                 userTags.append({
@@ -91,6 +97,7 @@ class Server:
                 })
 
         self._users.append(User(userID, userName, userTags, userRoles))
+        Journaling.record("INFO", "User added to server.")
     
     def updateUserObject(self, user: User, overwrite: bool = False):
         self.updateUser(user.getId(), user.getName(), user.getTags(), user.getRoles(), overwrite)

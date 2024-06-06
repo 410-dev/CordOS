@@ -1,7 +1,7 @@
 import traceback
 import kernel.config as Config
 import kernel.registry as Registry
-import kernel.services.DiscordUIService.servers as Servers
+import kernel.services.DiscordUIService.subsystem.server as Server
 
 class Regedit:
 
@@ -10,7 +10,7 @@ class Regedit:
         self.message = message
         self.config = Config.load()
         self.regPermission = Registry.read("SOFTWARE.CordOS.Security.Registry")
-        self.user = Servers.getUserAtServer(self.message.guild.id, self.message.author.id)
+        self.user = Server.getUserAtServer(self.message.getMessageObject())
 
     async def chkPermission(self, permission):
         if not self.user.hasPermission(permission):

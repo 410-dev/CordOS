@@ -1,4 +1,8 @@
 from kernel.services.DiscordUIService.objects.discordmessage import DiscordMessageWrapper
+from kernel.services.DiscordUIService.objects.server import Server as ServerO
+from kernel.services.DiscordUIService.objects.user import User
+
+import kernel.services.DiscordUIService.subsystem.server as Server
 
 import kernel.partitionmgr as PartitionMgr
 import kernel.journaling as Journaling
@@ -18,7 +22,6 @@ def getIsolationAvailable(message: DiscordMessageWrapper) -> bool:
 
     if not PartitionMgr.RootFS.isDir(getRoot(message.guild.id)):
         Journaling.record("INFO", f"Isolation not setup for guild {message.guild.id}.")
-        # return False
         if mkIsolation(message):
             Journaling.record("INFO", f"Isolation setup completed for guild {message.guild.id}.")
             return True
@@ -153,6 +156,30 @@ def mkIsolation(message: DiscordMessageWrapper) -> bool:
 
         Journaling.record("INFO", f"Preparing registry for isolation container for guild {message.guild.id}.")
         prepareRegistry(message)
+
+        # def updateUserData(message):
+        Journaling.record("INFO", "Updating server.json")
+        try:
+            sv: ServerO = Server.load()
+            if sv is None:
+                user = User(message.author.id, message.author.name, [], [])
+                sv = ServerO(message.guild.id, message.guild.name, [], [], [])
+                sv.updateUserObject(user)
+                Server.save(sv, message)
+            user = Server.getUserAtServer(message.getMessageObject())
+            Server.updateUserAtServer(user, message)
+            Server.save(sv, message)
+        except Exception as e:
+            Journaling.record("ERROR", f"Error updating user data: {e}")
+            if Registry.read("SOFTWARE.CordOS.Kernel.PrintErrors") == "1": print(f"Error updating user data: {e}")
+            if Registry.read("SOFTWARE.CordOS.Kernel.PrintTraceback") == "1": traceback.print_exc()
+
+        # Journaling.record("INFO", "Updating server.json")
+
+        # updateUserData(message)
+        # user = User(message.author.id, message.author.name, [], [])
+        # sv: ServerO = ServerO(message.guild.id, message.guild.name, [], [], [user])
+        # Server.save(sv, message.getMessageObject())
 
         Journaling.record("INFO", f"Isolation setup complete for guild {message.guild.id}.")
         return True

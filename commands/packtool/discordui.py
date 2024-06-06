@@ -1,5 +1,5 @@
 import kernel.registry as Registry
-import kernel.services.DiscordUIService.servers as Servers
+import kernel.services.DiscordUIService.subsystem.server as Server
 
 import commands.packtool.install as install
 import commands.packtool.remove as remove
@@ -7,7 +7,7 @@ import commands.packtool.database as Database
 
 async def checkPermission(message):
     permission = Registry.read("SOFTWARE.CordOS.Security.Services")
-    user = Servers.getUserAtServer(message.guild.id, message.author.id)
+    user = Server.getUserAtServer(message.getMessageObject())
 
     if user.hasPermission(permission) == False:
         await message.reply(f"You do not have permission to use this command. (Requires {permission})", mention_author=True)

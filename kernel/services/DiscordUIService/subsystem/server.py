@@ -4,19 +4,23 @@ from kernel.services.DiscordUIService.objects.user import User
 import kernel.services.DiscordUIService.object as Objects
 import kernel.services.DiscordUIService.subsystem.sv_isolation as Isolation
 
+import kernel.journaling as Journaling
+
 
 def getContainer(message = None) -> str:
     container = Isolation.getCallerContainerPath()
     if container is None:
         if message is not None:
+            Journaling.record("WARNING", f"Isolation not available for guild {message.guild.id}.")
             return Isolation.getContainerPath(message, "server.json")
         return None
     container += "servers.json"
+    Journaling.record("INFO", f"Server container path: {container}")
     return container
 
 
-def load() -> Server:
-    path = getContainer()
+def load(message = None) -> Server:
+    path = getContainer(message = message)
     if path is None:
         return None
 
@@ -29,11 +33,31 @@ def load() -> Server:
 
 def save(server: Server, message):
     with open(getContainer(message=message), 'w') as f:
+        if server is None:
+            json.dump({
+                "name": message.guild.name,
+                "id": message.guild.id,
+                "tags": [],
+                "roles": [],
+                "users": []
+            }, f, indent=4)
+            return
         json.dump(server.toJson(), f, indent=4)
 
 
 def getUserAtServer(message) -> User:
-    server = load()
+    server = load(message=message)
     if server is None:
+        Journaling.record("ERROR", "Server object is None.")
         return None
     return server.getUser(message.author.id)
+
+
+def updateUserAtServer(user: User, message):
+    server = load(message=message)
+    if server is None:
+        Journaling.record("ERROR", "Server object is None.")
+        return
+    server.updateUserObject(user, overwrite=True)
+    Journaling.record("INFO", f"User {user.getName()} updated in server cache.")
+    save(server, message)
