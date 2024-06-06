@@ -59,7 +59,7 @@ class User:
             return False
 
         # Convert value to integer
-        permissionValue = Registry.read("SOFTWARE.CordOS.Security.Definitions." + permissionValue)
+        permissionValue = Registry.read(f"SOFTWARE.CordOS.Security.Users.{permissionValue}", default=None, writeDefault=False)
         try:
             permissionValue = int(permissionValue)
         except:
@@ -72,7 +72,7 @@ class User:
             return False
 
         # Get tag of permission value from registry
-        permissionDefinition = Registry.read("SOFTWARE.CordOS.Security.Definitions." + permissionTag)
+        permissionDefinition = Registry.read(f"SOFTWARE.CordOS.Security.Definitions.{permissionTag}", default=None, writeDefault=False)
         if permissionDefinition is None:
             print(f"Permission definition {permissionTag} does not exist.")
             return False
