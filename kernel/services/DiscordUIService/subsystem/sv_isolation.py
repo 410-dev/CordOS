@@ -31,6 +31,55 @@ def getIsolationAvailable(message: DiscordMessageWrapper) -> bool:
     return declaration["isolation"]
 
 
+def mkIsolation_sync(message: DiscordMessageWrapper, fileMap: list) -> bool:
+    try:
+        for file in fileMap:
+            Journaling.record("INFO", f"Copying {file} to isolation container for guild {message.guild.id}.")
+            PartitionMgr.RootFS.mkdir(f"{getRoot(message.guild.id)}/{file[1]}")
+            PartitionMgr.RootFS.copy(file[0], f"{getRoot(message.guild.id)}/{file[1]}")
+            Journaling.record("INFO", f"Copy of {file} to isolation container for guild {message.guild.id} complete.")
+    except Exception as e:
+        Journaling.record("ERROR", f"Error setting up isolation for guild {message.guild.id}. e: {e}")
+        return False
+    return True
+
+
+def mkIsolation_patchImports(message: DiscordMessageWrapper, patchPath: str, patchPattern: list = None, patchNeglectPattern: str = "#GLOBAL") -> bool:
+    if patchPattern is None:
+        patchPattern = [
+            ("kernel.registry", "kernel.services.DiscordUIService.subsystem.registry"),
+            ("kernel.ipc", "kernel.services.DiscordUIService.subsystem.ipc"),
+            ("kernel.partitionmgr", "kernel.services.DiscordUIService.subsystem.partitionmgr"),
+            ("import commands.", f"import {patchPath.replace('\\', '/').replace('//', '/').replace('/', '.')}.commands."),
+        ]
+
+    def recursiveFileBuild(path: str, l: list) -> list:
+        for element in os.listdir(path):
+            full_path = os.path.join(path, element)
+            if os.path.isdir(full_path):
+                l += recursiveFileBuild(full_path, [])
+            else:
+                l.append(full_path)
+        return l
+
+    filesToPatch = recursiveFileBuild(patchPath, [])
+    for file in filesToPatch:
+        if ".py" not in file:
+            continue
+        Journaling.record("INFO", f"Patching: {file}")
+        with open(file, "r") as f:
+            content = f.read()
+        for line in content.split("\n"):
+            if patchNeglectPattern in line:
+                continue
+            for pattern in patchPattern:
+                content = content.replace(pattern[0], pattern[1])
+        with open(file, "w") as f:
+            f.write(content)
+        Journaling.record("INFO", f"Patched: {file}")
+    Journaling.record("INFO", f"File patching complete for guild {message.guild.id}.")
+
+
 def mkIsolation(message: DiscordMessageWrapper) -> bool:
     try:
         # Setup isolation environment
@@ -102,47 +151,12 @@ def mkIsolation(message: DiscordMessageWrapper) -> bool:
         filesToCopy = [
             ("commands", "commands"),
         ]
-        for file in filesToCopy:
-            Journaling.record("INFO", f"Copying {file} to isolation container for guild {message.guild.id}.")
-            PartitionMgr.RootFS.mkdir(f"{getRoot(message.guild.id)}/{file[1]}")
-            PartitionMgr.RootFS.copy(file[0], f"{getRoot(message.guild.id)}/{file[1]}")
-            Journaling.record("INFO", f"Copy of {file} to isolation container for guild {message.guild.id} complete.")
+        Journaling.record("INFO", f"Copying files to isolation container for guild {message.guild.id}.")
+        mkIsolation_sync(message, filesToCopy)
 
         # File patches
         Journaling.record("INFO", f"Patching files in isolation container for guild {message.guild.id}.")
-        patchPattern = [
-            ("kernel.registry", "kernel.services.DiscordUIService.subsystem.registry"),
-            ("kernel.ipc", "kernel.services.DiscordUIService.subsystem.ipc"),
-            ("kernel.partitionmgr", "kernel.services.DiscordUIService.subsystem.partitionmgr"),
-            ("import commands.", f"import {getRoot(message.guild.id).replace('\\', '/').replace('//', '/').replace('/', '.')}.commands."),
-        ]
-        patchNeglectPattern = "#@GLOBAL"
-
-        def recursiveFileBuild(path: str, l: list) -> list:
-            for element in os.listdir(path):
-                full_path = os.path.join(path, element)
-                if os.path.isdir(full_path):
-                    l += recursiveFileBuild(full_path, [])
-                else:
-                    l.append(full_path)
-            return l
-
-        filesToPatch = recursiveFileBuild(getRoot(message.guild.id), [])
-        for file in filesToPatch:
-            if ".py" not in file:
-                continue
-            Journaling.record("INFO", f"Patching: {file}")
-            with open(file, "r") as f:
-                content = f.read()
-            for line in content.split("\n"):
-                if patchNeglectPattern in line:
-                    continue
-                for pattern in patchPattern:
-                    content = content.replace(pattern[0], pattern[1])
-            with open(file, "w") as f:
-                f.write(content)
-            Journaling.record("INFO", f"Patched: {file}")
-        Journaling.record("INFO", f"File patching complete for guild {message.guild.id}.")
+        mkIsolation_patchImports(message, getRoot(message.guild.id))
 
         dirsToCreate = [
             "storage",

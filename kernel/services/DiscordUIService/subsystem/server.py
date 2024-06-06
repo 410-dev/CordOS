@@ -14,7 +14,9 @@ def getContainer(message = None) -> str:
             Journaling.record("WARNING", f"Isolation not available for guild {message.guild.id}.")
             return Isolation.getContainerPath(message, "server.json")
         return None
-    container += "servers.json"
+    if not container.endswith("/"):
+        container += "/"
+    container += "server.json"
     Journaling.record("INFO", f"Server container path: {container}")
     return container
 
