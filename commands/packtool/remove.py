@@ -2,6 +2,7 @@ import kernel.io as IO
 import kernel.partitionmgr as PartitionManager
 import kernel.journaling as Journaling
 import commands.packtool.database as database
+import commands.packtool.spec as Spec
 import json
 
 
@@ -35,7 +36,7 @@ def removeTask(uid: str, ignoreDependencies: bool, removeAsChain: bool, data: di
         if specPath.endswith(f"{uid}.json"):
             with open(specPath, "r") as f:
                 spec = json.loads(f.read())
-                if not spec.validateSpec(spec):
+                if not Spec.validateSpec(spec):
                     return False, "VALIDATE_SPEC", f"Spec {uid} is not valid", data
                 targetSpec = spec
 
