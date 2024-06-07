@@ -25,7 +25,7 @@ def getIsolationAvailable(message: DiscordMessageWrapper) -> bool:
             Journaling.record("INFO", f"Isolation setup completed for guild {message.guild.id}.")
             return True
 
-    Journaling.record("INFO", f"Isolation setup for guild {message.guild.id}.")
+    Journaling.record("INFO", f"Loading isolation configuration for guild {message.guild.id}.")
     declaration = json.loads(PartitionMgr.RootFS.read(f"{getRoot(message.guild.id)}/isolation.json"))
     return declaration["isolation"]
 

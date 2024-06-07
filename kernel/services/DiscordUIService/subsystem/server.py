@@ -11,8 +11,9 @@ def getContainer(message = None) -> str:
     container = Isolation.getCallerContainerPath()
     if container is None:
         if message is not None:
-            Journaling.record("WARNING", f"Isolation not available for guild {message.guild.id}.")
+            Journaling.record("INFO", f"Using generated container path since container is None for {message.guild.id}.")
             return Isolation.getContainerPath(message, "server.json")
+        Journaling.record("WARNING", "Container path is None while message object is also none.")
         return None
     if not container.endswith("/"):
         container += "/"
